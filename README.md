@@ -39,5 +39,13 @@ Now instead of using an actual tree, imagine that you could do this on JSON. ***
 ## Implications: this is a brand new branch of metaprogramming and an entirely ***new programming paradigm***.
 - Currently, tree adjunction grammars are primarily theoretical and have yet to be implemented as first-class features of a programming language
 - Tree adjunction grammars are also mainly used for NLP to generate a tree from a sentence. Mine uses the principles to take an initial tree to some terminal tree based on the rules
-- I have not found any examples of tree grammars or tree automata being used as the basis for a programming language. However if you know of any, I would love to learn more. Feel free to email me. My AndrewID is ***zkieda***, an ***alumni cmu edu**.
+- I have not found any examples of tree grammars or tree automata being used as the basis for a programming language. However if you know of any, I would love to learn more. Feel free to email me. My AndrewID is ***zkieda***, and I'm an ***alumni cmu edu***.
+
+## Practical Implications
+- This is a really useful tool to define advanced properties files for your java program and know it isn't turing complete
+- This is also very useful for playing around with data, functionality, and even some scripting without having to restart your java program
+  - Use case example: sync a visualization to a piece of music. You may define sections, filters, and data to define how a visualization will occur through time. Updating individual nodes will restart the visualization and music to that particular time for rapid testing and modifications
+ 
+## Future improvements: JTag
+Convert a JSON file to a valid subset of the ProTag abstract syntax tree, so JSON may be processed and self-generating in the same manner without turing completeness, and without using my bespoke DSL.
   
