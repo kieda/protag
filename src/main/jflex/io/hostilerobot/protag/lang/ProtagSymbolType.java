@@ -29,7 +29,9 @@ public enum ProtagSymbolType {
     PRECEDENCE_END(")"),
     PAIR_SEP("="),
     TRANSITION_SEP_L("<-"),
-    TRANSITION_SEP_R("->");
+    TRANSITION_SEP_R("->"),
+    BAD_CHARACTER(),
+    ERROR_ELEMENT();
     private final String tokenSymbol;
     private final boolean isFixed;
     ProtagSymbolType() {

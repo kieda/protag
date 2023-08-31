@@ -1,8 +1,10 @@
 package io.hostilerobot.protag.lang;
 
+import java.io.Reader;
 import java.util.ArrayDeque;import java.util.Deque;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.ComplexSymbolFactory;
+import static io.hostilerobot.protag.lang.ProtagSymbolType.*;
 
 %%
 %public
@@ -10,6 +12,7 @@ import java_cup.runtime.ComplexSymbolFactory;
 %unicode
 %cupsym ProtagSymbols
 %extends ProtagSymbols
+
 //%type IElementType
 %cup
 %char
@@ -18,15 +21,23 @@ import java_cup.runtime.ComplexSymbolFactory;
 %{
 StringBuffer current = new StringBuffer();
 ComplexSymbolFactory symbolFactory;
-public ProtagLexer(java.io.Reader in, ComplexSymbolFactory sf) {
+public ProtagLexer(Reader in, ComplexSymbolFactory sf) {
     this(in);
     this.symbolFactory = sf;
 }
 
+private ProtagSymbol.Location currentLocation() {
+    return new ProtagSymbol.Location(yyline, yycolumn, (int)yychar);
+}
+
 // ProtagTokenType x Location -> Symbol
 // ProtagTokenType x String x Location
-private Symbol symbol( ProtagSymbolType tokenType, CharSequence payload ) {
-
+private ProtagSymbol symbol( ProtagSymbolType tokenType ) {
+    if(tokenType.isFixed()) {
+        return new FixedProtagSymbol(type, currentLocation());
+    } else {
+        return new StringProtagSymbol(type, yytext(), currentLocation());
+    }
 }
 
 enum PathContext{
@@ -34,7 +45,7 @@ enum PathContext{
       BASE(YYINITIAL, YYINITIAL),
       FILE(AFTER_SLASH, BEFORE_SLASH),
       JAVA(AFTER_JSCOPE, BEFORE_JSCOPE),
-      YAPPING(AFTER_YSCOPE, BEFORE_YSCOPE);
+      PROTAG(AFTER_PSCOPE, BEFORE_PSCOPE);
       private final int fallback;
       private final int initialState;
       PathContext(int initialState, int fallback) {
@@ -44,7 +55,7 @@ enum PathContext{
 }
 // we want to handle java paths !com.user.Plugin
 // different from file paths @file/user/pugin.yap
-// different from YAPPING paths { ... }.my-value.3.length
+// different from PROTAG paths { ... }.my-value.3.length
 private Deque<PathContext> context = new ArrayDeque<>();
 {
   // top level is all BASE
@@ -62,13 +73,13 @@ private String getStateName(int state) {
     switch(state) {
         case AFTER_JSCOPE: return "AFTER_JSCOPE";
         case AFTER_SLASH: return "AFTER_SLASH";
-        case AFTER_YSCOPE: return "AFTER_YSCOPE";
+        case AFTER_PSCOPE: return "AFTER_PSCOPE";
         case BEFORE_JSCOPE: return "BEFORE_JSCOPE";
         case BEFORE_SLASH: return "BEFORE_SLASH";
-        case BEFORE_YSCOPE: return "BEFORE_YSCOPE";
+        case BEFORE_PSCOPE: return "BEFORE_PSCOPE";
         case PENDING_JSCOPE: return "PENDING_JSCOPE";
         case PENDING_SLASH: return "PENDING_SLASH";
-        case PENDING_YSCOPE: return "PENDING_YSCOPE";
+        case PENDING_PSCOPE: return "PENDING_PSCOPE";
         case LITERAL: return "LITERAL";
         case REGEX: return "REGEX";
         case REGEX_CLASS: return "REGEX_CLASS";
@@ -108,7 +119,7 @@ private void encounterJavaPath() {
 private void encounterRegexSegment() {
     debugCurrentState("START encounterRegexSegment");
     endTransition();
-    context.push(PathContext.YAPPING);
+    context.push(PathContext.PROTAG);
     yybegin(REGEX);
     debugCurrentState("END encounterRegexSegment");
 }
@@ -118,7 +129,7 @@ private void encounterRegexSegment() {
 private void encounterLiteralSegment() {
     debugCurrentState("START encounterLiteralSegment");
     endTransition();
-    context.push(PathContext.YAPPING);
+    context.push(PathContext.PROTAG);
     yybegin(LITERAL);
     debugCurrentState("END encounterLiteralSegment");
 }
@@ -140,12 +151,12 @@ private void encounterOpenSegment() {
 //      ^
 // !asdf asdf
 //       ^
-private void encounterYappingPath() {
-    debugCurrentState("START encounterYappingPath");
+private void encounterProTagPath() {
+    debugCurrentState("START encounterProTagPath");
     endTransition();
-    context.push(PathContext.YAPPING);
-    yybegin(PathContext.YAPPING.fallback);
-    debugCurrentState("END encounterYappingPath");
+    context.push(PathContext.PROTAG);
+    yybegin(PathContext.PROTAG.fallback);
+    debugCurrentState("END encounterProTagPath");
 }
 
 // !asdf=asdf
@@ -217,11 +228,11 @@ private void closeCurrentSegment() {
         if(context.size() > 1) {
             context.pop();
         }
-        yybegin(PathContext.YAPPING.fallback);
+        yybegin(PathContext.PROTAG.fallback);
     }
     // todo - should we throw if we encounter mismatched segments?
     //        ex: asdf)asdf
-    //        currently we just fall back to YAPPING and let the parser deal with it
+    //        currently we just fall back to PROTAG and let the parser deal with it
     debugCurrentState("END closeCurrentSegment");
 }
 
@@ -252,14 +263,14 @@ FNAME_ENDARROW = ({FNAMECHAR}+){TRANSITION_SEP_R}
 //({FNAMECHAR}|(\-({FNAMECHAR}|\-)))+ (!(!\-|{TRANSITION_SEP_R}))?
 // !{FNAMECHAR} = a [\/\"\`\!\@\r\n\t\f\-\ \#\[\]\(\)\{\}\<\>] [^]*
 //
-YBODYCHAR      = //[[{FNAMECHAR}] && [^\&\+\'\$\|\~\*\^\%\\\?\%\.]]
+PBODYCHAR      = //[[{FNAMECHAR}] && [^\&\+\'\$\|\~\*\^\%\\\?\%\.]]
     [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.]
-YFIRSTCHAR     = //[{YFIRSTCHAR} && [^0-9]]
+PFIRSTCHAR     = //[{YFIRSTCHAR} && [^0-9]]
     [^\/\"\`\!\@\,\r\n\t\f\=\-\:\;\ \#\[\]\(\)\{\}\<\>\&\+\'\$\|\~\*\^\%\\\?\%\.0-9]
 //YFIRSTCHAR     = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\+\;\|\=\,\~\*\^\%\\\?\%\.[0-9]]
-//YBODYCHAR      = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.]
-YBODY          = ({YBODYCHAR}|(\-{YFIRSTCHAR}))+    // asdf10hij maker-space10 10-asdf
-YNAME          = {YFIRSTCHAR}(({YBODYCHAR}|(\-{YFIRSTCHAR}))*) // sadfasdf asdf10 x10-asdf
+//PBODYCHAR      = [^\/\"\'\`\!\@\r\n\t\f\ \#\[\]\(\)\{\}\<\>\:\&\-\+\;\|\=\,\~\*\^\%\\\?\%\.]
+PBODY          = ({PBODYCHAR}|(\-{PFIRSTCHAR}))+    // asdf10hij maker-space10 10-asdf
+PNAME          = {PFIRSTCHAR}(({PBODYCHAR}|(\-{PFIRSTCHAR}))*) // sadfasdf asdf10 x10-asdf
 PLUS=\+
 MINUS=\-
 DOT=\.
@@ -286,14 +297,14 @@ TRANSITION_SEP_R="->"
 %state REGEX_CLASS
 %state BEFORE_SLASH, AFTER_SLASH, PENDING_SLASH
 %state BEFORE_JSCOPE, AFTER_JSCOPE, PENDING_JSCOPE
-%state BEFORE_YSCOPE, AFTER_YSCOPE, PENDING_YSCOPE
+%state BEFORE_PSCOPE, AFTER_PSCOPE, PENDING_PSCOPE
 
 %%
 
 // we have found a new identifier.
 
 // DEFAULT 1: new identifier stops previous path
-<PENDING_SLASH, PENDING_JSCOPE, PENDING_YSCOPE> {
+<PENDING_SLASH, PENDING_JSCOPE, PENDING_PSCOPE> {
     {LITERAL_QUOTE}                                 {
                                                         // we are encountering a new literal
                                                         encounterLiteralSegment();
@@ -301,85 +312,85 @@ TRANSITION_SEP_R="->"
     {REGEX_QUOTE}                                   {
                                                         encounterRegexSegment();
                                                     }
-    {YNAME}                                         {
-                                                        encounterYappingPath();
-                                                        return YappingTypes.YNAME;
+    {PNAME}                                         {
+                                                        encounterProTagPath();
+                                                        return symbol(PNAME);
                                                     }
     {NATURAL}                                       {
-                                                        encounterYappingPath();
-                                                        return YappingTypes.NATURAL;
+                                                        encounterProTagPath();
+                                                        return symbol(NATURAL);
                                                     }
     {MAP_START}                                     {
                                                         encounterOpenSegment();
-                                                        return YappingTypes.MAP_START;
+                                                        return symbol(MAP_START);
                                                     }
     {MAP_END}                                       {
                                                         closeCurrentSegment();
-                                                        return YappingTypes.MAP_END;
+                                                        return symbol(MAP_END);
                                                     }
     {LIST_START}                                    {
                                                         encounterOpenSegment();
-                                                        return YappingTypes.LIST_START;
+                                                        return symbol(LIST_START);
                                                     }
     {LIST_END}                                      {
                                                         closeCurrentSegment();
-                                                        return YappingTypes.LIST_END;
+                                                        return symbol(LIST_END);
                                                     }
     {PRECEDENCE_START}                              {
                                                         encounterOpenSegment();
-                                                        return YappingTypes.PRECEDENCE_START;
+                                                        return symbol(PRECEDENCE_START);
                                                     }
     {PRECEDENCE_END}                                {
                                                         closeCurrentSegment();
-                                                        return YappingTypes.PRECEDENCE_END;
+                                                        return symbol(PRECEDENCE_END);
                                                     }
 }
 
 // DEFAULT 2: new java|file path stops previous path
 //            and binary operators: items that may end the current path
-<YYINITIAL, PENDING_SLASH, PENDING_JSCOPE, PENDING_YSCOPE, BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_YSCOPE> {
+<YYINITIAL, PENDING_SLASH, PENDING_JSCOPE, PENDING_PSCOPE, BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_PSCOPE> {
     {FPATH_START}                                   {
                                                         /* fall back to BEFORE_SLASH when we're done parsing regex or literal */
                                                         encounterFilePath();
-                                                        return YappingTypes.FPATH_START;
+                                                        return symbol(FPATH_START);
                                                     }
     {JPATH_START}                                   {
                                                         encounterJavaPath();
-                                                        return YappingTypes.JPATH_START;
+                                                        return symbol(JPATH_START);
                                                     }
     {TRANSITION_SEP_L}                              {
                                                         endCurrentPath();
-                                                        return YappingTypes.TRANSITION_SEP_L;
+                                                        return symbol(TRANSITION_SEP_L);
                                                     }
     {TRANSITION_SEP_R}                              {
                                                         endCurrentPath();
-                                                        return YappingTypes.TRANSITION_SEP_R;
+                                                        return symbol(TRANSITION_SEP_R);
                                                     }
     {PAIR_SEP}                                      {
                                                         endCurrentPath();
-                                                        return YappingTypes.PAIR_SEP;
+                                                        return symbol(PAIR_SEP);
                                                     }
     {LIST_SEP}                                      {
                                                         endCurrentPath();
-                                                        return YappingTypes.LIST_SEP;
+                                                        return symbol(LIST_SEP);
                                                     }
     {PROPERTY_SEP}                                  {
                                                         endCurrentPath();
-                                                        return YappingTypes.PROPERTY_SEP;
+                                                        return symbol(PROPERTY_SEP);
                                                     }
 }
 // DEFAULT 3: whitespace, comments, etc in yapping context
 <YYINITIAL> {
-    {COMMENT}                                       { return YappingTypes.COMMENT; }
-    {WHITESPACE}                                    { return YappingTypes.WHITESPACE; }
+    {COMMENT}                                       { return symbol(COMMENT); }
+    {WHITESPACE}                                    { return symbol(WHITESPACE); }
     // parts in yapping paths
-    {YNAME}                                         {
-                                                        encounterYappingPath();
-                                                        return YappingTypes.YNAME;
+    {PNAME}                                         {
+                                                        encounterProTagPath();
+                                                        return symbol(PNAME);
                                                     }
     {NATURAL}                                       {
-                                                        encounterYappingPath();
-                                                        return YappingTypes.NATURAL;
+                                                        encounterProTagPath();
+                                                        return symbol(NATURAL);
                                                     }
 
     {REGEX_QUOTE}                                   {
@@ -390,111 +401,111 @@ TRANSITION_SEP_R="->"
                                                         encounterLiteralSegment();
                                                     }
 
-    {DOT}                                           { return YappingTypes.DOT; }
-    {SLASH}                                         { return YappingTypes.SLASH; }
+    {DOT}                                           { return symbol(DOT); }
+    {SLASH}                                         { return symbol(SLASH); }
 }
 // DEFAULT 4: items in a path that can be followed by . or /
-<YYINITIAL, BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_YSCOPE, AFTER_JSCOPE, AFTER_SLASH, AFTER_YSCOPE> {
+<YYINITIAL, BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_PSCOPE, AFTER_JSCOPE, AFTER_SLASH, AFTER_PSCOPE> {
     {MAP_START}                                     {
                                                         openCurrentSegment();
-                                                        return YappingTypes.MAP_START;
+                                                        return symbol(MAP_START);
                                                     }
     {MAP_END}                                       {
                                                         closeCurrentSegment();
-                                                        return YappingTypes.MAP_END;
+                                                        return symbol(MAP_END);
                                                     }
     {LIST_START}                                    {
                                                         openCurrentSegment();
-                                                        return YappingTypes.LIST_START;
+                                                        return symbol(LIST_START);
                                                     }
     {LIST_END}                                      {
                                                         closeCurrentSegment();
-                                                        return YappingTypes.LIST_END;
+                                                        return symbol(LIST_END);
                                                     }
     {PRECEDENCE_START}                              {
                                                         openCurrentSegment();
-                                                        return YappingTypes.PRECEDENCE_START;
+                                                        return symbol(PRECEDENCE_START);
                                                     }
     {PRECEDENCE_END}                                {
                                                         closeCurrentSegment();
-                                                        return YappingTypes.PRECEDENCE_END;
+                                                        return symbol(PRECEDENCE_END);
                                                     }
 }
-<BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_YSCOPE, AFTER_JSCOPE, AFTER_SLASH, AFTER_YSCOPE> {
+<BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_PSCOPE, AFTER_JSCOPE, AFTER_SLASH, AFTER_PSCOPE> {
     // if have another token that can be used in the path, then use it
     // after REGEX or LITERAL are parsed. Will fall back to BEFORE_(SCOPE|SLASH)
     {REGEX_QUOTE}                                   {yybegin(REGEX);}
     {LITERAL_QUOTE}                                 {yybegin(LITERAL);}
 }
 // DEFAULT 5: items that may be in a file path but not in a java path/yapping path
-<YYINITIAL, BEFORE_YSCOPE, BEFORE_JSCOPE, PENDING_YSCOPE, PENDING_JSCOPE, PENDING_SLASH> {
+<YYINITIAL, BEFORE_PSCOPE, BEFORE_JSCOPE, PENDING_PSCOPE, PENDING_JSCOPE, PENDING_SLASH> {
     {AND}                                           {
                                                         endCurrentPath();
-                                                        return YappingTypes.AND;
+                                                        return symbol(AND);
                                                     }
     {PLUS}                                          {
                                                         endCurrentPath();
-                                                        return YappingTypes.PLUS;
+                                                        return symbol(PLUS);
                                                     }
     {MINUS}                                         {
                                                         endCurrentPath();
-                                                        return YappingTypes.MINUS;
+                                                        return symbol(MINUS);
                                                     }
 }
-<BEFORE_YSCOPE, BEFORE_JSCOPE, PENDING_YSCOPE, PENDING_JSCOPE> {
+<BEFORE_PSCOPE, BEFORE_JSCOPE, PENDING_PSCOPE, PENDING_JSCOPE> {
     {SLASH}                                         {
                                                         endCurrentPath();
-                                                        return YappingTypes.SLASH;
+                                                        return symbol(SLASH);
                                                     }
 }
 
 
 <BEFORE_SLASH> {
     // encounter a file name, state doesn't change.
-    {FNAME}                                         {return YappingTypes.FNAME;}
+    {FNAME}                                         {return symbol(FNAME);}
     {FNAME_ENDARROW}                                {
           yypushback(2);
-          return YappingTypes.FNAME;
+          return symbol(FNAME);
       }
 
     // encountered a slash - we may now have whitespace
-    {SLASH}                                         {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
+    {SLASH}                                         {yybegin(AFTER_SLASH); return symbol(SLASH); }
     // pending slash - if we encounter another / we are still parsing file path. otherwise we are parsing a new item.
-    {COMMENT}                                       {yybegin(PENDING_SLASH); return YappingTypes.COMMENT;}
-    {WHITESPACE}                                    {yybegin(PENDING_SLASH); return YappingTypes.WHITESPACE;}
+    {COMMENT}                                       {yybegin(PENDING_SLASH); return symbol(COMMENT);}
+    {WHITESPACE}                                    {yybegin(PENDING_SLASH); return symbol(WHITESPACE);}
     // other valid tokens are covered in DEFAULT 2
 }
 <BEFORE_JSCOPE> {
-    [:jletterdigit:]+                               {return YappingTypes.JBODY;}
+    [:jletterdigit:]+                               {return symbol(JBODY);}
     // encountered a scope - we may now have whitespace
-    {DOT}                                           {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
+    {DOT}                                           {yybegin(AFTER_JSCOPE); return symbol(DOT); }
     // pending slash - if we encounter another / we are still parsing file path. otherwise we are parsing a new item.
-    {COMMENT}                                       {yybegin(PENDING_JSCOPE); return YappingTypes.COMMENT;}
-    {WHITESPACE}                                    {yybegin(PENDING_JSCOPE); return YappingTypes.WHITESPACE;}
+    {COMMENT}                                       {yybegin(PENDING_JSCOPE); return symbol(COMMENT);}
+    {WHITESPACE}                                    {yybegin(PENDING_JSCOPE); return symbol(WHITESPACE);}
     // other valid tokens are covered in DEFAULT 2
 }
-<BEFORE_YSCOPE> {
-    {NATURAL}                                       {return YappingTypes.NATURAL;}
-    {YBODY}                                         {return YappingTypes.YBODY;}
+<BEFORE_PSCOPE> {
+    {NATURAL}                                       {return symbol(NATURAL);}
+    {PBODY}                                         {return symbol(PBODY);}
 
-    {DOT}                                           {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
+    {DOT}                                           {yybegin(AFTER_PSCOPE); return symbol(DOT); }
 
-    {COMMENT}                                       {yybegin(PENDING_YSCOPE); return YappingTypes.COMMENT; }
-    {WHITESPACE}                                    {yybegin(PENDING_YSCOPE); return YappingTypes.WHITESPACE; }
+    {COMMENT}                                       {yybegin(PENDING_PSCOPE); return symbol(COMMENT); }
+    {WHITESPACE}                                    {yybegin(PENDING_PSCOPE); return symbol(WHITESPACE); }
 }
-<AFTER_SLASH, AFTER_JSCOPE, AFTER_YSCOPE, PENDING_JSCOPE, PENDING_SLASH, PENDING_YSCOPE> {
+<AFTER_SLASH, AFTER_JSCOPE, AFTER_PSCOPE, PENDING_JSCOPE, PENDING_SLASH, PENDING_PSCOPE> {
     // after or pending a scope separator: comments and or whitespace will stay in the same state
-    {WHITESPACE}                                    {return YappingTypes.WHITESPACE;}
-    {COMMENT}                                       {return YappingTypes.COMMENT;}
+    {WHITESPACE}                                    {return symbol(WHITESPACE);}
+    {COMMENT}                                       {return symbol(COMMENT);}
 }
 <AFTER_SLASH> {
     // file//asdf is fine
-    {SLASH}                                         {return YappingTypes.SLASH;}
-    {FNAME}                                         {yybegin(BEFORE_SLASH); return YappingTypes.FNAME;}
+    {SLASH}                                         {return symbol(SLASH);}
+    {FNAME}                                         {yybegin(BEFORE_SLASH); return symbol(FNAME);}
     {FNAME_ENDARROW}                                {
           yypushback(2);
           yybegin(BEFORE_SLASH);
-          return YappingTypes.FNAME;
+          return symbol(FNAME);
       }
     // however we do require a name at the end, a dangling / is invalid (and can cause confusion)
     // e.g.        @my/folder/
@@ -505,23 +516,23 @@ TRANSITION_SEP_R="->"
     // identifier.. is not valid
     //{SCOPE}                                         {return TokenType.BAD_CHARACTER;}
     // after jscope first char should be a jletter (or regex/literal)
-    [:jletter:][:jletterdigit:]*                    {yybegin(BEFORE_JSCOPE); return YappingTypes.JNAME;}
+    [:jletter:][:jletterdigit:]*                    {yybegin(BEFORE_JSCOPE); return symbol(JNAME);}
     // everything else is treated as a bad character, cannot have a java path that ends in '.'
 }
-<AFTER_YSCOPE> {
-    {YNAME}                                         {yybegin(BEFORE_YSCOPE); return YappingTypes.YNAME;}
-    {NATURAL}                                       {yybegin(BEFORE_YSCOPE); return YappingTypes.NATURAL;}
+<AFTER_PSCOPE> {
+    {PNAME}                                         {yybegin(BEFORE_PSCOPE); return symbol(PNAME);}
+    {NATURAL}                                       {yybegin(BEFORE_PSCOPE); return symbol(NATURAL);}
 }
 <PENDING_SLASH> {
     // before a path separator, comments and whitespaces separate to next item
-    {SLASH}                                         {yybegin(AFTER_SLASH); return YappingTypes.SLASH; }
+    {SLASH}                                         {yybegin(AFTER_SLASH); return symbol(SLASH); }
     // other valid tokens are covered in DEFAULT 1
 }
 <PENDING_JSCOPE> {
-    {DOT}                                           {yybegin(AFTER_JSCOPE); return YappingTypes.DOT; }
+    {DOT}                                           {yybegin(AFTER_JSCOPE); return symbol(DOT); }
 }
-<PENDING_YSCOPE> {
-    {DOT}                                           {yybegin(AFTER_YSCOPE); return YappingTypes.DOT; }
+<PENDING_PSCOPE> {
+    {DOT}                                           {yybegin(AFTER_PSCOPE); return symbol(DOT); }
 }
 <LITERAL> {
     // escaped quote in string
@@ -529,7 +540,7 @@ TRANSITION_SEP_R="->"
     // end of quote
     {LITERAL_QUOTE}                                 {
                                                         yybegin(getCurrentFallback());
-                                                        return YappingTypes.LITERAL;
+                                                        return symbol(LITERAL);
                                                     }
     // body: everything except " and \
     [^\"\\]+                                        {}
@@ -543,12 +554,12 @@ TRANSITION_SEP_R="->"
     \\\[                                            { yybegin(REGEX); }
     \[                                              { yybegin(REGEX_CLASS); }
     // end of regex, transition back to INITIAL
-    {REGEX_QUOTE}                                   { yybegin(getCurrentFallback()); return YappingTypes.REGEX; }
+    {REGEX_QUOTE}                                   { yybegin(getCurrentFallback()); return symbol(REGEX); }
     // body: everything except `, \, and [
     [^\\\`\[]+                                      {}
     // body: everything \. except \` and \[
     \\[^\`\[]                                       {}
-    <<EOF>>                                         { reset(); return TokenType.ERROR_ELEMENT; }
+    <<EOF>>                                         { reset(); return symbol(ERROR_ELEMENT); }
 }
 <REGEX_CLASS> {
     // escaped end of char class
@@ -559,8 +570,8 @@ TRANSITION_SEP_R="->"
     [^\\\]]+                                        {}
     // body: everything \. except \]
     \\[^\]]                                         {}
-    <<EOF>>                                         { reset(); return TokenType.ERROR_ELEMENT; }
+    <<EOF>>                                         { reset(); return symbol(ERROR_ELEMENT); }
 }
 
-[^]                                                 { return TokenType.BAD_CHARACTER; }
+[^]                                                 { return symbol(BAD_CHARACTER); }
 
