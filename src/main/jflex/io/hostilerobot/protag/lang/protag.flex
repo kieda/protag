@@ -1,12 +1,8 @@
 package io.hostilerobot.protag.lang;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.TokenType;
-
-import java.nio.file.Path;import java.util.ArrayDeque;import java.util.Deque;
+import java.util.ArrayDeque;import java.util.Deque;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.ComplexSymbolFactory;
-import java_cup.runtime.ComplexSymbolFactory.Location;
 
 %%
 %public
@@ -20,6 +16,18 @@ import java_cup.runtime.ComplexSymbolFactory.Location;
 %line
 %column
 %{
+StringBuffer current = new StringBuffer();
+ComplexSymbolFactory symbolFactory;
+public ProtagLexer(java.io.Reader in, ComplexSymbolFactory sf) {
+    this(in);
+    this.symbolFactory = sf;
+}
+
+// ProtagTokenType x Location -> Symbol
+// ProtagTokenType x String x Location
+private Symbol symbol( ProtagSymbolType tokenType, CharSequence payload ) {
+
+}
 
 enum PathContext{
       // base is used when we're not actively in a yapping segment.
