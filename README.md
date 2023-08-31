@@ -15,7 +15,7 @@ Now instead of using an actual tree, imagine that you could do this on JSON. ***
 ## In three words: *A new paradigm*.
 
 ### Ok, what does this *really* mean?
-- ***homoiconic:*** every valid structure is data. The base file, when read, is a tree much like JSON
+- ***homoiconic:*** every valid structure is data. The base file is just a tree much like JSON
 - ***property language:*** like JSON, we may read the file as just a tree structure. Or, we may specify adjunctions/replacements/macros so the tree produces itself, much like a lisp macro
 - ***restricted:*** the user may specify the complexity of the automoton that processes the file. May be turing complete or non-turing complete.
   - `TYPE-0` is turing complete, we place no restrictions on the tree grammar
