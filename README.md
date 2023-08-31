@@ -8,7 +8,8 @@
 > Here's an example instruction: whenever you encounter a pear branch followed by two orange branches, replace that with an apple branch followed by an orange branch.
 > 
 > How long will your arborist take to execute your instructions? Will it be *fast* or *slow* based on the initial size of your tree? Or will your arborist continue replacing branches *forever*? Or is it *undecidable* if they will ever stop?
-The key is in ***restricting the valid set of potential instructions*** you may give your arborist so you can guarantee that they will complete the job.
+>
+> The key is in ***restricting*** the ***valid set of instructions*** you may give your arborist so you can mathematically guarantee they will complete the job.
 
 Now instead of using an actual tree, imagine that you could do this on JSON. ***This is the basis of ProTag.***
 ## In three words: *A new paradigm*.
