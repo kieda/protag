@@ -1,30 +1,21 @@
 package io.hostilerobot.protag.lang;
 
-import java.io.Reader;
 import java.util.ArrayDeque;import java.util.Deque;
-import java_cup.runtime.Symbol;
-import java_cup.runtime.ComplexSymbolFactory;
-import static io.hostilerobot.protag.lang.ProtagSymbolType.*;
+import static io.hostilerobot.protag.lang.ProtagTokenType.*;
 
 %%
 %public
 %class ProtagLexer
 %unicode
 %cupsym ProtagSymbols
-%extends ProtagSymbols
-
-//%type IElementType
+//%extends ProtagSymbols
+%type ProtagSymbol
 %cup
 %char
 %line
 %column
 %{
-StringBuffer current = new StringBuffer();
-ComplexSymbolFactory symbolFactory;
-public ProtagLexer(Reader in, ComplexSymbolFactory sf) {
-    this(in);
-    this.symbolFactory = sf;
-}
+// StringBuilder current = new StringBuilder();
 
 private ProtagSymbol.Location currentLocation() {
     return new ProtagSymbol.Location(yyline, yycolumn, (int)yychar);
@@ -32,8 +23,8 @@ private ProtagSymbol.Location currentLocation() {
 
 // ProtagTokenType x Location -> Symbol
 // ProtagTokenType x String x Location
-private ProtagSymbol symbol( ProtagSymbolType tokenType ) {
-    if(tokenType.isFixed()) {
+private ProtagSymbol symbol( ProtagTokenType type ) {
+    if(type.isFixed()) {
         return new FixedProtagSymbol(type, currentLocation());
     } else {
         return new StringProtagSymbol(type, yytext(), currentLocation());
@@ -63,7 +54,7 @@ private Deque<PathContext> context = new ArrayDeque<>();
   context.push(PathContext.BASE);
 }
 
-private void reset() {
+public void reset() {
     context.clear();
     context.push(PathContext.BASE);
     yybegin(YYINITIAL);
@@ -80,8 +71,8 @@ private String getStateName(int state) {
         case PENDING_JSCOPE: return "PENDING_JSCOPE";
         case PENDING_SLASH: return "PENDING_SLASH";
         case PENDING_PSCOPE: return "PENDING_PSCOPE";
-        case LITERAL: return "LITERAL";
-        case REGEX: return "REGEX";
+        case LITERAL_STATE: return "LITERAL";
+        case REGEX_STATE: return "REGEX";
         case REGEX_CLASS: return "REGEX_CLASS";
         case YYINITIAL: return "YYINITIAL";
         default: return "ERROR_UNKNOWN_STATE";
@@ -120,7 +111,7 @@ private void encounterRegexSegment() {
     debugCurrentState("START encounterRegexSegment");
     endTransition();
     context.push(PathContext.PROTAG);
-    yybegin(REGEX);
+    yybegin(REGEX_STATE);
     debugCurrentState("END encounterRegexSegment");
 }
 // new path that starts with a literal
@@ -130,7 +121,7 @@ private void encounterLiteralSegment() {
     debugCurrentState("START encounterLiteralSegment");
     endTransition();
     context.push(PathContext.PROTAG);
-    yybegin(LITERAL);
+    yybegin(LITERAL_STATE);
     debugCurrentState("END encounterLiteralSegment");
 }
 
@@ -241,8 +232,9 @@ private static String zzToPrintable(CharSequence cs) {
 }
 %}
 
-%eof{  return;
-%eof}
+%eofval{
+    return symbol(EOF);
+%eofval}
 LineTerminator = \r|\n|\r\n
 //InputCharacter = [^\r\n\t\f\ \#]
 WHITESPACE     = ({LineTerminator} | [ \t\f])+
@@ -292,8 +284,8 @@ LITERAL_QUOTE=\"
 REGEX_QUOTE=\`
 TRANSITION_SEP_L="<-"
 TRANSITION_SEP_R="->"
-%state LITERAL
-%state REGEX
+%state LITERAL_STATE
+%state REGEX_STATE
 %state REGEX_CLASS
 %state BEFORE_SLASH, AFTER_SLASH, PENDING_SLASH
 %state BEFORE_JSCOPE, AFTER_JSCOPE, PENDING_JSCOPE
@@ -434,8 +426,8 @@ TRANSITION_SEP_R="->"
 <BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_PSCOPE, AFTER_JSCOPE, AFTER_SLASH, AFTER_PSCOPE> {
     // if have another token that can be used in the path, then use it
     // after REGEX or LITERAL are parsed. Will fall back to BEFORE_(SCOPE|SLASH)
-    {REGEX_QUOTE}                                   {yybegin(REGEX);}
-    {LITERAL_QUOTE}                                 {yybegin(LITERAL);}
+    {REGEX_QUOTE}                                   {yybegin(REGEX_STATE);}
+    {LITERAL_QUOTE}                                 {yybegin(LITERAL_STATE);}
 }
 // DEFAULT 5: items that may be in a file path but not in a java path/yapping path
 <YYINITIAL, BEFORE_PSCOPE, BEFORE_JSCOPE, PENDING_PSCOPE, PENDING_JSCOPE, PENDING_SLASH> {
@@ -534,24 +526,24 @@ TRANSITION_SEP_R="->"
 <PENDING_PSCOPE> {
     {DOT}                                           {yybegin(AFTER_PSCOPE); return symbol(DOT); }
 }
-<LITERAL> {
+<LITERAL_STATE> {
     // escaped quote in string
     \\\"                                            {}
     // end of quote
     {LITERAL_QUOTE}                                 {
-                                                        yybegin(getCurrentFallback());
-                                                        return symbol(LITERAL);
-                                                    }
+                                                            yybegin(getCurrentFallback());
+                                                            return symbol(LITERAL);
+                                                        }
     // body: everything except " and \
     [^\"\\]+                                        {}
     // body: everything \. except \"
     \\[^\"]                                         {}
-    <<EOF>>                                         { reset(); return TokenType.ERROR_ELEMENT; }
+    <<EOF>>                                         { reset(); return symbol(ERROR_ELEMENT); }
 }
-<REGEX> {
+<REGEX_STATE> {
     // escaped
-    \\\`                                            { yybegin(REGEX); }
-    \\\[                                            { yybegin(REGEX); }
+    \\\`                                            { yybegin(REGEX_STATE); }
+    \\\[                                            { yybegin(REGEX_STATE); }
     \[                                              { yybegin(REGEX_CLASS); }
     // end of regex, transition back to INITIAL
     {REGEX_QUOTE}                                   { yybegin(getCurrentFallback()); return symbol(REGEX); }
@@ -565,7 +557,7 @@ TRANSITION_SEP_R="->"
     // escaped end of char class
     \\\]                                            {}
     // end of char class, transition back to REGEX
-    \]                                              { yybegin(REGEX); }
+    \]                                              { yybegin(REGEX_STATE); }
     // body: everything except ] and \
     [^\\\]]+                                        {}
     // body: everything \. except \]

@@ -1,38 +1,71 @@
 package io.hostilerobot.protag.lang;
 
-public abstract class ProtagSymbol {
+import java_cup.runtime.Symbol;
+
+public abstract class ProtagSymbol extends Symbol {
     // location (start), string length, location (end)
     // String value (?)
     // ProtagTokenType tokenType
-    private final ProtagSymbolType type;
+    private final ProtagTokenType type;
     private final Location start;
-    private Location end = null; // lazy evaluate
-    public ProtagSymbol(ProtagSymbolType type, Location start) {
+    private final Location end;
+
+    public ProtagSymbol(int id, ProtagTokenType type) {
+        super(id);
         this.type = type;
+        start = null;
+        end = null;
+    }
+    public ProtagSymbol(int id, ProtagTokenType type, Object val) {
+        super(id, val);
+        this.type = type;
+        start = null;
+        end = null;
+    }
+    public ProtagSymbol(int id, ProtagTokenType type, Symbol center, Object val) {
+        super(id, center, val);
+        this.type = type;
+        start = null;
+        end = null;
+    }
+    public ProtagSymbol(int id, ProtagTokenType type, Symbol left, Symbol right) {
+        super(id, left, right);
+        this.type = type;
+        start = null;
+        end = null;
+    }
+    public ProtagSymbol(int id, ProtagTokenType type, Symbol left, Symbol right, Object val) {
+        super(id, left, right, val);
+        this.type = type;
+        start = null;
+        end = null;
+    }
+    public ProtagSymbol(int id, ProtagTokenType type, Location start) {
+        this(id, type, start, start.calculateEndLocation(type.getTokenSymbol()), type.getTokenSymbol());
+    }
+    public ProtagSymbol(int id, ProtagTokenType type, Location start, CharSequence symbol) {
+        this(id, type, start, start.calculateEndLocation(symbol), symbol);
+    }
+    private ProtagSymbol(int id, ProtagTokenType type, Location start, Location end, CharSequence symbol) {
+        super(id, start.offset, end.offset, symbol);
+        this.type =  type;
         this.start = start;
+        this.end = end;
     }
 
-    public Location getStart() {
-        return start;
-    }
+    public Location getStart() {return start; }
     public Location getEnd() {
-        if(end == null) {
-            CharSequence symbol = getSymbol();
-            end = start.calculateEndLocation(symbol, symbol.length());
-        }
         return end;
     }
 
     public abstract CharSequence getSymbol();
-    public ProtagSymbolType getType() {
+    public ProtagTokenType getType() {
         return type;
     }
 
     public record Location(int line, int column, int offset) {
-        public Location calculateEndLocation(CharSequence input, int length) {
-            if(input.length() < length) {
-                throw new IllegalArgumentException("Getting location at %d, past %s maximum length".formatted(length, input));
-            }
+        public Location calculateEndLocation(CharSequence input) {
+            int length = input.length();
             int endOffset = offset + length;
             int endLine = line;
             int endColumn = column + length;

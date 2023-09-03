@@ -1,11 +1,11 @@
 package io.hostilerobot.protag.lang;
 
-public enum ProtagSymbolType {
+public enum ProtagTokenType {
     COMMENT(),
     WHITESPACE(),
     REGEX(),
     LITERAL(),
-    YNAME(),
+//    YNAME(),
     JPATH_START("@"),
     DOT("."),
     JNAME(),
@@ -31,18 +31,19 @@ public enum ProtagSymbolType {
     TRANSITION_SEP_L("<-"),
     TRANSITION_SEP_R("->"),
     BAD_CHARACTER(),
-    ERROR_ELEMENT();
+    ERROR_ELEMENT(),
+    EOF(null);
     private final String tokenSymbol;
     private final boolean isFixed;
-    ProtagSymbolType() {
+    ProtagTokenType() {
         this.isFixed = false;
         this.tokenSymbol = null;
     }
-    ProtagSymbolType(String tokenSymbol) {
+    ProtagTokenType(String tokenSymbol) {
         this.isFixed = true;
         this.tokenSymbol = tokenSymbol;
-        if(tokenSymbol == null)
-            throw new NullPointerException("Cannot have null tokenSymbol for fixed type %s".formatted(this));
+//        if(this != ProtagSymbolType.EOF, tokenSymbol == null)
+//            throw new NullPointerException("Cannot have null tokenSymbol for fixed type %s".formatted(this));
 
     }
     public String getTokenSymbol() {

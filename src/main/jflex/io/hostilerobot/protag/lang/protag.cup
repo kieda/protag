@@ -3,11 +3,23 @@ package io.hostilerobot.protag.lang;
 import java.util.*;
 import java.io.*;
 import java_cup.runtime.Symbol;
-import java_cup.runtime.ComplexSymbolFactory.ComplexSymbol;
-import java_cup.runtime.ComplexSymbolFactory.Location;
-import java_cup.runtime.ComplexSymbolFactory;
+import java_cup.runtime.SymbolFactory;
+import io.hostilerobot.protag.lang.ProtagLexer;
+import io.hostilerobot.protag.lang.ProtagSymbol;
+import io.hostilerobot.protag.lang.ProtagTokenType;
 
 parser code {:
     ProtagLexer lexer;
+    ProtagParser(ProtagLexer lex, SymbolFactory sf) {
+        this.lexer = lex;
 
+    }
 :}
+//init with {: lexer.init(); :}
+scan with {: return lexer.next_token(); :}
+
+terminal ProtagSymbol AND, DOT, PLUS, MINUS;
+non terminal vval;
+
+vval ::= AND|DOT;
+
