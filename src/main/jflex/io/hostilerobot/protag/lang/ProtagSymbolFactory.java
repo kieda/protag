@@ -1,45 +1,55 @@
 package io.hostilerobot.protag.lang;
 
-import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.SymbolFactory;
 
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 public class ProtagSymbolFactory implements SymbolFactory {
+    private static Map<String, ProtagTokenType> toEnum = EnumSet.allOf(ProtagTokenType.class).stream()
+            .collect(Collectors.toUnmodifiableMap(ProtagTokenType::name, v -> v));
+
     public static ProtagTokenType getTokenType(String name) {
-        return ProtagTokenType.valueOf(name);
+        ProtagTokenType type = toEnum.get(name);
+        if(type == null) {
+            System.out.printf("NOTE: %s is null\n", name);
+        }
+        return type;
     }
+
     @Override
     public Symbol newSymbol(String name, int id, Symbol left, Symbol right, Object val) {
-        return null;
+        ProtagTokenType tokenType = getTokenType(name);
+        return new ProtagNonTerminalSymbol(id, tokenType, (ProtagSymbol) left, (ProtagSymbol) right, val);
     }
 
     @Override
     public Symbol newSymbol(String name, int id, Symbol left, Symbol right) {
-        return null;
+        return newSymbol(name, id, left, right, null);
     }
 
     @Override
     public Symbol newSymbol(String name, int id, Symbol center, Object val) {
-        return null;
+        ProtagTokenType tokenType = getTokenType(name);
+        return new ProtagNonTerminalSymbol(id, tokenType, (ProtagSymbol) center, val);
     }
 
     @Override
     public Symbol newSymbol(String name, int id, Object val) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Symbol newSymbol(String name, int id) {
-        ProtagTokenType type = getTokenType(name);
-        if(type.isFixed()) {
-            return new FixedProtagSymbol(name, id);
-        }
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Symbol startSymbol(String name, int id, int state) {
-        // zzz constructor with int state is package private for some reason
-        return new ComplexSymbolFactory.ComplexSymbol(name, id, state);
+        return new StartToken(id, name, state);
     }
 }

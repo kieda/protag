@@ -3,11 +3,12 @@ package io.hostilerobot.protag.lang.ast.impl;
 import io.hostilerobot.protag.lang.ast.IProtagSequence;
 import io.hostilerobot.protag.lang.ast.ProtagNode;
 
+import java.util.Deque;
 import java.util.List;
 
-public record ProtagSequence(ProtagNode parent, List<ProtagNode> items) implements IProtagSequence {
+public record ProtagSequence(ProtagNode parent, Deque<ProtagNode> items) implements IProtagSequence {
     @Override
-    public List<ProtagNode> getItems() {
+    public Deque<ProtagNode> getItems() {
         return items;
     }
 

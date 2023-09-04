@@ -5,4 +5,9 @@ public record LProtagName(ProtagNode parent, String name) implements CStringNode
     public ProtagNode getParent() {
         return parent;
     }
+
+    @Override
+    public String getRawValue() {
+        return name;
+    }
 }

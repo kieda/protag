@@ -1,24 +1,28 @@
 package io.hostilerobot.protag.lang;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ProtagTokenType {
+    // terminal string tokens
     COMMENT(),
     WHITESPACE(),
     REGEX(),
     LITERAL(),
-//    YNAME(),
-    JPATH_START("@"),
-    DOT("."),
     JNAME(),
     JBODY(),
-    FPATH_START("!"),
-    SLASH("/"),
     FNAME(),
     NATURAL(),
     PNAME(),
     PBODY(),
+    // terminal special tokens
+    JPATH_START("@"),
+    FPATH_START("!"),
+    DOT("."),
+    SLASH("/"),
     PLUS("+"),
-    MINUS("-"),
-    AND("&"),
+    MINUS( "-"),
+    AND( "&"),
     PROPERTY_SEP(":"),
     MAP_START("{"),
     MAP_END("}"),
@@ -30,21 +34,53 @@ public enum ProtagTokenType {
     PAIR_SEP("="),
     TRANSITION_SEP_L("<-"),
     TRANSITION_SEP_R("->"),
+    // special symbols
     BAD_CHARACTER(),
     ERROR_ELEMENT(),
-    EOF(null);
+    $START(null),
+    EOF(null),
+    // non-terminal symbols
+    ProtagInteger(false),
+    ProtagReal(false),
+    ProtagWhitespace(false),
+    ProtagComment(false)
+
+
+    ;
     private final String tokenSymbol;
     private final boolean isFixed;
+    private final int terminalId;
+    private final boolean isTerminal;
+
+    public int getTerminalId() {
+        return terminalId;
+    }
+
+    private static int getTerminalId(String name) {
+        for(int id = 0; id < ProtagSymbols.terminalNames.length; id++) {
+            if(name.equals(ProtagSymbols.terminalNames[id])) {
+                System.out.printf("name:%s = id:%d\n", name, id);
+                return id;
+            }
+        }
+        System.out.printf("name:%s id unknown\n", name);
+        return -1;
+    }
+
     ProtagTokenType() {
+        this(true);
+    }
+    ProtagTokenType(boolean isTerminal) {
         this.isFixed = false;
         this.tokenSymbol = null;
+        this.isTerminal = isTerminal;
+        this.terminalId = getTerminalId(name());
     }
     ProtagTokenType(String tokenSymbol) {
         this.isFixed = true;
+        this.isTerminal = true;
         this.tokenSymbol = tokenSymbol;
-//        if(this != ProtagSymbolType.EOF, tokenSymbol == null)
-//            throw new NullPointerException("Cannot have null tokenSymbol for fixed type %s".formatted(this));
-
+        this.terminalId = getTerminalId(name());
     }
     public String getTokenSymbol() {
         return tokenSymbol;

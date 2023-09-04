@@ -8,19 +8,23 @@ package io.hostilerobot.protag.lang;
 /** CUP generated interface containing symbol constants. */
 public interface ProtagSymbols {
   /* terminals */
-  public static final int AND = 2;
   public static final int error = 1;
-  public static final int PLUS = 4;
-  public static final int MINUS = 5;
+  public static final int PLUS = 3;
+  public static final int COMMENT = 5;
+  public static final int WHITESPACE = 6;
+  public static final int MINUS = 4;
   public static final int EOF = 0;
-  public static final int DOT = 3;
+  public static final int NATURAL = 7;
+  public static final int DOT = 2;
   public static final String[] terminalNames = new String[] {
   "EOF",
   "error",
-  "AND",
   "DOT",
   "PLUS",
-  "MINUS"
+  "MINUS",
+  "COMMENT",
+  "WHITESPACE",
+  "NATURAL"
   };
 }
 

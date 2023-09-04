@@ -1,11 +1,8 @@
 package io.hostilerobot.protag.lang;
 
-public class FixedProtagSymbol extends ProtagSymbol {
-    public FixedProtagSymbol(int id, ProtagTokenType type) {
-        super(id, type, null);
-    }
-    public FixedProtagSymbol(int id, ProtagTokenType type, Location start) {
-        super(id, type, start);
+public final class ProtagSpecialToken extends ProtagSymbol {
+    public ProtagSpecialToken(ProtagTokenType type, Location start) {
+        super(type.getTerminalId(), type, start, start.calculateEndLocation(type.getTokenSymbol()), null);
         if(!type.isFixed())
             throw new IllegalArgumentException("cannot use non-fixed type %s".formatted(type));
     }

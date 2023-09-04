@@ -1,8 +1,8 @@
 package io.hostilerobot.protag.lang.ast;
 
-import java.util.List;
+import java.util.Deque;
 
 // represents a
 public interface CListLikeNode extends ProtagNode {
-    List<? extends ProtagNode> getItems();
+    Deque<? extends ProtagNode> getItems();
 }

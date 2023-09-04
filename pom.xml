@@ -21,7 +21,6 @@
     <junit.platform.version>1.9.1</junit.platform.version>
     <protag.lang.directory>src/main/jflex</protag.lang.directory>
     <protag.lang.packagefolder>io/hostilerobot/protag/lang</protag.lang.packagefolder>
-    <javacc.sourceDirectory>${protag.lang.directory}/${protag.lang.packagefolder}</javacc.sourceDirectory>
   </properties>
 
   <dependencies>
@@ -97,11 +96,6 @@
       <version>${junit.platform.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>javacc</groupId>
-      <artifactId>javacc</artifactId>
-      <version>4.1</version>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -158,22 +152,6 @@
           <className>ProtagParser</className>
           <symbolsName>ProtagSymbols</symbolsName>
           <cupDefinition>${protag.lang.directory}/${protag.lang.packagefolder}/protag.cup</cupDefinition>
-          <outputDirectory>gen</outputDirectory>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>3.0.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <sourceDirectory>${javacc.sourceDirectory}</sourceDirectory>
           <outputDirectory>gen</outputDirectory>
         </configuration>
       </plugin>

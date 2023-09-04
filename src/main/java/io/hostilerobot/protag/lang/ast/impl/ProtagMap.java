@@ -4,11 +4,12 @@ import io.hostilerobot.protag.lang.ast.CPairLikeNode;
 import io.hostilerobot.protag.lang.ast.IProtagMap;
 import io.hostilerobot.protag.lang.ast.ProtagNode;
 
+import java.util.Deque;
 import java.util.List;
 
-public record ProtagMap(ProtagNode parent, List<CPairLikeNode> mapItems) implements IProtagMap {
+public record ProtagMap(ProtagNode parent, Deque<CPairLikeNode> mapItems) implements IProtagMap {
     @Override
-    public List<CPairLikeNode> getItems() {
+    public Deque<? extends ProtagNode> getItems() {
         return mapItems;
     }
 

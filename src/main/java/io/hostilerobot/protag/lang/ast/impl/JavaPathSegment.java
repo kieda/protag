@@ -3,11 +3,12 @@ package io.hostilerobot.protag.lang.ast.impl;
 import io.hostilerobot.protag.lang.ast.IJavaPathSegment;
 import io.hostilerobot.protag.lang.ast.ProtagNode;
 
+import java.util.Deque;
 import java.util.List;
 
-public record JavaPathSegment(ProtagNode parent, List<ProtagNode> pathSegmentItems) implements IJavaPathSegment {
+public record JavaPathSegment(ProtagNode parent, Deque<ProtagNode> pathSegmentItems) implements IJavaPathSegment {
     @Override
-    public List<ProtagNode> getItems() {
+    public Deque<? extends ProtagNode> getItems() {
         return pathSegmentItems;
     }
 

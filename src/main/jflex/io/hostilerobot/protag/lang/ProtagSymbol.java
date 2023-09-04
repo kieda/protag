@@ -2,7 +2,7 @@ package io.hostilerobot.protag.lang;
 
 import java_cup.runtime.Symbol;
 
-public abstract class ProtagSymbol extends Symbol {
+public sealed abstract class ProtagSymbol extends Symbol permits ProtagSpecialToken, ProtagNonTerminalSymbol, EOFToken, StartToken, ProtagStringToken, ProtagNaturalToken {
     // location (start), string length, location (end)
     // String value (?)
     // ProtagTokenType tokenType
@@ -10,44 +10,17 @@ public abstract class ProtagSymbol extends Symbol {
     private final Location start;
     private final Location end;
 
-    public ProtagSymbol(int id, ProtagTokenType type) {
+//  *** Constructor: Special Symbols (START) ***
+    protected ProtagSymbol(int id, ProtagTokenType type, int state) {
         super(id);
+        super.parse_state = state;
         this.type = type;
-        start = null;
-        end = null;
+        this.start = null;
+        this.end = null;
     }
-    public ProtagSymbol(int id, ProtagTokenType type, Object val) {
-        super(id, val);
-        this.type = type;
-        start = null;
-        end = null;
-    }
-    public ProtagSymbol(int id, ProtagTokenType type, Symbol center, Object val) {
-        super(id, center, val);
-        this.type = type;
-        start = null;
-        end = null;
-    }
-    public ProtagSymbol(int id, ProtagTokenType type, Symbol left, Symbol right) {
-        super(id, left, right);
-        this.type = type;
-        start = null;
-        end = null;
-    }
-    public ProtagSymbol(int id, ProtagTokenType type, Symbol left, Symbol right, Object val) {
-        super(id, left, right, val);
-        this.type = type;
-        start = null;
-        end = null;
-    }
-    public ProtagSymbol(int id, ProtagTokenType type, Location start) {
-        this(id, type, start, start.calculateEndLocation(type.getTokenSymbol()), type.getTokenSymbol());
-    }
-    public ProtagSymbol(int id, ProtagTokenType type, Location start, CharSequence symbol) {
-        this(id, type, start, start.calculateEndLocation(symbol), symbol);
-    }
-    private ProtagSymbol(int id, ProtagTokenType type, Location start, Location end, CharSequence symbol) {
-        super(id, start.offset, end.offset, symbol);
+//  *** Constructor: All other Symbols (DOT, Properties, LITERAL) ***
+    public ProtagSymbol(int id, ProtagTokenType type, Location start, Location end, Object val) {
+        super(id, start.offset, end.offset, val);
         this.type =  type;
         this.start = start;
         this.end = end;
@@ -96,6 +69,30 @@ public abstract class ProtagSymbol extends Symbol {
 
             return new Location(endLine, endColumn, endOffset);
         }
+
+        @Override
+        public String toString() {
+            return "%d:%d".formatted(line, column);
+        }
+    }
+
+    @Override
+    public String toString() {
+        String first;
+        if(type != null) {
+            first = "%s#%d(%s)".formatted(type, super.sym, getSymbol());
+        } else {
+            first = "#%d".formatted(super.sym);
+        }
+
+        if(start != null) {
+            if(end == null || start.equals(end)) {
+                return first + "[%s]".formatted(start);
+            } else {
+                return first + "[%s, %s]".formatted(start, end);
+            }
+        }
+        return first;
     }
 }
 

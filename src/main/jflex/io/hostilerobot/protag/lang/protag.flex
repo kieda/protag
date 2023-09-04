@@ -24,10 +24,14 @@ private ProtagSymbol.Location currentLocation() {
 // ProtagTokenType x Location -> Symbol
 // ProtagTokenType x String x Location
 private ProtagSymbol symbol( ProtagTokenType type ) {
-    if(type.isFixed()) {
-        return new FixedProtagSymbol(type, currentLocation());
+    if(type == EOF) {
+        return new EOFToken(currentLocation());
+    } else if(type == NATURAL) {
+        return new ProtagNaturalToken(currentLocation(), yytext());
+    } else if(type.isFixed()) {
+        return new ProtagSpecialToken(type, currentLocation());
     } else {
-        return new StringProtagSymbol(type, yytext(), currentLocation());
+        return new ProtagStringToken(type, currentLocation(), yytext());
     }
 }
 

@@ -641,7 +641,7 @@ private ProtagSymbol.Location currentLocation() {
 // ProtagTokenType x String x Location
 private ProtagSymbol symbol( ProtagTokenType type ) {
     if(type == EOF) {
-        return new EOFToken(currentLocation());
+        return new EOFToken(type, currentLocation());
     } else if(type == NATURAL) {
         return new ProtagNaturalToken(currentLocation(), yytext());
     } else if(type.isFixed()) {

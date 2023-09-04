@@ -1,9 +1,9 @@
 package io.hostilerobot.protag.lang.ast;
 
-import java.util.List;
+import java.util.Deque;
 
 // represents a list of PairLikeNodes
 public interface CMapLikeNode extends CListLikeNode {
     @Override
-    List<? extends CPairLikeNode> getItems();
+    Deque<? extends ProtagNode> getItems();
 }
