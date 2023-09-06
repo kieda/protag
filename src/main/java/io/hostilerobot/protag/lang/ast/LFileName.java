@@ -14,9 +14,4 @@ public final class LFileName extends AbstractProtagNode implements CStringNode, 
     public String getRawValue() {
         return fname;
     }
-
-    @Override
-    public List<ProtagNode> getChildren() {
-        return List.of();
-    }
 }

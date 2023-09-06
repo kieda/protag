@@ -1,9 +1,12 @@
 package io.hostilerobot.protag.lang.ast;
 
-public record LProtagName(ProtagNode parent, String name) implements CStringNode, TProtagPathSegmentItem, TProtagPathItem {
-    @Override
-    public ProtagNode getParent() {
-        return parent;
+import io.hostilerobot.protag.meta.ASTMetaInfo;
+
+public final class LProtagName extends AbstractProtagNode implements CStringNode, TProtagPathSegmentItem, TProtagPathItem {
+    private final String name;
+    public LProtagName(ASTMetaInfo meta, String name) {
+        super(meta);
+        this.name = name;
     }
 
     @Override

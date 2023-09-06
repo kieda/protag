@@ -1,5 +1,7 @@
 package io.hostilerobot.protag.lang.ast;
 
+import io.hostilerobot.protag.meta.ASTMetaInfo;
+
 import java.util.Optional;
 
 /**
@@ -35,12 +37,11 @@ import java.util.Optional;
  *      )
  *
  *
- * @param parent
- * @param comment
  */
 public final class LProtagLineComment extends AbstractProtagNode implements CCommentNode{
     private final CharSequence comment;
-    public LProtagLineComment(CharSequence comment) {
+    public LProtagLineComment(ASTMetaInfo meta, CharSequence comment) {
+        super(meta);
         this.comment = comment;
     }
 

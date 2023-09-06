@@ -1,11 +1,17 @@
 package io.hostilerobot.protag.lang.ast;
 
+import io.hostilerobot.protag.meta.ASTMetaInfo;
 import org.apache.commons.math.fraction.Fraction;
 
 /**
  * represents a natural number
  */
-public record LProtagNatural(ProtagNode parent, int nat) implements CNumberNode, TProtagPathItem, TProtagPathSegmentItem {
+public final class LProtagNatural extends AbstractProtagNode implements CNumberNode, TProtagPathItem, TProtagPathSegmentItem {
+    private final int nat;
+    public LProtagNatural(ASTMetaInfo meta, int nat) {
+        super(meta);
+        this.nat = nat;
+    }
     @Override
     public EProtagNumberType getType() {
         return EProtagNumberType.INTEGER;
@@ -13,7 +19,7 @@ public record LProtagNatural(ProtagNode parent, int nat) implements CNumberNode,
 
     @Override
     public double toReal() {
-        return (double) nat;
+        return nat;
     }
 
     @Override
@@ -24,10 +30,5 @@ public record LProtagNatural(ProtagNode parent, int nat) implements CNumberNode,
     @Override
     public Fraction toQuotient() {
         return new Fraction(nat, 1);
-    }
-
-    @Override
-    public ProtagNode getParent() {
-        return parent;
     }
 }

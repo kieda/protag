@@ -1,8 +1,15 @@
 package io.hostilerobot.protag.lang.ast;
 
+import io.hostilerobot.protag.meta.ASTMetaInfo;
 import org.apache.commons.math.fraction.Fraction;
+import org.apache.commons.math.fraction.FractionConversionException;
 
-public record LProtagReal(ProtagNode parent, double val) implements CNumberNode {
+public final class LProtagReal extends AbstractProtagNode implements CNumberNode {
+    private final double val;
+    public LProtagReal(ASTMetaInfo meta, double val) {
+        super(meta);
+        this.val = val;
+    }
     @Override
     public EProtagNumberType getType() {
         return EProtagNumberType.REAL;
@@ -10,20 +17,20 @@ public record LProtagReal(ProtagNode parent, double val) implements CNumberNode 
 
     @Override
     public double toReal() {
-        return 0;
+        return val;
     }
 
     @Override
     public int toInteger() {
-        return 0;
+        return (int)val;
     }
 
     @Override
     public Fraction toQuotient() {
-        return null;
-    }
-
-    public ProtagNode getParent() {
-        return parent;
+        try {
+            return new Fraction(val);
+        } catch (FractionConversionException e) {
+            throw new FractionConversionRuntimeException(e);
+        }
     }
 }

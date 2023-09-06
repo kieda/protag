@@ -1,8 +1,14 @@
 package io.hostilerobot.protag.lang.ast;
 
+import io.hostilerobot.protag.meta.ASTMetaInfo;
 import org.apache.commons.math.fraction.Fraction;
 
-public record LProtagQuotient(ProtagNode parent, Fraction val) implements CNumberNode {
+public final class LProtagQuotient extends AbstractProtagNode implements CNumberNode {
+    private final Fraction val;
+    public LProtagQuotient(ASTMetaInfo meta, Fraction val) {
+        super(meta);
+        this.val = val;
+    }
     @Override
     public EProtagNumberType getType() {
         return EProtagNumberType.QUOTIENT;
@@ -10,21 +16,16 @@ public record LProtagQuotient(ProtagNode parent, Fraction val) implements CNumbe
 
     @Override
     public double toReal() {
-        return getType().toReal(val);
+        return val.doubleValue();
     }
 
     @Override
     public int toInteger() {
-        return getType().toInteger(val);
+        return val.intValue();
     }
 
     @Override
     public Fraction toQuotient() {
-        return getType().toQuotient(val);
-    }
-
-    @Override
-    public ProtagNode getParent() {
-        return parent;
+        return val;
     }
 }
