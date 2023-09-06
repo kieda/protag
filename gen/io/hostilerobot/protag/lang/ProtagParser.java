@@ -15,6 +15,7 @@ import io.hostilerobot.protag.lang.ProtagSymbolFactory;
 import io.hostilerobot.protag.lang.ProtagTokenType;
 import io.hostilerobot.protag.lang.ast.*;
 import io.hostilerobot.protag.lang.ast.impl.*;
+import io.hostilerobot.protag.meta.*;
 import java_cup.runtime.XMLElement;
 
 /** CUP v0.11b 20160615 (GIT 4ac7450) generated parser.
@@ -165,6 +166,15 @@ public class ProtagParser extends java_cup.runtime.lr_parser {
 /** Cup generated class to encapsulate user supplied action code.*/
 @SuppressWarnings({"rawtypes", "unchecked", "unused"})
 class CUP$ProtagParser$actions {
+
+
+    ProtagMetaTable metaTable = new ProtagMetaTable();
+    ASTMetaInfoFactory<ProtagMetaInfo> factory = metaTable.getFactory();
+
+    public ProtagSymbol currentSymbol() {
+        return (ProtagSymbol) cur_token;
+    }
+
   private final ProtagParser parser;
 
   /** Constructor */
@@ -216,7 +226,10 @@ class CUP$ProtagParser$actions {
           case 2: // protag ::= 
             {
               IProtagSequence RESULT =null;
-		 RESULT = new ProtagSequence(null, new LinkedList<ProtagNode>()); 
+		
+        RESULT = new ProtagSequence(null);
+        factory.createInfo(RESULT, currentSymbol());
+    
               CUP$ProtagParser$result = parser.getSymbolFactory().newSymbol("protag",4, ((java_cup.runtime.Symbol)CUP$ProtagParser$stack.peek()), RESULT);
             }
           return CUP$ProtagParser$result;
@@ -234,6 +247,7 @@ class CUP$ProtagParser$actions {
 		
         item.setParent(protag);
         protag.getItems().addFirst(item);
+
         RESULT = protag;
     
               CUP$ProtagParser$result = parser.getSymbolFactory().newSymbol("protag_",5, ((java_cup.runtime.Symbol)CUP$ProtagParser$stack.elementAt(CUP$ProtagParser$top-1)), ((java_cup.runtime.Symbol)CUP$ProtagParser$stack.peek()), RESULT);
@@ -248,10 +262,13 @@ class CUP$ProtagParser$actions {
 		int itemright = ((java_cup.runtime.Symbol)CUP$ProtagParser$stack.peek()).right;
 		ProtagNode item = (ProtagNode)((java_cup.runtime.Symbol) CUP$ProtagParser$stack.peek()).value;
 		
-        Deque<ProtagNode> initial = new LinkedList<>();
-        initial.addFirst(item);
-        ProtagSequence seq = new ProtagSequence(null, initial);
+//        Deque<ProtagNode> initial = new LinkedList<>();
+//        initial.addFirst(item);
+        ProtagSequence seq = new ProtagSequence(null);//, initial);
+        seq.getItems().addFirst(item);
         item.setParent(seq);
+        factory.createInfo(seq, currentSymbol());
+
         RESULT = seq;
     
               CUP$ProtagParser$result = parser.getSymbolFactory().newSymbol("protag_",5, ((java_cup.runtime.Symbol)CUP$ProtagParser$stack.peek()), ((java_cup.runtime.Symbol)CUP$ProtagParser$stack.peek()), RESULT);

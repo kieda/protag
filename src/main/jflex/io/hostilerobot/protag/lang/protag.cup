@@ -10,6 +10,7 @@ import io.hostilerobot.protag.lang.ProtagSymbolFactory;
 import io.hostilerobot.protag.lang.ProtagTokenType;
 import io.hostilerobot.protag.lang.ast.*;
 import io.hostilerobot.protag.lang.ast.impl.*;
+import io.hostilerobot.protag.meta.*;
 
 parser code {:
     ProtagLexer lexer;
@@ -18,6 +19,14 @@ parser code {:
         super(lex, sf);
         this.lexer = lex;
         this.symbolFactory = sf;
+    }
+:}
+action code {:
+    ProtagMetaTable metaTable = new ProtagMetaTable();
+    ASTMetaInfoFactory<ProtagMetaInfo> factory = metaTable.getFactory();
+
+    public ProtagSymbol currentSymbol() {
+        return (ProtagSymbol) cur_token;
     }
 :}
 init with {: lexer.reset(); :}
@@ -86,21 +95,28 @@ start with protag;
 protag ::= protag_:seq
     {: RESULT = seq; :}
     | // protag_ or empty
-    {: RESULT = new ProtagSequence(null, new LinkedList<ProtagNode>()); :}
+    {:
+        RESULT = new ProtagSequence(null);
+        factory.createInfo(RESULT, currentSymbol());
+    :}
     ;
 protag_ ::= //ProtagProperties|
     _item:item protag_:protag
     {:
-//        item.setParent(protag);
+        item.setParent(protag);
         protag.getItems().addFirst(item);
+
         RESULT = protag;
     :}
     |_item:item
     {:
-        Deque<ProtagNode> initial = new LinkedList<>();
-        initial.addFirst(item);
-        ProtagSequence seq = new ProtagSequence(null, initial);
-//        item.setParent(seq);
+//        Deque<ProtagNode> initial = new LinkedList<>();
+//        initial.addFirst(item);
+        ProtagSequence seq = new ProtagSequence(null);//, initial);
+        seq.getItems().addFirst(item);
+        item.setParent(seq);
+        factory.createInfo(seq, currentSymbol());
+
         RESULT = seq;
     :};
 _item ::=
@@ -283,6 +299,9 @@ containedSegment ::= REGEX|LITERAL|List|Map|Precedence;
 // asdf10&3/4 vs "asdf"10 & 3/4"asdf"
 // spacing items
 */
+// todo : spacing is a linked list
+// todo : remove ProtagWhitespace rule
+// todo : utility to add 
 spacing ::=
     WHITESPACE spacing
     | COMMENT spacing
