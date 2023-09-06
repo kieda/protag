@@ -1,20 +1,13 @@
 package io.hostilerobot.protag.lang.ast.impl;
 
-import io.hostilerobot.protag.lang.ast.CPairLikeNode;
-import io.hostilerobot.protag.lang.ast.IProtagMap;
-import io.hostilerobot.protag.lang.ast.ProtagNode;
+import io.hostilerobot.protag.lang.ast.*;
+import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 import java.util.Deque;
 import java.util.List;
 
-public record ProtagMap(ProtagNode parent, Deque<CPairLikeNode> mapItems) implements IProtagMap {
-    @Override
-    public Deque<? extends ProtagNode> getItems() {
-        return mapItems;
-    }
-
-    @Override
-    public ProtagNode getParent() {
-        return parent;
+public final class ProtagMap extends AbstractListLikeNode<CPairLikeNode> implements IProtagMap {
+    public ProtagMap(ASTMetaInfo meta) {
+        super(meta);
     }
 }

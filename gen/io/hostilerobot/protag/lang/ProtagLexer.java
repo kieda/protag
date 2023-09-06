@@ -4,6 +4,8 @@
 
 package io.hostilerobot.protag.lang;
 
+import io.hostilerobot.protag.meta.Location;
+
 import java.util.ArrayDeque;import java.util.Deque;
 import static io.hostilerobot.protag.lang.ProtagTokenType.*;
 
@@ -633,8 +635,8 @@ public class ProtagLexer implements java_cup.runtime.Scanner {
   /* user code: */
 // StringBuilder current = new StringBuilder();
 
-private ProtagSymbol.Location currentLocation() {
-    return new ProtagSymbol.Location(yyline, yycolumn, (int)yychar);
+private Location currentLocation() {
+    return new Location(yyline, yycolumn, (int)yychar);
 }
 
 // ProtagTokenType x Location -> Symbol

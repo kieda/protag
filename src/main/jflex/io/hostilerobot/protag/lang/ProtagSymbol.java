@@ -1,5 +1,6 @@
 package io.hostilerobot.protag.lang;
 
+import io.hostilerobot.protag.meta.Location;
 import java_cup.runtime.Symbol;
 
 public sealed abstract class ProtagSymbol extends Symbol permits ProtagSpecialToken, ProtagNonTerminalSymbol, EOFToken, StartToken, ProtagStringToken, ProtagNaturalToken {
@@ -20,7 +21,7 @@ public sealed abstract class ProtagSymbol extends Symbol permits ProtagSpecialTo
     }
 //  *** Constructor: All other Symbols (DOT, Properties, LITERAL) ***
     public ProtagSymbol(int id, ProtagTokenType type, Location start, Location end, Object val) {
-        super(id, start.offset, end.offset, val);
+        super(id, start.offset(), end.offset(), val);
         this.type =  type;
         this.start = start;
         this.end = end;
@@ -34,46 +35,6 @@ public sealed abstract class ProtagSymbol extends Symbol permits ProtagSpecialTo
     public abstract CharSequence getSymbol();
     public ProtagTokenType getType() {
         return type;
-    }
-
-    public record Location(int line, int column, int offset) {
-        public Location calculateEndLocation(CharSequence input) {
-            int length = input.length();
-            int endOffset = offset + length;
-            int endLine = line;
-            int endColumn = column + length;
-            // note -- yylength() returns the number of chars (and not code points) till the end of the match
-            boolean hasCarriage = false;
-            for(int i = 0; i < length; i++) {
-                switch (input.charAt(i)) {
-                    case '\n' -> {
-                        if (hasCarriage) hasCarriage = false;
-                        endLine++;
-                        endColumn = (length - i) + 1;
-                    }
-                    case '\r' -> hasCarriage = true; // \r\n counts as a single new line
-                    default -> {
-                        if (hasCarriage) {
-                            endLine++;
-                            endColumn = (length - i);
-                            hasCarriage = false;
-                        }
-                    }
-                }
-            }
-            // string ends in \r
-            if(hasCarriage) {
-                endLine++;
-                endColumn = 0;
-            }
-
-            return new Location(endLine, endColumn, endOffset);
-        }
-
-        @Override
-        public String toString() {
-            return "%d:%d".formatted(line, column);
-        }
     }
 
     @Override

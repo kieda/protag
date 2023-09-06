@@ -1,20 +1,10 @@
 package io.hostilerobot.protag.lang.ast.impl;
 
-import io.hostilerobot.protag.lang.ast.IProtagProperties;
-import io.hostilerobot.protag.lang.ast.IProtagSection;
-import io.hostilerobot.protag.lang.ast.ProtagNode;
+import io.hostilerobot.protag.lang.ast.*;
+import io.hostilerobot.protag.meta.ASTMetaInfo;
 
-import java.util.Deque;
-import java.util.List;
-
-public record ProtagProperties(ProtagNode parent, Deque<IProtagSection> properties) implements IProtagProperties {
-    @Override
-    public Deque<? extends ProtagNode> getItems() {
-        return properties;
-    }
-
-    @Override
-    public ProtagNode getParent() {
-        return parent;
+public final class ProtagProperties extends AbstractListLikeNode<IProtagSection> implements IProtagProperties {
+    public ProtagProperties(ASTMetaInfo meta) {
+        super(meta);
     }
 }

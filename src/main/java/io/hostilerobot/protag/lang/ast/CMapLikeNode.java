@@ -5,5 +5,5 @@ import java.util.Deque;
 // represents a list of PairLikeNodes
 public interface CMapLikeNode extends CListLikeNode {
     @Override
-    Deque<? extends ProtagNode> getItems();
+    Deque<? extends CPairLikeNode> getItems();
 }

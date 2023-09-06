@@ -38,10 +38,10 @@ import java.util.Optional;
  * @param parent
  * @param comment
  */
-public record LProtagLineComment(ProtagNode parent, CharSequence comment) implements CCommentNode{
-    @Override
-    public ProtagNode getParent() {
-        return parent;
+public final class LProtagLineComment extends AbstractProtagNode implements CCommentNode{
+    private final CharSequence comment;
+    public LProtagLineComment(CharSequence comment) {
+        this.comment = comment;
     }
 
     @Override

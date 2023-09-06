@@ -1,13 +1,22 @@
 package io.hostilerobot.protag.lang.ast;
 
-public record LFileName(ProtagNode parent, String fname) implements CStringNode, TFilePathSegmentItem, TFilePathItem {
+import io.hostilerobot.protag.meta.ASTMetaInfo;
+
+import java.util.List;
+
+public final class LFileName extends AbstractProtagNode implements CStringNode, TFilePathSegmentItem, TFilePathItem {
+    private final String fname;
+    public LFileName(ASTMetaInfo meta, String fname) {
+        super(meta);
+        this.fname = fname;
+    }
     @Override
     public String getRawValue() {
         return fname;
     }
 
     @Override
-    public ProtagNode getParent() {
-        return parent;
+    public List<ProtagNode> getChildren() {
+        return List.of();
     }
 }

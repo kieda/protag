@@ -1,9 +1,20 @@
 package io.hostilerobot.protag.lang.ast.impl;
 
+import io.hostilerobot.protag.lang.ast.AbstractProtagNode;
 import io.hostilerobot.protag.lang.ast.IProtagTransitionLeft;
 import io.hostilerobot.protag.lang.ast.ProtagNode;
+import io.hostilerobot.protag.meta.ASTMetaInfo;
 
-public record ProtagTransitionLeft(ProtagNode parent, ProtagNode to, ProtagNode from) implements IProtagTransitionLeft {
+import java.util.List;
+
+public final class ProtagTransitionLeft extends AbstractProtagNode implements IProtagTransitionLeft {
+    private final ProtagNode to;
+    private final ProtagNode from;
+    public ProtagTransitionLeft(ASTMetaInfo meta, ProtagNode to, ProtagNode from) {
+        super(meta);
+        this.to = to;
+        this.from = from;
+    }
     @Override
     public ProtagNode getKey() {
         return to;
@@ -15,7 +26,7 @@ public record ProtagTransitionLeft(ProtagNode parent, ProtagNode to, ProtagNode 
     }
 
     @Override
-    public ProtagNode getParent() {
-        return parent;
+    public List<ProtagNode> getChildren() {
+        return List.of(to, from);
     }
 }

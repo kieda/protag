@@ -1,6 +1,6 @@
 package io.hostilerobot.protag.lang;
 
-import java.math.BigInteger;
+import io.hostilerobot.protag.meta.Location;
 
 public final class ProtagStringToken extends ProtagSymbol{
     public ProtagStringToken(ProtagTokenType type, Location start, CharSequence symbol) {
