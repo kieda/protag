@@ -1,6 +1,5 @@
 package io.hostilerobot.protag.lang.ast;
 
-import io.hostilerobot.protag.meta.ASTMetaInfo;
 import org.apache.commons.math.fraction.Fraction;
 import org.apache.commons.math.fraction.FractionConversionException;
 

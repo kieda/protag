@@ -1,7 +1,5 @@
 package io.hostilerobot.protag.lang;
 
-import io.hostilerobot.protag.meta.Location;
-
 public final class ProtagStringToken extends ProtagSymbol{
     public ProtagStringToken(ProtagTokenType type, Location start, CharSequence symbol) {
         super(type.getTerminalId(), type, start, start.calculateEndLocation(symbol), symbol);

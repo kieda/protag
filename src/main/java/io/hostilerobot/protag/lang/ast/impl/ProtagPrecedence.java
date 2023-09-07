@@ -3,7 +3,6 @@ package io.hostilerobot.protag.lang.ast.impl;
 import io.hostilerobot.protag.lang.ast.AbstractProtagNode;
 import io.hostilerobot.protag.lang.ast.IProtagPrecedence;
 import io.hostilerobot.protag.lang.ast.ProtagNode;
-import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 import java.util.List;
 

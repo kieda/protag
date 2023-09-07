@@ -1,6 +1,4 @@
-package io.hostilerobot.protag.meta;
-
-import io.hostilerobot.protag.lang.ProtagSymbol;
+package io.hostilerobot.protag.lang;
 
 public record Location(int line, int column, int offset) {
     public static Location UNKNOWN = new Location(-1, -1, -1);

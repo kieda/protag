@@ -1,8 +1,5 @@
 package io.hostilerobot.protag.lang;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public enum ProtagTokenType {
     // terminal string tokens
     COMMENT(),

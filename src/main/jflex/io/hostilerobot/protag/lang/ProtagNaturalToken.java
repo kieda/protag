@@ -1,7 +1,5 @@
 package io.hostilerobot.protag.lang;
 
-import io.hostilerobot.protag.meta.Location;
-
 public final class ProtagNaturalToken extends ProtagSymbol{
     private final CharSequence naturalString;
     private static int parseNatural(CharSequence val) {

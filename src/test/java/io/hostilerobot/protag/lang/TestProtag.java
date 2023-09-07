@@ -2,8 +2,6 @@ package io.hostilerobot.protag.lang;
 
 import java_cup.runtime.Symbol;
 
-import java.io.BufferedInputStream;
-import java.io.CharArrayReader;
 import java.io.StringReader;
 
 public class TestProtag {
@@ -19,7 +17,6 @@ public class TestProtag {
         Symbol s = pp.parse();
         System.out.println(s);
         System.out.println(s.value);
-        System.out.println(pp.metaTable);
 
     }
 }

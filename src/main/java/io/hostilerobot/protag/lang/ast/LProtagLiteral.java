@@ -1,7 +1,5 @@
 package io.hostilerobot.protag.lang.ast;
 
-import io.hostilerobot.protag.meta.ASTMetaInfo;
-
 public final class LProtagLiteral extends AbstractProtagNode implements CStringNode, TCommonPathSegmentItem, TCommonPathItem {
     private final String literal;
     public LProtagLiteral(String literal) {

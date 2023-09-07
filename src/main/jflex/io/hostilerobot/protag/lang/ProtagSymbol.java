@@ -1,6 +1,5 @@
 package io.hostilerobot.protag.lang;
 
-import io.hostilerobot.protag.meta.Location;
 import java_cup.runtime.Symbol;
 
 public sealed abstract class ProtagSymbol extends Symbol permits ProtagSpecialToken, ProtagNonTerminalSymbol, EOFToken, StartToken, ProtagStringToken, ProtagNaturalToken {

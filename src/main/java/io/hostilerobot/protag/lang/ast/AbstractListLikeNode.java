@@ -1,8 +1,5 @@
 package io.hostilerobot.protag.lang.ast;
 
-import io.hostilerobot.protag.meta.ASTMetaInfo;
-import io.hostilerobot.protag.util.MirrorDeque;
-
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;

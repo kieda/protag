@@ -2,8 +2,6 @@ package io.hostilerobot.protag.lang.ast;
 
 import io.hostilerobot.protag.meta.ASTMetaInfo;
 
-import java.util.Optional;
-
 /**
  *
  * comment: # asdf - attached to thing on the same line

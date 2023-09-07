@@ -6,14 +6,6 @@ import java.util.List;
 
 // base class for all nodes in the AST
 public interface ProtagNode {
-    /**
-     * Contains meta-information for this node. Meta info should not change the way we process or handle protag
-     * E.g. comments, line numbers, etc
-     *
-     * @return the meta info
-     */
-    void setParent(ProtagNode node);
-    ProtagNode getParent();
     default boolean isLeaf() {
         return !(this instanceof CListLikeNode);
     }

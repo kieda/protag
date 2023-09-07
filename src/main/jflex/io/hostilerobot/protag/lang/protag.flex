@@ -1,6 +1,6 @@
 package io.hostilerobot.protag.lang;
 
-import io.hostilerobot.protag.meta.Location;import java.util.ArrayDeque;import java.util.Deque;
+import java.util.ArrayDeque;import java.util.Deque;
 import static io.hostilerobot.protag.lang.ProtagTokenType.*;
 
 %%
@@ -15,7 +15,6 @@ import static io.hostilerobot.protag.lang.ProtagTokenType.*;
 %line
 %column
 %{
-// StringBuilder current = new StringBuilder();
 
 private Location currentLocation() {
     return new Location(yyline, yycolumn, (int)yychar);

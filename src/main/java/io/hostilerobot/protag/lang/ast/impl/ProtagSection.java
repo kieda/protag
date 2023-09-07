@@ -4,7 +4,6 @@ import io.hostilerobot.protag.lang.ast.AbstractProtagNode;
 import io.hostilerobot.protag.lang.ast.IProtagSection;
 import io.hostilerobot.protag.lang.ast.IProtagSequence;
 import io.hostilerobot.protag.lang.ast.ProtagNode;
-import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 import java.util.List;
 

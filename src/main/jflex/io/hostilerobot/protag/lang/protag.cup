@@ -61,7 +61,6 @@ non terminal LProtagName ProtagName;
 non terminal LProtagNatural ProtagNatural;
 non terminal LProtagQuotient ProtagQuotient; */
 non terminal LProtagReal ProtagReal;
-non terminal LProtagLineComment ProtagComment;
 //non terminal LProtagWhitespace ProtagWhitespace;
 // composite nodes
 /*non terminal IFilePath FilePath;
@@ -87,7 +86,7 @@ non terminal EOF;
 //    jScope, jScopeSegment, jSegmentSingle, jSegmentMulti, jSegmentInclJBody, jSegmentExclJBody;
 non terminal ESignType _sign;
 non terminal XDecimal _decimal;
-non terminal LinkedList<LProtagLineComment> spacing;
+
 /**
  * protag may have items that consist of a header, then a set of properties
  * # example
