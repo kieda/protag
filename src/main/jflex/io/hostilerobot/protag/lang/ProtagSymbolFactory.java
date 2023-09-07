@@ -1,6 +1,5 @@
 package io.hostilerobot.protag.lang;
 
-import io.hostilerobot.protag.lang.ast.ProtagNode;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.SymbolFactory;
 
@@ -13,36 +12,13 @@ public class ProtagSymbolFactory implements SymbolFactory {
 
     public static ProtagTokenType getTokenType(String name) {
         ProtagTokenType type = toEnum.get(name);
-        if(type == null) {
-            System.out.printf("NOTE: %s is null\n", name);
-        }
         return type;
     }
 
-    private Map<String, Map<ProtagNode, ProtagSymbol>> protagLookup
-            = new HashMap<>();
-    public ProtagSymbol lookup(String name, ProtagNode item) {
-        var map = protagLookup.get(name);
-        if(map != null) {
-            return map.get(item);
-        }
-        return null;
-    }
-    private void put(String name, ProtagNode item, ProtagSymbol result) {
-        protagLookup.computeIfAbsent(name, n -> new HashMap<>());
-        protagLookup.get(name).put(item, result);
-        System.out.printf("putting (%s, %s) -> %s\n", name, item, result);
-    }
-    private Symbol unpackAndPutEntry(String name, Object item, ProtagSymbol result) {
-        if(item instanceof ProtagNode node) {
-            put(name, node, result);
-        }
-        return result;
-    }
     @Override
     public Symbol newSymbol(String name, int id, Symbol left, Symbol right, Object val) {
         ProtagTokenType tokenType = getTokenType(name);
-        return unpackAndPutEntry(name, val, new ProtagNonTerminalSymbol(id, tokenType, (ProtagSymbol) left, (ProtagSymbol) right, val));
+        return new ProtagNonTerminalSymbol(id, tokenType, (ProtagSymbol) left, (ProtagSymbol) right, val);
     }
 
     @Override
@@ -53,7 +29,7 @@ public class ProtagSymbolFactory implements SymbolFactory {
     @Override
     public Symbol newSymbol(String name, int id, Symbol center, Object val) {
         ProtagTokenType tokenType = getTokenType(name);
-        return unpackAndPutEntry(name, val, new ProtagNonTerminalSymbol(id, tokenType, (ProtagSymbol) center, val));
+        return new ProtagNonTerminalSymbol(id, tokenType, (ProtagSymbol) center, val);
     }
 
     @Override

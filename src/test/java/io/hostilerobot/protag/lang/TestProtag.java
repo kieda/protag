@@ -6,8 +6,9 @@ import java.io.StringReader;
 
 public class TestProtag {
     static String test = """
-            123 1.2 
-            -35""";
+            123 1.2 # commentR
+            - # comas  
+            35""";
     public static void main(String[] args) throws Exception{
         System.out.println(test.length());
 

@@ -1,7 +1,5 @@
 package io.hostilerobot.protag.lang.ast;
 
-import io.hostilerobot.protag.meta.ASTMetaInfo;
-
 /**
  *
  * comment: # asdf - attached to thing on the same line

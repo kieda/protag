@@ -10,34 +10,20 @@ import io.hostilerobot.protag.lang.ProtagSymbolFactory;
 import io.hostilerobot.protag.lang.ProtagTokenType;
 import io.hostilerobot.protag.lang.ast.*;
 import io.hostilerobot.protag.lang.ast.impl.*;
-import io.hostilerobot.protag.meta.*;
-import io.hostilerobot.protag.meta.ProtagMetaTable.ProtagMetaBuilder;
 
 parser code {:
-    ProtagMetaTable metaTable;
     ProtagLexer lexer;
     ProtagSymbolFactory symbolFactory;
     ProtagParser(ProtagLexer lex, ProtagSymbolFactory sf) {
         super(lex, sf);
-        this.metaTable = new ProtagMetaTable();
         this.lexer = lex;
         this.symbolFactory = sf;
     }
 :}
 action code {:
-//    ASTMetaInfoFactory<ProtagMetaInfo> factory = metaTable.getFactory();
-
-    public void addComments(ProtagMetaBuilder meta, List<LProtagLineComment> comments) {
-
-        for(LProtagLineComment comment : comments) {
-//            comment.setParent(parent);
-            meta.addComment(comment);
-        }
-    }
-
 :}
 init with {: lexer.reset(); :}
-scan with {: ProtagSymbol s =  lexer.next_token(); System.out.println("INCOMING: " + s); return s; :}
+scan with {: return lexer.next_token(); :}
 
 // special tokens
 /*terminal JPATH_START, FPATH_START,
@@ -50,6 +36,7 @@ terminal DOT, PLUS, MINUS;
 /*terminal CharSequence COMMENT, WHITESPACE, REGEX, LITERAL, JNAME, JBODY, FNAME, NATURAL, PNAME, PBODY; */
 terminal CharSequence COMMENT, WHITESPACE;
 terminal Integer NATURAL;
+//terminal EOF;
 
 // leaf nodes
 /*non terminal LFileName FileName;
@@ -82,7 +69,7 @@ non terminal IProtagSequence protag, program;//, protag_;
 non terminal ProtagNode _item,
     _unboundedData, _baseData
     ;
-non terminal EOF;
+non terminal spacing;
 //    jScope, jScopeSegment, jSegmentSingle, jSegmentMulti, jSegmentInclJBody, jSegmentExclJBody;
 non terminal ESignType _sign;
 non terminal XDecimal _decimal;
@@ -109,9 +96,9 @@ start with program;
     :}
     ;*/
 program ::= protag:val {: RESULT = val; :}
-    | EOF
+    |
     {:
-        RESULT = new ProtagSequence();
+        RESULT = null;
     :};
 protag ::=
 //ProtagProperties|
@@ -121,11 +108,9 @@ protag ::=
             RESULT = rest;
         } else if(rest == null){
             RESULT = new ProtagSequence();
-            i.setParent(RESULT);
         } else {
             rest.getItems().addFirst(i);
             RESULT = rest;
-            i.setParent(RESULT);
         }
     :}
     | _item:item
@@ -134,7 +119,6 @@ protag ::=
             RESULT = null;
         } else {
             RESULT = new ProtagSequence();
-            item.setParent(RESULT);
             RESULT.getItems().addFirst(item);
         }
     :}
@@ -187,7 +171,7 @@ protag ::=
 _item ::=
     _unboundedData:data {:RESULT = data;:}
     // commentsection
-    |ProtagComment:comment {:RESULT = comment;:}
+    |COMMENT {:RESULT = null;:}
     |WHITESPACE {:RESULT = null;:};
 
 _baseData ::=
@@ -198,18 +182,11 @@ _baseData ::=
     ProtagReal:real
     {:
         RESULT = real;
-        // todo - set comments of real, integer's parents to real
-        metaTable.getBuilder(real).build(
-            symbolFactory.lookup("ProtagReal", real)
-        );
     :}
 //    |QUOTIENT
     |ProtagInteger:integer
     {:
         RESULT = integer;
-        metaTable.getBuilder(integer).build(
-            symbolFactory.lookup("ProtagInteger", integer)
-        );
     :}  // primitive - numbers
 //    |REGEX|LITERAL|YNAME // primitive - string types
     ;
@@ -311,32 +288,22 @@ _baseData ::=
 
 //QUOTIENT ::= INTEGER spacing AND spacing INTEGER spacing SLASH spacing NATURAL
 //    |  INTEGER spacing SLASH spacing NATURAL; // 1 & 3/4, -1 &3/4, +1 & -3/4, 1/2
-ProtagInteger ::= _sign:sign spacing:c NATURAL:nat
+ProtagInteger ::= _sign:sign spacing NATURAL:nat
     {:
         RESULT = new LProtagInteger(sign.negate(nat));
-        var builder = metaTable.createBuilder(RESULT);
-        addComments(builder, c);
-        System.out.println(metaTable);
     :}
     | NATURAL:nat
     {:
         RESULT = new LProtagInteger(nat);
-        metaTable.createBuilder(RESULT);
-        System.out.println(metaTable);
     :};
 
-ProtagReal ::= _sign:sign spacing:c _decimal:decimal
+ProtagReal ::= _sign:sign spacing _decimal:decimal
     {:
         RESULT = new LProtagReal(decimal.toDouble(sign));
-        var builder = metaTable.createBuilder(RESULT);
-        addComments(builder, c);
-        System.out.println(metaTable);
     :}
     | _decimal:decimal
     {:
         RESULT = new LProtagReal(decimal.toDouble(ESignType.NONE));
-        metaTable.createBuilder(RESULT);
-        System.out.println(metaTable);
     :}
     ;
 
@@ -395,24 +362,8 @@ containedSegment ::= REGEX|LITERAL|List|Map|Precedence;
 // asdf10&3/4 vs "asdf"10 & 3/4"asdf"
 // spacing items
 */
-// todo : spacing is a linked list
-// todo : remove ProtagWhitespace rule
-// todo : utility to add
 spacing ::=
-    WHITESPACE spacing:prev
-    {: RESULT = prev; :}
-    | ProtagComment:comment spacing:prev
-    {:
-        if(prev == null) {
-            RESULT = new LinkedList<>();
-        } else {
-            RESULT = prev;
-        }
-        RESULT.addFirst(comment);
-    :}
+    WHITESPACE spacing
+    | COMMENT spacing
     | // empty
-    {: RESULT = null; :} // don't create a list if we don't need to
     ;
-//    (WHITESPACE|COMMENT)*
-ProtagComment ::= COMMENT:comment
-    {: RESULT = new LProtagLineComment(comment); :};
