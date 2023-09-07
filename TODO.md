@@ -12,6 +12,9 @@
   to a given symbol until a rule is evaluated and its action is completed. 
 * Thus, a protag node will be built with the symbol completely unavailable till later
 * The solution: continuations
+
+***current state*** - meta table was in production, but removed temporarily. 
+check commits.
 #### Continuations
 * Keep the protagnode type, but in cup parsing declare a continuation type
 * Have relevant nodes pass up a function with the following signature:
@@ -22,4 +25,8 @@
   * this may instantiate the child, such that its parent is know upon creation
 * the final result of parsing will be a continuation, which will generate the full tree by
   * (parent: null, parentSymbol: $START) where $START is the result of the parser.
-  
+
+*** current state*** - continuations not implemented. Had a partial implementation of 
+passing items upward via a map. However, the logic is voodoo and would be better with continuations.
+Will remove existing code before eventually adding back.
+
