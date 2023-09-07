@@ -6,7 +6,6 @@ import io.hostilerobot.protag.lang.ast.ProtagNode;
 import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 public final class FilePath extends AbstractListLikeNode<ProtagNode> implements IFilePath {
-    public FilePath(ASTMetaInfo meta) {
-        super(meta);
+    public FilePath() {
     }
 }

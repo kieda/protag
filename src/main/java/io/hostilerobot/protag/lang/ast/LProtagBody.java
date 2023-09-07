@@ -4,8 +4,7 @@ import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 public final class LProtagBody extends AbstractProtagNode implements CStringNode, TProtagPathSegmentItem {
     private final String body;
-    public LProtagBody(ASTMetaInfo meta, String body) {
-        super(meta);
+    public LProtagBody(String body) {
         this.body = body;
     }
     @Override

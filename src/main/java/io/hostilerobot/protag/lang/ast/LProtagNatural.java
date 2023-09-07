@@ -8,8 +8,7 @@ import org.apache.commons.math.fraction.Fraction;
  */
 public final class LProtagNatural extends AbstractProtagNode implements CNumberNode, TProtagPathItem, TProtagPathSegmentItem {
     private final int nat;
-    public LProtagNatural(ASTMetaInfo meta, int nat) {
-        super(meta);
+    public LProtagNatural(int nat) {
         this.nat = nat;
     }
     @Override

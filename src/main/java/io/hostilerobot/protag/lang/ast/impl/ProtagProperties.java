@@ -4,7 +4,7 @@ import io.hostilerobot.protag.lang.ast.*;
 import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 public final class ProtagProperties extends AbstractListLikeNode<IProtagSection> implements IProtagProperties {
-    public ProtagProperties(ASTMetaInfo meta) {
-        super(meta);
+    public ProtagProperties() {
+
     }
 }

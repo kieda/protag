@@ -6,8 +6,7 @@ import org.apache.commons.math.fraction.FractionConversionException;
 
 public final class LProtagReal extends AbstractProtagNode implements CNumberNode {
     private final double val;
-    public LProtagReal(ASTMetaInfo meta, double val) {
-        super(meta);
+    public LProtagReal(double val) {
         this.val = val;
     }
     @Override
@@ -32,5 +31,10 @@ public final class LProtagReal extends AbstractProtagNode implements CNumberNode
         } catch (FractionConversionException e) {
             throw new FractionConversionRuntimeException(e);
         }
+    }
+
+    @Override
+    public String toString() {
+        return "%s[%s]".formatted(getClass().getSimpleName(), Double.toString(val));
     }
 }

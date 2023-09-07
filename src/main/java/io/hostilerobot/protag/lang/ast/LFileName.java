@@ -6,12 +6,16 @@ import java.util.List;
 
 public final class LFileName extends AbstractProtagNode implements CStringNode, TFilePathSegmentItem, TFilePathItem {
     private final String fname;
-    public LFileName(ASTMetaInfo meta, String fname) {
-        super(meta);
+    public LFileName(String fname) {
         this.fname = fname;
     }
     @Override
     public String getRawValue() {
         return fname;
+    }
+
+    @Override
+    public String toString() {
+        return "LFileName[%s]".formatted(fname);
     }
 }

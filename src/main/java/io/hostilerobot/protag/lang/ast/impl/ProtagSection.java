@@ -11,8 +11,7 @@ import java.util.List;
 public final class ProtagSection extends AbstractProtagNode implements IProtagSection {
     private final ProtagNode name;
     private final IProtagSequence items;
-    public ProtagSection(ASTMetaInfo meta, ProtagNode name, IProtagSequence items) {
-        super(meta);
+    public ProtagSection(ProtagNode name, IProtagSequence items) {
         this.name = name;
         this.items = items;
     }

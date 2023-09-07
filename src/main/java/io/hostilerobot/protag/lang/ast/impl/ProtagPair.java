@@ -10,8 +10,7 @@ import java.util.List;
 public final class ProtagPair extends AbstractProtagNode implements IProtagPair {
     private final ProtagNode key;
     private final ProtagNode value;
-    public ProtagPair(ASTMetaInfo meta, ProtagNode key, ProtagNode value) {
-        super(meta);
+    public ProtagPair(ProtagNode key, ProtagNode value) {
         this.key = key;
         this.value = value;
     }

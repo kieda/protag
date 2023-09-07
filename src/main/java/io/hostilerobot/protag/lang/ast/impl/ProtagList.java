@@ -10,7 +10,6 @@ import java.util.Deque;
 import java.util.List;
 
 public final class ProtagList extends AbstractListLikeNode<ProtagNode> implements IProtagList {
-    public ProtagList(ASTMetaInfo meta, Deque<ProtagNode> listItems) {
-        super(meta);
+    public ProtagList(Deque<ProtagNode> listItems) {
     }
 }

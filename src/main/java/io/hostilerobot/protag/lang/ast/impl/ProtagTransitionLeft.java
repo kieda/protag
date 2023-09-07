@@ -10,8 +10,7 @@ import java.util.List;
 public final class ProtagTransitionLeft extends AbstractProtagNode implements IProtagTransitionLeft {
     private final ProtagNode to;
     private final ProtagNode from;
-    public ProtagTransitionLeft(ASTMetaInfo meta, ProtagNode to, ProtagNode from) {
-        super(meta);
+    public ProtagTransitionLeft(ProtagNode to, ProtagNode from) {
         this.to = to;
         this.from = from;
     }

@@ -1120,6 +1120,7 @@ private static String zzToPrintable(CharSequence cs) {
     if (!zzEOFDone) {
       zzEOFDone = true;
     
+    //return;// symbol(EOF);
   yyclose();    }
   }
 
@@ -1287,8 +1288,7 @@ private static String zzToPrintable(CharSequence cs) {
             }  // fall though
             case 92: break;
             default:
-          {     return symbol(EOF);
- }
+          { return new java_cup.runtime.Symbol(ProtagSymbols.EOF); }
         }
       }
       else {

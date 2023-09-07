@@ -9,8 +9,7 @@ import java.util.List;
 
 public final class ProtagPrecedence extends AbstractProtagNode implements IProtagPrecedence {
     private final ProtagNode child;
-    public ProtagPrecedence(ASTMetaInfo meta, ProtagNode child) {
-        super(meta);
+    public ProtagPrecedence(ProtagNode child) {
         this.child = child;
     }
 

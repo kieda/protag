@@ -7,7 +7,7 @@ import java.util.Deque;
 import java.util.List;
 
 public final class ProtagMap extends AbstractListLikeNode<CPairLikeNode> implements IProtagMap {
-    public ProtagMap(ASTMetaInfo meta) {
-        super(meta);
+    public ProtagMap() {
+
     }
 }

@@ -11,9 +11,7 @@ import java.util.List;
 // todo - should we remove getChildren() or getItems(), or just keep it as is to access the fields in multiple ways??
 public abstract class AbstractListLikeNode<T extends ProtagNode> extends AbstractProtagNode implements CListLikeNode{
     private final LinkedList<T> items;
-    public AbstractListLikeNode(ASTMetaInfo info) {
-        super(info);
-
+    public AbstractListLikeNode() {
         this.items = new LinkedList<>();
     }
 

@@ -6,7 +6,6 @@ import io.hostilerobot.protag.lang.ast.ProtagNode;
 import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 public final class ProtagSequence extends AbstractListLikeNode<ProtagNode> implements IProtagSequence {
-    public ProtagSequence(ASTMetaInfo meta) {
-        super(meta);
+    public ProtagSequence() {
     }
 }

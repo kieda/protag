@@ -1,8 +1,10 @@
 package io.hostilerobot.protag.meta;
 
+import io.hostilerobot.protag.lang.ProtagSymbol;
 import io.hostilerobot.protag.lang.ProtagTokenType;
 import io.hostilerobot.protag.lang.ast.CCommentNode;
 
+import java.util.Deque;
 import java.util.List;
 
 /**
@@ -28,6 +30,8 @@ import java.util.List;
  *  (x (* comment *)) = val
  */
 public interface ASTMetaInfo {
+    ProtagSymbol getSymbol();
+
     Range getRange();
-    List<CCommentNode> getComments();
+    Deque<CCommentNode>[] getComments();
 }

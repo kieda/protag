@@ -12,7 +12,6 @@ public interface ProtagNode {
      *
      * @return the meta info
      */
-    ASTMetaInfo getMetaInfo();
     void setParent(ProtagNode node);
     ProtagNode getParent();
     default boolean isLeaf() {

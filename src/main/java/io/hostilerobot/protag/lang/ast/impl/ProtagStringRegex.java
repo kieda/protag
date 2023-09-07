@@ -9,8 +9,7 @@ import java.util.List;
 
 public final class ProtagStringRegex extends AbstractProtagNode implements IProtagRegex {
     private final String value;
-    public ProtagStringRegex(ASTMetaInfo meta, String value) {
-        super(meta);
+    public ProtagStringRegex(String value) {
         this.value = value;
     }
     @Override

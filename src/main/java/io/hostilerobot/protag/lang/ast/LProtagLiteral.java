@@ -4,8 +4,7 @@ import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 public final class LProtagLiteral extends AbstractProtagNode implements CStringNode, TCommonPathSegmentItem, TCommonPathItem {
     private final String literal;
-    public LProtagLiteral(ASTMetaInfo meta, String literal) {
-        super(meta);
+    public LProtagLiteral(String literal) {
         this.literal = literal;
     }
     @Override

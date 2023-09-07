@@ -6,7 +6,6 @@ import io.hostilerobot.protag.lang.ast.ProtagNode;
 import io.hostilerobot.protag.meta.ASTMetaInfo;
 
 public final class JavaPath extends AbstractListLikeNode<ProtagNode> implements IJavaPath {
-    public JavaPath(ASTMetaInfo meta) {
-        super(meta);
+    public JavaPath() {
     }
 }

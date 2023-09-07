@@ -5,8 +5,7 @@ import org.apache.commons.math.fraction.Fraction;
 
 public final class LProtagInteger extends AbstractProtagNode implements CNumberNode {
     private final int val;
-    public LProtagInteger(ASTMetaInfo meta, int val) {
-        super(meta);
+    public LProtagInteger(int val) {
         this.val = val;
     }
     @Override
@@ -27,5 +26,10 @@ public final class LProtagInteger extends AbstractProtagNode implements CNumberN
     @Override
     public Fraction toQuotient() {
         return new Fraction(val);
+    }
+
+    @Override
+    public String toString() {
+        return "%s[%d]".formatted(getClass().getSimpleName(), val);
     }
 }

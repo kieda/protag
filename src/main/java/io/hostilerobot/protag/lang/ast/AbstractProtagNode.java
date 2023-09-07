@@ -5,11 +5,9 @@ import io.hostilerobot.protag.meta.ASTMetaInfo;
 import java.util.List;
 
 public abstract class AbstractProtagNode implements ProtagNode {
-    private final ASTMetaInfo meta;
     private ProtagNode parent;
 
-    public AbstractProtagNode(ASTMetaInfo info) {
-        meta = info;
+    public AbstractProtagNode() {
     }
 
     @Override
@@ -23,12 +21,12 @@ public abstract class AbstractProtagNode implements ProtagNode {
     }
 
     @Override
-    public ASTMetaInfo getMetaInfo() {
-        return meta;
+    public List<ProtagNode> getChildren() {
+        return List.of();
     }
 
     @Override
-    public List<ProtagNode> getChildren() {
-        return List.of();
+    public String toString() {
+        return getClass().getSimpleName() + getChildren();
     }
 }

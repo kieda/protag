@@ -14,8 +14,7 @@ import java.util.List;
 // depending on the context, may resolve to a number, or to 0 (false), non-zero (true)
 public final class ProtagNumberRegex extends AbstractProtagNode implements IProtagRegex {
     private final String value;
-    public ProtagNumberRegex(ASTMetaInfo meta, String value) {
-        super(meta);
+    public ProtagNumberRegex(String value) {
         this.value = value;
     }
     @Override

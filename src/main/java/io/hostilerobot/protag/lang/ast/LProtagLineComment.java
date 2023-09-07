@@ -40,13 +40,17 @@ import java.util.Optional;
  */
 public final class LProtagLineComment extends AbstractProtagNode implements CCommentNode{
     private final CharSequence comment;
-    public LProtagLineComment(ASTMetaInfo meta, CharSequence comment) {
-        super(meta);
+    public LProtagLineComment(CharSequence comment) {
         this.comment = comment;
     }
 
     @Override
     public CharSequence getRawComment() {
         return comment;
+    }
+
+    @Override
+    public String toString() {
+        return "%s[#%s]".formatted(getClass().getSimpleName(), comment);
     }
 }
