@@ -37,25 +37,25 @@ public enum ProtagTokenType {
     $START(null),
     EOF(null),
     // non-terminal symbols
-    ProtagInteger(false),
-    ProtagReal(false),
-    ProtagWhitespace(false),
-    ProtagComment(false)
+//    ProtagInteger(false),
+//    ProtagReal(false),
+//    ProtagWhitespace(false),
+//    ProtagComment(false)
 
 
     ;
     private final String tokenSymbol;
     private final boolean isFixed;
     private final int terminalId;
-    private final boolean isTerminal;
+//    private final boolean isTerminal;
 
     public int getTerminalId() {
         return terminalId;
     }
 
     private static int getTerminalId(String name) {
-        for(int id = 0; id < ProtagSymbols.terminalNames.length; id++) {
-            if(name.equals(ProtagSymbols.terminalNames[id])) {
+        for(int id = 0; id < ProtagParserGenConstants.tokenImage.length; id++) {
+            if(name.equals(ProtagParserGenConstants.tokenImage[id])) {
 //                System.out.printf("name:%s = id:%d\n", name, id);
                 return id;
             }
@@ -64,23 +64,26 @@ public enum ProtagTokenType {
         return -1;
     }
 
-    ProtagTokenType() {
+    ProtagTokenType()/* {
         this(true);
     }
-    ProtagTokenType(boolean isTerminal) {
+    ProtagTokenType(boolean isTerminal) */{
         this.isFixed = false;
         this.tokenSymbol = null;
-        this.isTerminal = isTerminal;
-        this.terminalId = getTerminalId(name());
+//        this.isTerminal = isTerminal;
+        this.terminalId = getTerminalId(getImage());
     }
     ProtagTokenType(String tokenSymbol) {
         this.isFixed = true;
-        this.isTerminal = true;
+//        this.isTerminal = true;
         this.tokenSymbol = tokenSymbol;
-        this.terminalId = getTerminalId(name());
+        this.terminalId = getTerminalId(getImage());
     }
     public String getTokenSymbol() {
         return tokenSymbol;
+    }
+    public String getImage() {
+        return "<" + name() + ">";
     }
 
     /**

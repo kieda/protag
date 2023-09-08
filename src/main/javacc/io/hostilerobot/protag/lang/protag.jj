@@ -1,0 +1,470 @@
+options {
+    USER_TOKEN_MANAGER=true;
+    STATIC = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC=false;
+    //GENERATE_BOILERPLATE = true;
+}
+PARSER_BEGIN(ProtagParserGen)
+package io.hostilerobot.protag.lang;
+
+import java.util.*;
+import java.io.*;
+import io.hostilerobot.protag.lang.ProtagLexer;
+import io.hostilerobot.protag.lang.ProtagSymbol;
+import io.hostilerobot.protag.lang.ProtagTokenType;
+import io.hostilerobot.protag.lang.ast.*;
+import io.hostilerobot.protag.lang.ast.impl.*;import org.apache.commons.math.fraction.Fraction;
+
+class ProtagParserGen {
+    public ProtagParserGen(ProtagLexer lexer) {
+        this((TokenManager)lexer);
+        token = new StartToken();
+    }
+
+    public void ReInit(ProtagLexer lexer) {
+        this.ReInit((TokenManager) lexer);
+        token = new StartToken();
+    }
+}}
+}
+
+
+PARSER_END(ProtagParserGen)
+
+// todo - factory for implementation?
+
+/** Main production. */
+//yapping ::= yapping_?
+public IProtagSequence program() :
+{
+    IProtagSequence result = null;
+}
+{
+//  Plus() {return ESignType.PLUS; } | Minus() {return ESignType.MINUS; }
+    [result=ProtagSequence(null, null)] <EOF>
+    {
+
+        if(result == null)
+            result = new ProtagSequence();
+        return result;
+    }
+}
+//private yapping_ ::= Properties|(item yapping_?)
+IProtagSequence ProtagSequence(ProtagNode parent, ProtagProperties context) :
+{
+    IProtagSequence result = new ProtagSequence();
+}
+{
+    properties=ProtagProperties(result, context)
+    {
+        
+    }
+    | item() [ProtagSequence(result, context)]
+    {
+    }
+}
+//private item ::=
+//    UnboundedData
+//    |COMMENT|WHITESPACE // whitespace
+private ProtagNode item() :
+{
+    ProtagNode item;
+}
+{
+    item=unboundedData()
+    {
+        return item;
+    }
+    |<COMMENT>
+    |<WHITESPACE>
+}
+//private BaseData ::=
+//    yPath1|jPath|fPath // paths. final path is a two part or more yapping segment
+//    |ySegmentMulti  // single yapping segment (not a path)
+//    |Precedence // (x)
+//    |Map|List   // composite data
+//    |REAL|QUOTIENT|INTEGER  // primitive - numbers
+//    |REGEX|LITERAL|YNAME // primitive - string types
+private ProtagNode baseData() :
+{
+    ProtagNode result;
+}
+{
+    (
+        result=ProtagPath()
+        | result=JavaPath()
+        | result=FilePath()
+        | result=ProtagPathSegment()
+        | result=ProtagPrecedence()
+        | result=ProtagMap()
+        | result=ProtagList()
+        | result=ProtagReal()
+        | result=ProtagQuotient()
+        | result=ProtagInteger()
+        | result=ProtagRegex()
+        | result=ProtagLiteral()
+        | result=ProtagName()
+    )
+    {
+        return result;
+    }
+}
+// *** Java Paths and Scopes ***
+    IJavaPath JavaPath() :
+    {}
+    {
+        <JPATH_START> spacing() jScope()
+    }
+    private List<IJavaPathSegment> jScope() :
+    {}
+    {
+        JavaPathSegment() [spacing() <DOT> spacing() jScope()]
+    }
+    public IJavaPathSegment JavaPathSegment() :
+    {}
+    {
+        jSegmentMulti() | jSegmentSingle()
+    }
+    private ProtagNode jSegmentSingle() :
+    {}
+    {
+        <JNAME> | containedSegment()
+    }
+    private List<ProtagNode> jSegmentMulti() :
+    {}
+    {
+        (<JNAME> jSegmentExclJBody())
+        | (containedSegment() jSegmentInclJBody())
+    }
+    private List<ProtagNode> jSegmentInclJBody() :
+    {}
+    {
+        <JBODY> [jSegmentExclJBody()]
+        | jSegmentExclJBody()
+    }
+    private List<ProtagNode> jSegmentExclJBody() :
+    {}
+    {
+        containedSegment() [jSegmentInclJBody()]
+    }
+// *** File Paths and Scopes ***
+    //    fPath ::= (FPATH_START spacing fScope)
+    IFilePath FilePath() :
+    {}
+    {
+        <FPATH_START> spacing() fScope()
+    }
+    //    private fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
+    private List<IFilePathSegment> fScope() :
+    {}
+    {
+        FilePathSegment() [spacing() <SLASH> spacing() fScope()]
+    }
+    //    private fScopeSegment ::= fSegmentMulti | fSegmentSingle
+    IFilePathSegment FilePathSegment() :
+    {}
+    {
+        fSegmentMulti() | fSegmentSingle()
+    }
+    //    private fSegmentSingle ::= FNAME | containedSegment
+    private ProtagNode fSegmentSingle() :
+    {}
+    {
+        <FNAME> | containedSegment()
+    }
+    //    fSegmentMulti ::= (containedSegment fSegmentInclFName)
+    //        | (FNAME fSegmentExclFName) {methods=[isElementType]}
+    private List<ProtagNode> fSegmentMulti() :
+    {}
+    {
+        containedSegment() fSegmentInclFName()
+        | <FNAME> fSegmentExclFName()
+    }
+    //    private fSegmentInclFName ::= (FNAME (fSegmentExclFName?))
+    //        | fSegmentExclFName
+    private List<ProtagNode> fSegmentInclFName() :
+    {
+    }
+    {
+        <FNAME> [fSegmentExclFName()]
+        | fSegmentExclFName()
+    }
+    //    private fSegmentExclFName ::= containedSegment fSegmentInclFName?
+    private List<ProtagNode> fSegmentExclFName() :
+    {}
+    {
+        containedSegment() [fSegmentInclFName()]
+    }
+// *** Protag Paths and Scopes ***
+//    //yPath0 ::= yPath1|NATURAL|ySegmentExclNat // single a or a(.b)+
+//    yPath1 ::= ((NATURAL spacing DOT spacing ySegmentExclNat) (spacing DOT spacing yPathRest)?)
+//        | (ySegmentExclNat spacing DOT spacing yPathRest) {methods=[isElementType]}
+    public IProtagPath ProtagPath() :
+    {}
+    {
+        <NATURAL> spacing() <DOT> spacing() protagSegmentExclNat()
+        | protagSegmentExclNat() spacing() <DOT> spacing() protagPathRest()
+    }
+    //    private ySegmentExclNat ::= ySegmentMulti | containedSegment | YNAME  // multi segments are not considered nats
+    private IProtagPathSegment protagSegmentExclNat() :
+    {}
+    {
+        ProtagPathSegment() | containedSegment() | <PNAME>
+    }
+    //    private yPathRest ::= (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
+    private List<ProtagNode> protagPathRest() :
+    {}
+    {
+        (ProtagPath()
+        |containedSegment()
+        | <PNAME>
+        | <NATURAL>) [spacing() <DOT> spacing() protagPathRest()]
+    }
+    //    ySegmentMulti ::= (containedSegment ySegmentInclVals)
+    //        | ((YNAME|NATURAL) ySegmentExclVals) {methods=[isElementType]}
+    IProtagPathSegment ProtagPathSegment() :
+    {}
+    {
+        containedSegment() protagSegmentInclVals()
+        | (<PNAME>|<NATURAL>) protagSegmentExclVals()
+    }
+    //    private ySegmentExclVals ::= containedSegment ySegmentInclVals?
+    private List<ProtagNode> protagSegmentExclVals() :
+    {}
+    {
+        containedSegment() [protagSegmentInclVals()]
+    }
+    //    private ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
+    //        | ySegmentExclVals
+    private List<ProtagNode> protagSegmentInclVals() :
+    {
+
+    }
+    {
+        (<NATURAL>|<PBODY>) [protagSegmentExclVals()]
+        | protagSegmentExclVals()
+    }
+
+//QUOTIENT ::= (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4, 1/2
+LProtagQuotient ProtagQuotient() :
+{
+    XInteger intPart;
+    XInteger numerator;
+    ProtagNaturalToken denominator;
+}
+{
+    [intPart=IntegerVal() spacing() <AND> spacing()] numerator=IntegerVal() spacing() <SLASH> spacing() denominator=<NATURAL>
+    {
+        int integerPart = intPart.toInteger();
+        // todo if denominator is zero, we should probably throw somewhere and make it more explicit to user
+        Fraction fractionalPart = new Fraction(numerator.toInteger(), denominator.getValue());
+        return new LProtagQuotient(fractionalPart.add(integerPart));
+    }
+}
+XInteger IntegerVal() :
+{
+    ESignType sign = ESignType.NONE;
+    ProtagNaturalToken nat;
+}
+{
+    [sign=Sign() spacing()] nat=<NATURAL>
+    {
+        return new XInteger(sign, nat.getValue());
+    }
+}
+//INTEGER ::= (SIGN spacing)? NATURAL
+LProtagInteger ProtagInteger() :
+{
+    ESignType sign = ESignType.NONE;
+    ProtagNaturalToken nat;
+}
+{
+    [sign=Sign() spacing()] nat=<NATURAL>
+    {
+        return new LProtagInteger(sign,negate(nat.getValue()));
+    }
+}
+//REAL ::= (SIGN spacing)? DECIMAL
+LProtagReal ProtagReal() :
+{
+    ESignType sign = ESignType.NONE;
+    XDecimal decimal;
+}
+{
+    [sign=Sign() spacing()] decimal=Decimal()
+    {
+        return new LProtagReal(decimal.toDouble(sign));
+    }
+}
+//private DECIMAL ::= NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
+XDecimal Decimal() :
+{
+    ProtagNaturalToken integerPart;
+    ProtagNaturalToken fractionalPart;
+}
+{
+    integerPart=<NATURAL> <DOT> fractionalPart=<NATURAL>
+    { return new XDecimal(integerPart.getValue(), fractionalPart.getValue());}
+}
+//private SIGN ::= (PLUS|MINUS)
+ESignType Sign() :
+{}
+{
+    <PLUS>
+    { return ESignType.PLUS; }
+    | <MINUS>
+    { return ESignType.MINUS; }
+}
+
+//Properties ::= BaseData spacing PROPERTY_SEP (yapping_)? {
+IProtagProperties ProtagProperties(ProtagNode parent, IProtagProperties context) :
+{
+    IProtagProperties result = context == null ? new ProtagProperties() : context;
+    ProtagNode name;
+    IProtagSequence body;
+}
+{
+    name=baseData() spacing() <PROPERTY_SEP> [body=ProtagSequence(parent, result)]
+    {
+
+    }
+}
+
+//Map ::= (MAP_START spacing MAP_END) // {}
+//    // { a = b[, c = d]* }
+//    | (MAP_START spacing PairBounded (spacing LIST_SEP spacing PairBounded)* spacing MAP_END) {
+//        methods=[isElementType]
+//    }
+IProtagMap ProtagMap() :
+{}
+{
+    <MAP_START> spacing() <MAP_END>
+    | <MAP_START> spacing() pairBounded() (spacing() <LIST_SEP> spacing() pairBounded())* spacing() <MAP_END>
+}
+
+//List ::= (LIST_START LIST_END) // []
+//    // [a[, b]*]
+//    | LIST_START spacing BoundedData (spacing LIST_SEP spacing BoundedData)* spacing LIST_END {
+//        methods=[isElement]
+//    }
+IProtagList ProtagList() :
+{}
+{
+    <LIST_START> <LIST_END>
+    | <LIST_START> spacing() boundedData() (spacing() <LIST_SEP> spacing() boundedData())* spacing() <LIST_END>
+}
+
+//Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
+IProtagPrecedence ProtagPrecedence() :
+{}
+{
+    <PRECEDENCE_START> spacing() boundedData() spacing() <PRECEDENCE_END>
+}
+
+//private UnboundedData ::= PairExpr|TransitionLExpr|TransitionRExpr|BaseData
+private ProtagNode unboundedData() :
+{}
+{
+    ProtagPair()
+    | ProtagTransitionLeft()
+    | ProtagTransitionRight()
+    | baseData()
+}
+
+//PairExpr ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing UnboundedData
+IProtagPair ProtagPair() :
+{}
+{
+   ( ProtagTransitionLeft()
+    | ProtagTransitionRight()
+    | baseData() ) spacing() <PAIR_SEP> spacing() unboundedData()
+}
+//TransitionLExpr ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing (TransitionLExpr|TransitionRExpr|BaseData)
+IProtagTransitionLeft ProtagTransitionLeft() :
+{}
+{
+    ( ProtagTransitionRight() | baseData() ) spacing()
+        <TRANSITION_SEP_L> spacing()
+        (ProtagTransitionLeft() | ProtagTransitionRight() | baseData() )
+}
+//TransitionRExpr ::= BaseData spacing TRANSITION_SEP_R spacing (TransitionRExpr|BaseData)
+IProtagTransitionRight ProtagTransitionRight() :
+{}
+{
+    baseData() spacing() <TRANSITION_SEP_R> spacing() ( ProtagTransitionRight() | baseData() )
+}
+//
+//private BoundedData ::= PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData
+private ProtagNode boundedData() :
+{}
+{
+    pairBounded()
+    | ProtagTransitionLeftBounded()
+    | ProtagTransitionRightBounded()
+    | ProtagProperties()
+    | baseData()
+}
+
+//PairBounded ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing BoundedData
+private ProtagNode pairBounded() :
+{}
+{
+    ( ProtagTransitionLeft()
+    | ProtagTransitionRight()
+    | baseData() ) spacing() <PAIR_SEP> spacing() boundedData()
+
+}
+//TransitionLBounded ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing (TransitionLBounded|TransitionRBounded|Properties|BaseData)
+private IProtagTransitionLeft ProtagTransitionLeftBounded() :
+{}
+{
+    ( ProtagTransitionRight() | baseData() ) spacing()
+        <TRANSITION_SEP_L> spacing()
+        ( ProtagTransitionLeftBounded() | ProtagTransitionRightBounded() | ProtagProperties() | baseData() )
+
+}
+//TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing (TransitionRBounded|Properties|BaseData)
+private IProtagTransitionRight ProtagTransitionRightBounded() :
+{}
+{
+    baseData() spacing() <TRANSITION_SEP_R> spacing() ( ProtagTransitionRightBounded() | ProtagProperties() | baseData() )
+}
+//
+//// all these items that can be contained in a path and have incipient and terminator chars.
+//private containedSegment ::= REGEX|LITERAL|List|Map|Precedence
+private ProtagNode containedSegment() :
+{}
+{
+    ProtagRegex()
+    | ProtagLiteral()
+    | ProtagList()
+    | ProtagMap()
+    | ProtagPrecedence()
+}
+//| ProtagRegex()
+//    | ProtagLiteral()
+//    | ProtagIdentifier()
+IProtagRegex ProtagRegex() :
+{}
+{
+    <REGEX>
+}
+LProtagLiteral ProtagLiteral()
+{}
+{
+    <LITERAL>
+}
+LProtagName ProtagName() :
+{}
+{
+    <PNAME>
+}
+
+//// asdf10&3/4 vs "asdf"10 & 3/4"asdf"
+//// spacing items
+//private spacing ::= (WHITESPACE|COMMENT)*
+private void spacing() :
+{}
+{
+    ( <WHITESPACE> | <COMMENT> )*
+}

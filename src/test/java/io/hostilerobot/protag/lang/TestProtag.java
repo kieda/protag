@@ -13,11 +13,12 @@ public class TestProtag {
         System.out.println(test.length());
 
         ProtagLexer pl = new ProtagLexer(new StringReader(test));
-        ProtagParser pp = new ProtagParser(pl, new ProtagSymbolFactory());
+        ProtagParser pp = new ProtagParser(pl);
 
-        Symbol s = pp.parse();
-        System.out.println(s);
-        System.out.println(s.value);
+//        pp.
+//        Symbol s = pp.parse();
+        //System.out.println(s);
+        //System.out.println(s.value);
 
     }
 }

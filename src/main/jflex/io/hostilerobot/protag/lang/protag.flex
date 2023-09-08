@@ -1,20 +1,31 @@
 package io.hostilerobot.protag.lang;
 
-import java.util.ArrayDeque;import java.util.Deque;
+import java.io.IOError;import java.io.IOException;import java.util.ArrayDeque;import java.util.Deque;
 import static io.hostilerobot.protag.lang.ProtagTokenType.*;
 
 %%
 %public
 %class ProtagLexer
 %unicode
-%cupsym ProtagSymbols
+//%cupsym ProtagSymbols
 //%extends ProtagSymbols
+%implements TokenSource<ProtagSymbol>
 %type ProtagSymbol
-%cup
+%function _getNextToken
+//%cup
 %char
 %line
 %column
 %{
+@Override
+public ProtagSymbol getNextToken() {
+      try {
+          return _getNextToken();
+      } catch(IOException ex) {
+          throw new IOError(ex);
+      }
+}
+
 
 private Location currentLocation() {
     return new Location(yyline, yycolumn, (int)yychar);
@@ -234,7 +245,6 @@ private static String zzToPrintable(CharSequence cs) {
     return zzToPrintable(cs.toString());
 }
 %}
-
 %eofval{
     return symbol(EOF);
 %eofval}

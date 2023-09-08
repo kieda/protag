@@ -9,7 +9,7 @@ import static io.hostilerobot.protag.lang.ProtagTokenType.*;
 
 
 @SuppressWarnings("fallthrough")
-public class ProtagLexer implements TokenSource<ProtagSymbol> {
+public class ProtagLexer implements TokenManager {
 
   /** This character denotes the end of file. */
   public static final int YYEOF = -1;

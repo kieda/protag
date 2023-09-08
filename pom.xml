@@ -48,10 +48,15 @@
       <artifactId>jflex</artifactId>
       <version>1.9.1</version>
     </dependency>
+<!--    <dependency>-->
+<!--      <groupId>com.github.vbmacher</groupId>-->
+<!--      <artifactId>java-cup-runtime</artifactId>-->
+<!--      <version>11b-20160615-2</version>-->
+<!--    </dependency>-->
     <dependency>
-      <groupId>com.github.vbmacher</groupId>
-      <artifactId>java-cup-runtime</artifactId>
-      <version>11b-20160615-2</version>
+      <groupId>javacc</groupId>
+      <artifactId>javacc</artifactId>
+      <version>4.1</version>
     </dependency>
     <!--<dependency>
       <groupId>de.jflex</groupId>
@@ -136,25 +141,46 @@
           <outputDirectory>gen</outputDirectory>
         </configuration>
       </plugin>
+
+<!--      <plugin>-->
+<!--        <groupId>com.github.vbmacher</groupId>-->
+<!--        <artifactId>cup-maven-plugin</artifactId>-->
+<!--        <version>11b-20160615-2</version>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>generate</goal>-->
+<!--            </goals>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <configuration>-->
+<!--          <packageName>io.hostilerobot.protag.lang</packageName>-->
+<!--          <className>ProtagParser</className>-->
+<!--          <symbolsName>ProtagSymbols</symbolsName>-->
+<!--          <cupDefinition>${protag.lang.directory}/${protag.lang.packagefolder}/protag.cup</cupDefinition>-->
+<!--          <outputDirectory>gen</outputDirectory>-->
+<!--        </configuration>-->
+<!--      </plugin>-->
       <plugin>
-        <groupId>com.github.vbmacher</groupId>
-        <artifactId>cup-maven-plugin</artifactId>
-        <version>11b-20160615-2</version>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>javacc-maven-plugin</artifactId>
+        <version>3.0.1</version>
         <executions>
           <execution>
             <goals>
-              <goal>generate</goal>
+              <goal>javacc</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
-          <packageName>io.hostilerobot.protag.lang</packageName>
-          <className>ProtagParser</className>
-          <symbolsName>ProtagSymbols</symbolsName>
-          <cupDefinition>${protag.lang.directory}/${protag.lang.packagefolder}/protag.cup</cupDefinition>
+          <sourceDirectory>src/main/javacc</sourceDirectory>
           <outputDirectory>gen</outputDirectory>
+          <includes>
+            <include>io/hostilerobot/protag/lang/protag.jj</include>
+          </includes>
         </configuration>
       </plugin>
+
     </plugins>
   </build>
 </project>
