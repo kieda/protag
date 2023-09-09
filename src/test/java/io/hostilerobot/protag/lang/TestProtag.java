@@ -7,7 +7,7 @@ import java.io.StringReader;
 
 public class TestProtag {
     static String test = """
-            a = b <- 123"asdf" -> d
+            {map = section: val poo: cool, val = 1}
             """;
 //    static String test = """
 //            "x"(sadf)y13`v`12.123"x".213

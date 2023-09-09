@@ -11,63 +11,66 @@ interface ProtagParserGenConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int WHITESPACE = 1;
+  int PROPERTY_SEP = 1;
   /** RegularExpression Id. */
-  int DOT = 2;
+  int WHITESPACE = 2;
   /** RegularExpression Id. */
-  int NATURAL = 3;
+  int DOT = 3;
   /** RegularExpression Id. */
-  int PNAME = 4;
+  int NATURAL = 4;
   /** RegularExpression Id. */
-  int AND = 5;
+  int PNAME = 5;
   /** RegularExpression Id. */
-  int SLASH = 6;
+  int AND = 6;
   /** RegularExpression Id. */
-  int JPATH_START = 7;
+  int SLASH = 7;
   /** RegularExpression Id. */
-  int JNAME = 8;
+  int JPATH_START = 8;
   /** RegularExpression Id. */
-  int JBODY = 9;
+  int JNAME = 9;
   /** RegularExpression Id. */
-  int FPATH_START = 10;
+  int JBODY = 10;
   /** RegularExpression Id. */
-  int FNAME = 11;
+  int FPATH_START = 11;
   /** RegularExpression Id. */
-  int PBODY = 12;
+  int FNAME = 12;
   /** RegularExpression Id. */
-  int PLUS = 13;
+  int PBODY = 13;
   /** RegularExpression Id. */
-  int MINUS = 14;
+  int PLUS = 14;
   /** RegularExpression Id. */
-  int MAP_START = 15;
+  int MINUS = 15;
   /** RegularExpression Id. */
-  int MAP_END = 16;
+  int MAP_START = 16;
   /** RegularExpression Id. */
-  int LIST_SEP = 17;
+  int MAP_END = 17;
   /** RegularExpression Id. */
-  int LIST_START = 18;
+  int LIST_SEP = 18;
   /** RegularExpression Id. */
-  int LIST_END = 19;
+  int LIST_START = 19;
   /** RegularExpression Id. */
-  int PRECEDENCE_START = 20;
+  int LIST_END = 20;
   /** RegularExpression Id. */
-  int PRECEDENCE_END = 21;
+  int PRECEDENCE_START = 21;
   /** RegularExpression Id. */
-  int PAIR_SEP = 22;
+  int PRECEDENCE_END = 22;
   /** RegularExpression Id. */
-  int TRANSITION_SEP_R = 23;
+  int PAIR_SEP = 23;
   /** RegularExpression Id. */
-  int TRANSITION_SEP_L = 24;
+  int TRANSITION_SEP_R = 24;
   /** RegularExpression Id. */
-  int REGEX = 25;
+  int TRANSITION_SEP_L = 25;
   /** RegularExpression Id. */
-  int LITERAL = 26;
+  int REGEX = 26;
   /** RegularExpression Id. */
-  int COMMENT = 27;
+  int LITERAL = 27;
+  /** RegularExpression Id. */
+  int COMMENT = 28;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
+    "<PROPERTY_SEP>",
     "<WHITESPACE>",
     "<DOT>",
     "<NATURAL>",
