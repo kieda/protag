@@ -27,6 +27,6 @@ public class ProtagParser implements Parser<ProtagSymbol, ProtagNode, ProtagLexe
 
     @Override
     public ProtagNode parse() throws ParseException {
-        return (ProtagNode) internal.Start();
+        return internal.program();
     }
 }

@@ -11,6 +11,9 @@ public abstract class AbstractListLikeNode<T extends ProtagNode> extends Abstrac
     public AbstractListLikeNode() {
         this.items = new LinkedList<>();
     }
+    public AbstractListLikeNode(LinkedList<T> items) {
+        this.items = items;
+    }
 
     @Override
     public Deque<T> getItems() {

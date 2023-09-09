@@ -17,6 +17,23 @@ import static io.hostilerobot.protag.lang.ProtagTokenType.*;
 %line
 %column
 %{
+private int markedPos = -1;
+private Location markedLocation = null;
+
+private void mark() {
+    if(isMarked())
+        throw new IllegalStateException("Already marked! call unmark() before calling this.");
+    markedPos = zzStartRead;
+    markedLocation = currentLocation();
+}
+private void unmark() {
+    markedPos = -1;
+    markedLocation = null;
+}
+private boolean isMarked() {
+    return markedPos >= 0 && markedLocation != null;
+}
+
 @Override
 public ProtagSymbol getNextToken() {
       try {
@@ -26,7 +43,20 @@ public ProtagSymbol getNextToken() {
       }
 }
 
-
+private String getText() {
+    if(isMarked()) {
+        return new String(zzBuffer, markedPos, zzMarkedPos-markedPos);
+    } else {
+        return yytext();
+    }
+}
+private Location getLocation() {
+    if(isMarked()) {
+        return markedLocation;
+    } else {
+        return currentLocation();
+    }
+}
 private Location currentLocation() {
     return new Location(yyline, yycolumn, (int)yychar);
 }
@@ -40,6 +70,11 @@ private ProtagSymbol symbol( ProtagTokenType type ) {
         return new ProtagNaturalToken(currentLocation(), yytext());
     } else if(type.isFixed()) {
         return new ProtagSpecialToken(type, currentLocation());
+    } else if(type == LITERAL || type == REGEX){
+        String val = getText();
+        Location loc = getLocation();
+        unmark();
+        return new ProtagStringToken(type, loc, val);
     } else {
         return new ProtagStringToken(type, currentLocation(), yytext());
     }
@@ -71,6 +106,7 @@ private Deque<PathContext> context = new ArrayDeque<>();
 public void reset() {
     context.clear();
     context.push(PathContext.BASE);
+    unmark();
     yybegin(YYINITIAL);
 }
 
@@ -123,6 +159,7 @@ private void encounterJavaPath() {
 // new path that starts with a regex
 private void encounterRegexSegment() {
     debugCurrentState("START encounterRegexSegment");
+    mark();
     endTransition();
     context.push(PathContext.PROTAG);
     yybegin(REGEX_STATE);
@@ -133,6 +170,7 @@ private void encounterRegexSegment() {
 //       ^
 private void encounterLiteralSegment() {
     debugCurrentState("START encounterLiteralSegment");
+    mark();
     endTransition();
     context.push(PathContext.PROTAG);
     yybegin(LITERAL_STATE);
@@ -439,8 +477,14 @@ TRANSITION_SEP_R="->"
 <BEFORE_SLASH, BEFORE_JSCOPE, BEFORE_PSCOPE, AFTER_JSCOPE, AFTER_SLASH, AFTER_PSCOPE> {
     // if have another token that can be used in the path, then use it
     // after REGEX or LITERAL are parsed. Will fall back to BEFORE_(SCOPE|SLASH)
-    {REGEX_QUOTE}                                   {yybegin(REGEX_STATE);}
-    {LITERAL_QUOTE}                                 {yybegin(LITERAL_STATE);}
+    {REGEX_QUOTE}                                   {
+                                                        mark();
+                                                        yybegin(REGEX_STATE);
+                                                    }
+    {LITERAL_QUOTE}                                 {
+                                                        mark();
+                                                        yybegin(LITERAL_STATE);
+                                                    }
 }
 // DEFAULT 5: items that may be in a file path but not in a java path/yapping path
 <YYINITIAL, BEFORE_PSCOPE, BEFORE_JSCOPE, PENDING_PSCOPE, PENDING_JSCOPE, PENDING_SLASH> {

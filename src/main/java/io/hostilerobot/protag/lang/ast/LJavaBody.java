@@ -10,4 +10,8 @@ public final class LJavaBody extends AbstractProtagNode implements CStringNode, 
         return jbody;
     }
 
+    @Override
+    public String toString() {
+        return "%s[%s]".formatted(getClass().getSimpleName(), jbody);
+    }
 }

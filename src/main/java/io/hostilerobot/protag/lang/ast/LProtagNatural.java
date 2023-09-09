@@ -29,4 +29,9 @@ public final class LProtagNatural extends AbstractProtagNode implements CNumberN
     public Fraction toQuotient() {
         return new Fraction(nat, 1);
     }
+
+    @Override
+    public String toString() {
+        return "%s[%s]".formatted(getClass().getSimpleName(), nat);
+    }
 }

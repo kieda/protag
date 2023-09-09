@@ -26,4 +26,9 @@ public final class LProtagQuotient extends AbstractProtagNode implements CNumber
     public Fraction toQuotient() {
         return val;
     }
+
+    @Override
+    public String toString() {
+        return "%s[%s]".formatted(getClass().getSimpleName(), val);
+    }
 }

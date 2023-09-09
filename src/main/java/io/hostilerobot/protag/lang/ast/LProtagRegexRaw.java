@@ -10,4 +10,9 @@ public final class LProtagRegexRaw extends AbstractProtagNode implements IProtag
     public String getRawValue() {
         return regexVal;
     }
+
+    @Override
+    public String toString() {
+        return "%s[%s]".formatted(getClass().getSimpleName(), regexVal);
+    }
 }

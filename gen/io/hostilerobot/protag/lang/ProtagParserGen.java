@@ -8,7 +8,7 @@ import io.hostilerobot.protag.lang.ProtagLexer;
 import io.hostilerobot.protag.lang.ProtagSymbol;
 import io.hostilerobot.protag.lang.ProtagTokenType;
 import io.hostilerobot.protag.lang.ast.*;
-import io.hostilerobot.protag.lang.ast.impl.*;
+import io.hostilerobot.protag.lang.ast.impl.*;import org.apache.commons.math.fraction.Fraction;
 
 class ProtagParserGen implements ProtagParserGenConstants {
     public ProtagParserGen(ProtagLexer lexer) {
@@ -21,38 +21,1400 @@ class ProtagParserGen implements ProtagParserGenConstants {
         token = new StartToken();
     }
 
-  final public ESignType Start() throws ParseException {
+  final public IProtagSequence program() throws ParseException {IProtagSequence result = new ProtagSequence();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-    case PLUS:{
-      Plus();
-{if ("" != null) return ESignType.PLUS;}
-      break;
-      }
-    case MINUS:{
-      Minus();
-{if ("" != null) return ESignType.MINUS;}
+    case WHITESPACE:
+    case NATURAL:
+    case JPATH_START:
+    case PLUS:
+    case MINUS:
+    case LIST_START:
+    case PRECEDENCE_START:
+    case REGEX:
+    case LITERAL:
+    case PNAME:
+    case COMMENT:{
+      result = ProtagSequence(result, null);
       break;
       }
     default:
       jj_la1[0] = jj_gen;
+      ;
+    }
+    jj_consume_token(0);
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
+}
+
+//private yapping_ ::= Properties|(item yapping_?)
+  final public IProtagSequence ProtagSequence(IProtagSequence result, ProtagProperties context) throws ParseException {IProtagProperties properties;
+    ProtagNode item;
+    /*properties=ProtagProperties(result, context)
+        {
+    
+        }
+        | */item = item();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case WHITESPACE:
+    case NATURAL:
+    case JPATH_START:
+    case PLUS:
+    case MINUS:
+    case LIST_START:
+    case PRECEDENCE_START:
+    case REGEX:
+    case LITERAL:
+    case PNAME:
+    case COMMENT:{
+      ProtagSequence(result, context);
+      break;
+      }
+    default:
+      jj_la1[1] = jj_gen;
+      ;
+    }
+if(item != null) {
+            result.getItems().addFirst(item);
+        }
+        {if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
+}
+
+  final private ProtagNode item() throws ParseException {ProtagNode item = null;
+    LProtagLineComment lineComment;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case NATURAL:
+    case JPATH_START:
+    case PLUS:
+    case MINUS:
+    case LIST_START:
+    case PRECEDENCE_START:
+    case REGEX:
+    case LITERAL:
+    case PNAME:{
+      item = unboundedData();
+{if ("" != null) return item;}
+      break;
+      }
+    case COMMENT:{
+      lineComment = ProtagLineComment();
+// todo - add lineComment to meta table
+        {if ("" != null) return null;}
+      break;
+      }
+    case WHITESPACE:{
+      jj_consume_token(WHITESPACE);
+{if ("" != null) return null;}
+      break;
+      }
+    default:
+      jj_la1[2] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
     throw new Error("Missing return statement in function");
 }
 
-/** An Additive Expression. */
-  final public Token Plus() throws ParseException {
-    jj_consume_token(PLUS);
-{if ("" != null) return token;}
+  final private ProtagNode baseData() throws ParseException {ProtagNode result;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case JPATH_START:{
+      /*result=ProtagPath()
+              | */result = JavaPath();
+      break;
+      }
+    case PRECEDENCE_START:{
+      result = ProtagPrecedence();
+      break;
+      }
+    case LIST_START:{
+      result = ProtagList();
+      break;
+      }
+    default:
+      jj_la1[3] = jj_gen;
+      if (jj_2_1(2147483647)) {
+        result = ProtagReal();
+      } else if (jj_2_2(2147483647)) {
+        result = ProtagQuotient();
+      } else {
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case NATURAL:
+        case PLUS:
+        case MINUS:{
+          result = ProtagInteger();
+          break;
+          }
+        case REGEX:{
+          result = ProtagRegex();
+          break;
+          }
+        case LITERAL:{
+          result = ProtagLiteral();
+          break;
+          }
+        case PNAME:{
+          result = ProtagName();
+          break;
+          }
+        default:
+          jj_la1[4] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+      }
+    }
+{if ("" != null) return result;}
     throw new Error("Missing return statement in function");
 }
 
-  final public Token Minus() throws ParseException {
-    jj_consume_token(MINUS);
-{if ("" != null) return token;}
+// *** Java Paths and Scopes ***
+  final public     IJavaPath JavaPath() throws ParseException {LinkedList<IJavaPathSegment> segments = new LinkedList<>();
+        List<IJavaPathSegment> result;
+    jj_consume_token(JPATH_START);
+    spacing();
+    result = jScope(segments);
+{if ("" != null) return new JavaPath(segments);}
     throw new Error("Missing return statement in function");
 }
+
+  final private List<IJavaPathSegment> jScope(LinkedList<IJavaPathSegment> segments) throws ParseException {IJavaPathSegment item;
+    item = JavaPathSegment();
+    if (jj_2_3(2147483647)) {
+      spacing();
+      jj_consume_token(DOT);
+      spacing();
+      jScope(segments);
+    } else {
+      ;
+    }
+segments.addFirst(item);
+            {if ("" != null) return segments;}
+    throw new Error("Missing return statement in function");
+}
+
+  final public IJavaPathSegment JavaPathSegment() throws ParseException {LinkedList<ProtagNode> pathSegments = new LinkedList<>();
+        ProtagNode singleSegment;
+    if (jj_2_4(2)) {
+      jSegmentMulti(pathSegments);
+{if ("" != null) return new JavaPathSegment(pathSegments);}
+    } else {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case JNAME:
+      case LIST_START:
+      case PRECEDENCE_START:
+      case REGEX:
+      case LITERAL:{
+        singleSegment = jSegmentSingle();
+pathSegments.addFirst(singleSegment);
+            {if ("" != null) return new JavaPathSegment(pathSegments);}
+        break;
+        }
+      default:
+        jj_la1[5] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    throw new Error("Missing return statement in function");
+}
+
+  final private ProtagNode jSegmentSingle() throws ParseException {Token jName;
+        ProtagNode segment;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case JNAME:{
+      jName = jj_consume_token(JNAME);
+ProtagStringToken pst = (ProtagStringToken) jName;
+            {if ("" != null) return new LJavaName(String.valueOf(pst.getValue()));}
+      break;
+      }
+    case LIST_START:
+    case PRECEDENCE_START:
+    case REGEX:
+    case LITERAL:{
+      segment = containedSegment();
+{if ("" != null) return segment;}
+      break;
+      }
+    default:
+      jj_la1[6] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+}
+
+  final private List<ProtagNode> jSegmentMulti(LinkedList<ProtagNode> pathSegments) throws ParseException {Token jName;
+        ProtagNode segmentItem;
+    if (jj_2_5(2)) {
+      jName = jj_consume_token(JNAME);
+      jSegmentExclJBody(pathSegments);
+ProtagStringToken pst = (ProtagStringToken) jName;
+            pathSegments.addFirst(new LJavaName(String.valueOf(pst.getValue())));
+            {if ("" != null) return pathSegments;}
+    } else if (jj_2_6(2)) {
+      segmentItem = containedSegment();
+      jSegmentInclJBody(pathSegments);
+pathSegments.addFirst(segmentItem);
+            {if ("" != null) return pathSegments;}
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+}
+
+  final private List<ProtagNode> jSegmentInclJBody(LinkedList<ProtagNode> pathSegments) throws ParseException {Token jBody;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case JBODY:{
+      jBody = jj_consume_token(JBODY);
+      if (jj_2_7(2147483647)) {
+        jSegmentExclJBody(pathSegments);
+      } else {
+        ;
+      }
+ProtagStringToken pst = (ProtagStringToken) jBody;
+            pathSegments.addFirst(new LJavaBody(String.valueOf(pst.getValue())));
+            {if ("" != null) return pathSegments;}
+      break;
+      }
+    default:
+      jj_la1[7] = jj_gen;
+      if (jj_2_8(2147483647)) {
+        jSegmentExclJBody(pathSegments);
+{if ("" != null) return pathSegments;}
+      } else {
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    throw new Error("Missing return statement in function");
+}
+
+  final private List<ProtagNode> jSegmentExclJBody(LinkedList<ProtagNode> pathSegments) throws ParseException {ProtagNode segmentItem;
+    segmentItem = containedSegment();
+    if (jj_2_9(2147483647)) {
+      jSegmentInclJBody(pathSegments);
+    } else {
+      ;
+    }
+pathSegments.addFirst(segmentItem);
+            {if ("" != null) return pathSegments;}
+    throw new Error("Missing return statement in function");
+}
+
+/*
+// *** File Paths and Scopes ***
+    //    fPath ::= (FPATH_START spacing fScope)
+    IFilePath FilePath() :
+    {}
+    {
+        <FPATH_START> spacing() fScope()
+    }
+    //    private fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
+    private List<IFilePathSegment> fScope() :
+    {}
+    {
+        FilePathSegment() [spacing() <SLASH> spacing() fScope()]
+    }
+    //    private fScopeSegment ::= fSegmentMulti | fSegmentSingle
+    IFilePathSegment FilePathSegment() :
+    {}
+    {
+        fSegmentMulti() | fSegmentSingle()
+    }
+    //    private fSegmentSingle ::= FNAME | containedSegment
+    private ProtagNode fSegmentSingle() :
+    {}
+    {
+        <FNAME> | containedSegment()
+    }
+    //    fSegmentMulti ::= (containedSegment fSegmentInclFName)
+    //        | (FNAME fSegmentExclFName) {methods=[isElementType]}
+    private List<ProtagNode> fSegmentMulti() :
+    {}
+    {
+        containedSegment() fSegmentInclFName()
+        | <FNAME> fSegmentExclFName()
+    }
+    //    private fSegmentInclFName ::= (FNAME (fSegmentExclFName?))
+    //        | fSegmentExclFName
+    private List<ProtagNode> fSegmentInclFName() :
+    {
+    }
+    {
+        <FNAME> [fSegmentExclFName()]
+        | fSegmentExclFName()
+    }
+    //    private fSegmentExclFName ::= containedSegment fSegmentInclFName?
+    private List<ProtagNode> fSegmentExclFName() :
+    {}
+    {
+        containedSegment() [fSegmentInclFName()]
+    }
+
+// *** Protag Paths and Scopes ***
+//    //yPath0 ::= yPath1|NATURAL|ySegmentExclNat // single a or a(.b)+
+//    yPath1 ::= ((NATURAL spacing DOT spacing ySegmentExclNat) (spacing DOT spacing yPathRest)?)
+//        | (ySegmentExclNat spacing DOT spacing yPathRest) {methods=[isElementType]}
+    public IProtagPath ProtagPath() :
+    {}
+    {
+        <NATURAL> spacing() <DOT> spacing() protagSegmentExclNat()
+        | protagSegmentExclNat() spacing() <DOT> spacing() protagPathRest()
+    }
+    //    private ySegmentExclNat ::= ySegmentMulti | containedSegment | YNAME  // multi segments are not considered nats
+    private IProtagPathSegment protagSegmentExclNat() :
+    {}
+    {
+        ProtagPathSegment() | containedSegment() | <PNAME>
+    }
+    //    private yPathRest ::= (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
+    private List<ProtagNode> protagPathRest() :
+    {}
+    {
+        (ProtagPath()
+        |containedSegment()
+        | <PNAME>
+        | <NATURAL>) [spacing() <DOT> spacing() protagPathRest()]
+    }
+    //    ySegmentMulti ::= (containedSegment ySegmentInclVals)
+    //        | ((YNAME|NATURAL) ySegmentExclVals) {methods=[isElementType]}
+    IProtagPathSegment ProtagPathSegment() :
+    {}
+    {
+        containedSegment() protagSegmentInclVals()
+        | (<PNAME>|<NATURAL>) protagSegmentExclVals()
+    }
+    //    private ySegmentExclVals ::= containedSegment ySegmentInclVals?
+    private List<ProtagNode> protagSegmentExclVals() :
+    {}
+    {
+        containedSegment() [protagSegmentInclVals()]
+    }
+    //    private ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
+    //        | ySegmentExclVals
+    private List<ProtagNode> protagSegmentInclVals() :
+    {
+
+    }
+    {
+        (<NATURAL>|<PBODY>) [protagSegmentExclVals()]
+        | protagSegmentExclVals()
+    }
+*/
+
+//QUOTIENT ::= (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4, 1/2
+  final public LProtagQuotient ProtagQuotient() throws ParseException {XInteger intPart;
+    XInteger numerator;
+    Token denominator;
+    if (jj_2_10(2147483647)) {
+      intPart = IntegerVal();
+      spacing();
+      jj_consume_token(AND);
+      spacing();
+      numerator = IntegerVal();
+      spacing();
+      jj_consume_token(SLASH);
+      spacing();
+      denominator = jj_consume_token(NATURAL);
+int integerPart = intPart.toInteger();
+        // todo if denominator is zero, we should probably throw somewhere and make it more explicit to user
+        Fraction fractionalPart = new Fraction(numerator.toInteger(), ((ProtagNaturalToken)denominator).getValue());
+        {if ("" != null) return new LProtagQuotient(fractionalPart.add(integerPart));}
+    } else {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case NATURAL:
+      case PLUS:
+      case MINUS:{
+        numerator = IntegerVal();
+        spacing();
+        jj_consume_token(SLASH);
+        spacing();
+        denominator = jj_consume_token(NATURAL);
+Fraction fractionalPart = new Fraction(numerator.toInteger(), ((ProtagNaturalToken)denominator).getValue());
+        {if ("" != null) return new LProtagQuotient(fractionalPart);}
+        break;
+        }
+      default:
+        jj_la1[8] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    throw new Error("Missing return statement in function");
+}
+
+  final public XInteger IntegerVal() throws ParseException {ESignType sign = ESignType.NONE;
+    Token nat;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case PLUS:
+    case MINUS:{
+      sign = Sign();
+      spacing();
+      break;
+      }
+    default:
+      jj_la1[9] = jj_gen;
+      ;
+    }
+    nat = jj_consume_token(NATURAL);
+{if ("" != null) return new XInteger(sign, ((ProtagNaturalToken)nat).getValue());}
+    throw new Error("Missing return statement in function");
+}
+
+//INTEGER ::= (SIGN spacing)? NATURAL
+  final public LProtagInteger ProtagInteger() throws ParseException {ESignType sign = ESignType.NONE;
+    Token nat;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case PLUS:
+    case MINUS:{
+      sign = Sign();
+      spacing();
+      break;
+      }
+    default:
+      jj_la1[10] = jj_gen;
+      ;
+    }
+    nat = jj_consume_token(NATURAL);
+{if ("" != null) return new LProtagInteger(sign.negate(((ProtagNaturalToken)nat).getValue()));}
+    throw new Error("Missing return statement in function");
+}
+
+//REAL ::= (SIGN spacing)? DECIMAL
+  final public LProtagReal ProtagReal() throws ParseException {ESignType sign = ESignType.NONE;
+    XDecimal decimal;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case PLUS:
+    case MINUS:{
+      sign = Sign();
+      spacing();
+      break;
+      }
+    default:
+      jj_la1[11] = jj_gen;
+      ;
+    }
+    decimal = Decimal();
+{if ("" != null) return new LProtagReal(decimal.toDouble(sign));}
+    throw new Error("Missing return statement in function");
+}
+
+//private DECIMAL ::= NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
+  final public XDecimal Decimal() throws ParseException {Token integerPart;
+    Token fractionalPart;
+    integerPart = jj_consume_token(NATURAL);
+    jj_consume_token(DOT);
+    fractionalPart = jj_consume_token(NATURAL);
+{if ("" != null) return new XDecimal(((ProtagNaturalToken)integerPart).getValue(), ((ProtagNaturalToken)fractionalPart).getValue());}
+    throw new Error("Missing return statement in function");
+}
+
+//private SIGN ::= (PLUS|MINUS)
+  final public ESignType Sign() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case PLUS:{
+      jj_consume_token(PLUS);
+{if ("" != null) return ESignType.PLUS;}
+      break;
+      }
+    case MINUS:{
+      jj_consume_token(MINUS);
+{if ("" != null) return ESignType.MINUS;}
+      break;
+      }
+    default:
+      jj_la1[12] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+}
+
+/*
+//Properties ::= BaseData spacing PROPERTY_SEP (yapping_)? {
+IProtagProperties ProtagProperties(IProtagProperties context) :
+{
+    IProtagProperties result = context == null ? new ProtagProperties() : context;
+    ProtagNode name;
+    IProtagSequence body;
+}
+{
+    name=baseData() spacing() <PROPERTY_SEP> [body=ProtagSequence(parent, result)]
+    {
+
+    }
+}
+
+//Map ::= (MAP_START spacing MAP_END) // {}
+//    // { a = b[, c = d]* }
+//    | (MAP_START spacing PairBounded (spacing LIST_SEP spacing PairBounded)* spacing MAP_END) {
+//        methods=[isElementType]
+//    }
+IProtagMap ProtagMap() :
+{}
+{
+    <MAP_START> spacing() <MAP_END>
+    | <MAP_START> spacing() pairBounded() (spacing() <LIST_SEP> spacing() pairBounded())* spacing() <MAP_END>
+}*/
+
+//List ::= (LIST_START LIST_END) // []
+//    // [a[, b]*]
+//    | LIST_START spacing BoundedData (spacing LIST_SEP spacing BoundedData)* spacing LIST_END {
+//        methods=[isElement]
+//    }
+  final public IProtagList ProtagList() throws ParseException {LinkedList<ProtagNode> list = new LinkedList<>();
+    IProtagList result = new ProtagList(list);
+    ProtagNode item;
+    if (jj_2_12(2147483647)) {
+      jj_consume_token(LIST_START);
+      spacing();
+      jj_consume_token(LIST_END);
+{if ("" != null) return result;}
+    } else if (jj_2_13(2147483647)) {
+      jj_consume_token(LIST_START);
+      spacing();
+      item = boundedData();
+list.add(item);
+      label_1:
+      while (true) {
+        if (jj_2_11(2147483647)) {
+          ;
+        } else {
+          break label_1;
+        }
+        spacing();
+        jj_consume_token(LIST_SEP);
+        spacing();
+        item = boundedData();
+list.add(item);
+      }
+      spacing();
+      jj_consume_token(LIST_END);
+{if ("" != null) return result;}
+    } else {
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+}
+
+//Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
+  final public IProtagPrecedence ProtagPrecedence() throws ParseException {ProtagNode data;
+    jj_consume_token(PRECEDENCE_START);
+    spacing();
+    data = boundedData();
+    spacing();
+    jj_consume_token(PRECEDENCE_END);
+{if ("" != null) return new ProtagPrecedence(data);}
+    throw new Error("Missing return statement in function");
+}
+
+  final private ProtagNode unboundedData() throws ParseException {ProtagNode result;
+    /*ProtagPair()
+        | ProtagTransitionLeft()
+        | ProtagTransitionRight()
+        | */result = baseData();
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
+}
+
+  final private ProtagNode boundedData() throws ParseException {ProtagNode result;
+    /*pairBounded()
+        | ProtagTransitionLeftBounded()
+        | ProtagTransitionRightBounded()
+        | ProtagProperties()
+        | */result = baseData();
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
+}
+
+  final private ProtagNode containedSegment() throws ParseException {ProtagNode result;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case REGEX:{
+      result = ProtagRegex();
+      break;
+      }
+    case LITERAL:{
+      result = ProtagLiteral();
+      break;
+      }
+    case LIST_START:{
+      result = ProtagList();
+      break;
+      }
+    case PRECEDENCE_START:{
+      result = ProtagPrecedence();
+      break;
+      }
+    default:
+      jj_la1[13] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
+}
+
+//| ProtagRegex()
+//    | ProtagLiteral()
+//    | ProtagIdentifier()
+  final public IProtagRegex ProtagRegex() throws ParseException {Token tok;
+    tok = jj_consume_token(REGEX);
+ProtagStringToken pst = (ProtagStringToken) tok;
+        {if ("" != null) return new LProtagRegexRaw(String.valueOf(pst.getValue()));}
+    throw new Error("Missing return statement in function");
+}
+
+  final public LProtagLiteral ProtagLiteral() throws ParseException {Token tok;
+    tok = jj_consume_token(LITERAL);
+ProtagStringToken lit = (ProtagStringToken) tok;
+        {if ("" != null) return new LProtagLiteral(String.valueOf(lit.getValue()));}
+    throw new Error("Missing return statement in function");
+}
+
+  final public LProtagName ProtagName() throws ParseException {Token tok;
+    tok = jj_consume_token(PNAME);
+ProtagStringToken lit = (ProtagStringToken) tok;
+        {if ("" != null) return new LProtagName(String.valueOf(lit.getValue()));}
+    throw new Error("Missing return statement in function");
+}
+
+  final private List<LProtagLineComment> spacing() throws ParseException {List<LProtagLineComment> result = new ArrayList<>();
+    LProtagLineComment comment;
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case WHITESPACE:
+      case COMMENT:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[14] = jj_gen;
+        break label_2;
+      }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case WHITESPACE:{
+        jj_consume_token(WHITESPACE);
+        break;
+        }
+      case COMMENT:{
+        comment = ProtagLineComment();
+result.add(comment);
+        break;
+        }
+      default:
+        jj_la1[15] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+{if ("" != null) return result;}
+    throw new Error("Missing return statement in function");
+}
+
+  final private LProtagLineComment ProtagLineComment() throws ParseException {Token comment;
+    comment = jj_consume_token(COMMENT);
+{if ("" != null) return new LProtagLineComment(((ProtagStringToken)comment).getValue());}
+    throw new Error("Missing return statement in function");
+}
+
+  private boolean jj_2_1(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_1()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(0, xla); }
+  }
+
+  private boolean jj_2_2(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_2()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(1, xla); }
+  }
+
+  private boolean jj_2_3(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_3()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(2, xla); }
+  }
+
+  private boolean jj_2_4(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_4()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(3, xla); }
+  }
+
+  private boolean jj_2_5(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_5()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(4, xla); }
+  }
+
+  private boolean jj_2_6(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_6()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(5, xla); }
+  }
+
+  private boolean jj_2_7(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_7()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(6, xla); }
+  }
+
+  private boolean jj_2_8(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_8()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(7, xla); }
+  }
+
+  private boolean jj_2_9(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_9()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(8, xla); }
+  }
+
+  private boolean jj_2_10(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_10()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(9, xla); }
+  }
+
+  private boolean jj_2_11(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_11()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(10, xla); }
+  }
+
+  private boolean jj_2_12(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_12()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(11, xla); }
+  }
+
+  private boolean jj_2_13(int xla)
+ {
+    jj_la = xla; jj_lastpos = jj_scanpos = token;
+    try { return (!jj_3_13()); }
+    catch(LookaheadSuccess ls) { return true; }
+    finally { jj_save(12, xla); }
+  }
+
+  private boolean jj_3_5()
+ {
+    if (jj_scan_token(JNAME)) return true;
+    if (jj_3R_jSegmentExclJBody_214_9_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentMulti_181_9_6()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_5()) {
+    jj_scanpos = xsp;
+    if (jj_3_6()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_ProtagReal_374_6_48()
+ {
+    if (jj_3R_Sign_393_5_12()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_containedSegment_564_7_18()
+ {
+    if (jj_3R_ProtagPrecedence_468_5_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagReal_374_5_42()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_ProtagReal_374_6_48()) jj_scanpos = xsp;
+    if (jj_3R_Decimal_386_5_49()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_containedSegment_562_7_17()
+ {
+    if (jj_3R_ProtagList_437_5_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_containedSegment_561_7_16()
+ {
+    if (jj_3R_ProtagLiteral_589_5_26()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_containedSegment_560_7_15()
+ {
+    if (jj_3R_ProtagRegex_578_5_25()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_containedSegment_560_5_8()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_containedSegment_560_7_15()) {
+    jj_scanpos = xsp;
+    if (jj_3R_containedSegment_561_7_16()) {
+    jj_scanpos = xsp;
+    if (jj_3R_containedSegment_562_7_17()) {
+    jj_scanpos = xsp;
+    if (jj_3R_containedSegment_564_7_18()) return true;
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentSingle_170_11_58()
+ {
+    if (jj_3R_containedSegment_560_5_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3_3()
+ {
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(DOT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagInteger_362_6_52()
+ {
+    if (jj_3R_Sign_393_5_12()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagInteger_362_5_44()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_ProtagInteger_362_6_52()) jj_scanpos = xsp;
+    if (jj_scan_token(NATURAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentSingle_165_9_56()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_jSegmentSingle_165_9_57()) {
+    jj_scanpos = xsp;
+    if (jj_3R_jSegmentSingle_170_11_58()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentSingle_165_9_57()
+ {
+    if (jj_scan_token(JNAME)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jScope_136_33_54()
+ {
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(DOT)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_3R_jScope_136_9_47()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_IntegerVal_350_6_13()
+ {
+    if (jj_3R_Sign_393_5_12()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_JavaPathSegment_153_11_55()
+ {
+    if (jj_3R_jSegmentSingle_165_9_56()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_IntegerVal_350_5_4()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_IntegerVal_350_6_13()) jj_scanpos = xsp;
+    if (jj_scan_token(NATURAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3_4()
+ {
+    if (jj_3R_jSegmentMulti_181_9_6()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_JavaPathSegment_148_9_53()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3_4()) {
+    jj_scanpos = xsp;
+    if (jj_3R_JavaPathSegment_153_11_55()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_10()
+ {
+    if (jj_3R_IntegerVal_350_5_4()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(AND)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagQuotient_338_5_51()
+ {
+    if (jj_3R_IntegerVal_350_5_4()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(SLASH)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(NATURAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_boundedData_521_9_11()
+ {
+    if (jj_3R_baseData_101_5_21()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jScope_136_9_47()
+ {
+    if (jj_3R_JavaPathSegment_148_9_53()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_jScope_136_33_54()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagQuotient_329_5_43()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_ProtagQuotient_329_5_50()) {
+    jj_scanpos = xsp;
+    if (jj_3R_ProtagQuotient_338_5_51()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_ProtagQuotient_329_5_50()
+ {
+    if (jj_3R_IntegerVal_350_5_4()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(AND)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_3R_IntegerVal_350_5_4()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(SLASH)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(NATURAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_JavaPath_128_9_41()
+ {
+    if (jj_scan_token(JPATH_START)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_3R_jScope_136_9_47()) return true;
+    return false;
+  }
+
+  private boolean jj_3_2()
+ {
+    if (jj_3R_IntegerVal_350_5_4()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(4)) {
+    jj_scanpos = xsp;
+    if (jj_scan_token(5)) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_null_109_22_3()
+ {
+    if (jj_3R_Sign_393_5_12()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    return false;
+  }
+
+  private boolean jj_3_1()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_null_109_22_3()) jj_scanpos = xsp;
+    if (jj_scan_token(NATURAL)) return true;
+    if (jj_scan_token(DOT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_114_11_37()
+ {
+    if (jj_3R_ProtagName_600_5_45()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_113_11_36()
+ {
+    if (jj_3R_ProtagLiteral_589_5_26()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_112_11_35()
+ {
+    if (jj_3R_ProtagRegex_578_5_25()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_111_11_34()
+ {
+    if (jj_3R_ProtagInteger_362_5_44()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_110_11_33()
+ {
+    if (jj_3R_ProtagQuotient_329_5_43()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_109_11_32()
+ {
+    if (jj_3R_ProtagReal_374_5_42()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_108_11_31()
+ {
+    if (jj_3R_ProtagList_437_5_27()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_106_11_30()
+ {
+    if (jj_3R_ProtagPrecedence_468_5_28()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_103_13_29()
+ {
+    if (jj_3R_JavaPath_128_9_41()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_baseData_101_5_21()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_baseData_103_13_29()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_106_11_30()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_108_11_31()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_109_11_32()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_110_11_33()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_111_11_34()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_112_11_35()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_113_11_36()) {
+    jj_scanpos = xsp;
+    if (jj_3R_baseData_114_11_37()) return true;
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    }
+    return false;
+  }
+
+  private boolean jj_3R_ProtagPrecedence_468_5_28()
+ {
+    if (jj_scan_token(PRECEDENCE_START)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_3R_boundedData_521_9_11()) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(PRECEDENCE_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3_11()
+ {
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(LIST_SEP)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_null_214_59_10()
+ {
+    if (jj_3R_containedSegment_560_5_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagList_449_13_46()
+ {
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(LIST_SEP)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_3R_boundedData_521_9_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3_13()
+ {
+    if (jj_scan_token(LIST_START)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_3R_boundedData_521_9_11()) return true;
+    return false;
+  }
+
+  private boolean jj_3_9()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(8)) {
+    jj_scanpos = xsp;
+    if (jj_3R_null_214_59_10()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3_12()
+ {
+    if (jj_scan_token(LIST_START)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(LIST_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagList_442_7_40()
+ {
+    if (jj_scan_token(LIST_START)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_3R_boundedData_521_9_11()) return true;
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_ProtagList_449_13_46()) { jj_scanpos = xsp; break; }
+    }
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(LIST_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentExclJBody_214_41_59()
+ {
+    if (jj_3R_jSegmentInclJBody_198_9_9()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagLineComment_629_5_38()
+ {
+    if (jj_scan_token(COMMENT)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagList_437_5_27()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_ProtagList_437_5_39()) {
+    jj_scanpos = xsp;
+    if (jj_3R_ProtagList_442_7_40()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_ProtagList_437_5_39()
+ {
+    if (jj_scan_token(LIST_START)) return true;
+    if (jj_3R_spacing_615_5_5()) return true;
+    if (jj_scan_token(LIST_END)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_spacing_616_9_24()
+ {
+    if (jj_3R_ProtagLineComment_629_5_38()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_spacing_615_7_14()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_scan_token(1)) {
+    jj_scanpos = xsp;
+    if (jj_3R_spacing_616_9_24()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_spacing_615_5_5()
+ {
+    Token xsp;
+    while (true) {
+      xsp = jj_scanpos;
+      if (jj_3R_spacing_615_7_14()) { jj_scanpos = xsp; break; }
+    }
+    return false;
+  }
+
+  private boolean jj_3_7()
+ {
+    if (jj_3R_containedSegment_560_5_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3_8()
+ {
+    if (jj_3R_containedSegment_560_5_8()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentExclJBody_214_9_7()
+ {
+    if (jj_3R_containedSegment_560_5_8()) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_jSegmentExclJBody_214_41_59()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagName_600_5_45()
+ {
+    if (jj_scan_token(PNAME)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentInclJBody_198_24_60()
+ {
+    if (jj_3R_jSegmentExclJBody_214_9_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentInclJBody_204_11_20()
+ {
+    if (jj_3R_jSegmentExclJBody_214_9_7()) return true;
+    return false;
+  }
+
+  private boolean jj_3R_ProtagLiteral_589_5_26()
+ {
+    if (jj_scan_token(LITERAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_Sign_395_7_23()
+ {
+    if (jj_scan_token(MINUS)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentInclJBody_198_9_19()
+ {
+    if (jj_scan_token(JBODY)) return true;
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_jSegmentInclJBody_198_24_60()) jj_scanpos = xsp;
+    return false;
+  }
+
+  private boolean jj_3R_jSegmentInclJBody_198_9_9()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_jSegmentInclJBody_198_9_19()) {
+    jj_scanpos = xsp;
+    if (jj_3R_jSegmentInclJBody_204_11_20()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_Sign_393_5_22()
+ {
+    if (jj_scan_token(PLUS)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_Sign_393_5_12()
+ {
+    Token xsp;
+    xsp = jj_scanpos;
+    if (jj_3R_Sign_393_5_22()) {
+    jj_scanpos = xsp;
+    if (jj_3R_Sign_395_7_23()) return true;
+    }
+    return false;
+  }
+
+  private boolean jj_3R_ProtagRegex_578_5_25()
+ {
+    if (jj_scan_token(REGEX)) return true;
+    return false;
+  }
+
+  private boolean jj_3R_Decimal_386_5_49()
+ {
+    if (jj_scan_token(NATURAL)) return true;
+    if (jj_scan_token(DOT)) return true;
+    if (jj_scan_token(NATURAL)) return true;
+    return false;
+  }
+
+  private boolean jj_3_6()
+ {
+    if (jj_3R_containedSegment_560_5_8()) return true;
+    if (jj_3R_jSegmentInclJBody_198_9_9()) return true;
+    return false;
+  }
 
   /** User defined Token Manager. */
   public TokenManager token_source;
@@ -61,15 +1423,20 @@ class ProtagParserGen implements ProtagParserGenConstants {
   /** Next token. */
   public Token jj_nt;
   private int jj_ntk;
+  private Token jj_scanpos, jj_lastpos;
+  private int jj_la;
   private int jj_gen;
-  final private int[] jj_la1 = new int[1];
+  final private int[] jj_la1 = new int[16];
   static private int[] jj_la1_0;
   static {
 	   jj_la1_init_0();
 	}
 	private static void jj_la1_init_0() {
-	   jj_la1_0 = new int[] {0x6,};
+	   jj_la1_0 = new int[] {0xf4e46,0xf4e46,0xf4e46,0x4840,0x70604,0x34880,0x34880,0x100,0x604,0x600,0x600,0x600,0x600,0x34800,0x80002,0x80002,};
 	}
+  final private JJCalls[] jj_2_rtns = new JJCalls[13];
+  private boolean jj_rescan = false;
+  private int jj_gc = 0;
 
 
   /** Constructor with user supplied Token Manager. */
@@ -78,7 +1445,8 @@ class ProtagParserGen implements ProtagParserGenConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   /** Reinitialise. */
@@ -87,7 +1455,8 @@ class ProtagParserGen implements ProtagParserGenConstants {
 	 token = new Token();
 	 jj_ntk = -1;
 	 jj_gen = 0;
-	 for (int i = 0; i < 1; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < 16; i++) jj_la1[i] = -1;
+	 for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -97,11 +1466,50 @@ class ProtagParserGen implements ProtagParserGenConstants {
 	 jj_ntk = -1;
 	 if (token.kind == kind) {
 	   jj_gen++;
+	   if (++jj_gc > 100) {
+		 jj_gc = 0;
+		 for (int i = 0; i < jj_2_rtns.length; i++) {
+		   JJCalls c = jj_2_rtns[i];
+		   while (c != null) {
+			 if (c.gen < jj_gen) c.first = null;
+			 c = c.next;
+		   }
+		 }
+	   }
 	   return token;
 	 }
 	 token = oldToken;
 	 jj_kind = kind;
 	 throw generateParseException();
+  }
+
+  @SuppressWarnings("serial")
+  static private final class LookaheadSuccess extends java.lang.Error {
+    @Override
+    public Throwable fillInStackTrace() {
+      return this;
+    }
+  }
+  static private final LookaheadSuccess jj_ls = new LookaheadSuccess();
+  private boolean jj_scan_token(int kind) {
+	 if (jj_scanpos == jj_lastpos) {
+	   jj_la--;
+	   if (jj_scanpos.next == null) {
+		 jj_lastpos = jj_scanpos = jj_scanpos.next = token_source.getNextToken();
+	   } else {
+		 jj_lastpos = jj_scanpos = jj_scanpos.next;
+	   }
+	 } else {
+	   jj_scanpos = jj_scanpos.next;
+	 }
+	 if (jj_rescan) {
+	   int i = 0; Token tok = token;
+	   while (tok != null && tok != jj_scanpos) { i++; tok = tok.next; }
+	   if (tok != null) jj_add_error_token(kind, i);
+	 }
+	 if (jj_scanpos.kind != kind) return true;
+	 if (jj_la == 0 && jj_scanpos == jj_lastpos) throw jj_ls;
+	 return false;
   }
 
 
@@ -134,16 +1542,56 @@ class ProtagParserGen implements ProtagParserGenConstants {
   private java.util.List<int[]> jj_expentries = new java.util.ArrayList<int[]>();
   private int[] jj_expentry;
   private int jj_kind = -1;
+  private int[] jj_lasttokens = new int[100];
+  private int jj_endpos;
+
+  private void jj_add_error_token(int kind, int pos) {
+	 if (pos >= 100) {
+		return;
+	 }
+
+	 if (pos == jj_endpos + 1) {
+	   jj_lasttokens[jj_endpos++] = kind;
+	 } else if (jj_endpos != 0) {
+	   jj_expentry = new int[jj_endpos];
+
+	   for (int i = 0; i < jj_endpos; i++) {
+		 jj_expentry[i] = jj_lasttokens[i];
+	   }
+
+	   for (int[] oldentry : jj_expentries) {
+		 if (oldentry.length == jj_expentry.length) {
+		   boolean isMatched = true;
+
+		   for (int i = 0; i < jj_expentry.length; i++) {
+			 if (oldentry[i] != jj_expentry[i]) {
+			   isMatched = false;
+			   break;
+			 }
+
+		   }
+		   if (isMatched) {
+			 jj_expentries.add(jj_expentry);
+			 break;
+		   }
+		 }
+	   }
+
+	   if (pos != 0) {
+		 jj_lasttokens[(jj_endpos = pos) - 1] = kind;
+	   }
+	 }
+  }
 
   /** Generate ParseException. */
   public ParseException generateParseException() {
 	 jj_expentries.clear();
-	 boolean[] la1tokens = new boolean[3];
+	 boolean[] la1tokens = new boolean[20];
 	 if (jj_kind >= 0) {
 	   la1tokens[jj_kind] = true;
 	   jj_kind = -1;
 	 }
-	 for (int i = 0; i < 1; i++) {
+	 for (int i = 0; i < 16; i++) {
 	   if (jj_la1[i] == jj_gen) {
 		 for (int j = 0; j < 32; j++) {
 		   if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -152,13 +1600,16 @@ class ProtagParserGen implements ProtagParserGenConstants {
 		 }
 	   }
 	 }
-	 for (int i = 0; i < 3; i++) {
+	 for (int i = 0; i < 20; i++) {
 	   if (la1tokens[i]) {
 		 jj_expentry = new int[1];
 		 jj_expentry[0] = i;
 		 jj_expentries.add(jj_expentry);
 	   }
 	 }
+	 jj_endpos = 0;
+	 jj_rescan_token();
+	 jj_add_error_token(0, 0);
 	 int[][] exptokseq = new int[jj_expentries.size()][];
 	 for (int i = 0; i < jj_expentries.size(); i++) {
 	   exptokseq[i] = jj_expentries.get(i);
@@ -179,6 +1630,58 @@ class ProtagParserGen implements ProtagParserGenConstants {
 
   /** Disable tracing. */
   final public void disable_tracing() {
+  }
+
+  private void jj_rescan_token() {
+	 jj_rescan = true;
+	 for (int i = 0; i < 13; i++) {
+	   try {
+		 JJCalls p = jj_2_rtns[i];
+
+		 do {
+		   if (p.gen > jj_gen) {
+			 jj_la = p.arg; jj_lastpos = jj_scanpos = p.first;
+			 switch (i) {
+			   case 0: jj_3_1(); break;
+			   case 1: jj_3_2(); break;
+			   case 2: jj_3_3(); break;
+			   case 3: jj_3_4(); break;
+			   case 4: jj_3_5(); break;
+			   case 5: jj_3_6(); break;
+			   case 6: jj_3_7(); break;
+			   case 7: jj_3_8(); break;
+			   case 8: jj_3_9(); break;
+			   case 9: jj_3_10(); break;
+			   case 10: jj_3_11(); break;
+			   case 11: jj_3_12(); break;
+			   case 12: jj_3_13(); break;
+			 }
+		   }
+		   p = p.next;
+		 } while (p != null);
+
+		 } catch(LookaheadSuccess ls) { }
+	 }
+	 jj_rescan = false;
+  }
+
+  private void jj_save(int index, int xla) {
+	 JJCalls p = jj_2_rtns[index];
+	 while (p.gen > jj_gen) {
+	   if (p.next == null) { p = p.next = new JJCalls(); break; }
+	   p = p.next;
+	 }
+
+	 p.gen = jj_gen + xla - jj_la; 
+	 p.first = token;
+	 p.arg = xla;
+  }
+
+  static final class JJCalls {
+	 int gen;
+	 Token first;
+	 int arg;
+	 JJCalls next;
   }
 
 }

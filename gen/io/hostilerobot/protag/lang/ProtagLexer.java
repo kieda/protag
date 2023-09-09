@@ -367,13 +367,13 @@ public class ProtagLexer implements TokenSource<ProtagSymbol> {
     "\1\27\1\30\1\31\1\6\1\30\1\32\1\6\1\33"+
     "\1\30\1\34\1\35\1\36\1\37\1\40\1\35\1\41"+
     "\1\42\1\43\1\44\1\45\1\46\1\47\1\50\1\51"+
-    "\1\52\1\53\1\54\1\55\1\56\1\57\1\14\1\60"+
-    "\1\61\1\62\1\63\1\0\2\5\1\64\1\65\1\30"+
-    "\1\35\2\40\1\42\2\51\1\0\2\57\1\0\1\66"+
-    "\1\67";
+    "\1\52\1\53\1\54\1\55\1\56\1\57\1\60\1\14"+
+    "\1\61\1\62\1\63\1\64\1\0\2\5\1\65\1\66"+
+    "\1\30\1\35\2\40\1\43\2\52\1\0\2\60\1\0"+
+    "\1\67\1\70";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[89];
+    int [] result = new int[90];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -404,15 +404,15 @@ public class ProtagLexer implements TokenSource<ProtagSymbol> {
     "\0\u0220\0\u01e0\0\u01e0\0\u0240\0\u01e0\0\u0260\0\u01e0\0\u01e0"+
     "\0\u01e0\0\u01e0\0\u01e0\0\u01e0\0\u01e0\0\u0280\0\u01e0\0\u02a0"+
     "\0\u02c0\0\u01e0\0\u02e0\0\u01e0\0\u0300\0\u01e0\0\u0320\0\u0340"+
-    "\0\u01e0\0\u0360\0\u0380\0\u01e0\0\u03a0\0\u01e0\0\u01e0\0\u01e0"+
-    "\0\u01e0\0\u03c0\0\u03e0\0\u0400\0\u01e0\0\u01e0\0\u0420\0\u0440"+
-    "\0\u0460\0\u0480\0\u04a0\0\u01e0\0\u04c0\0\u04e0\0\u0500\0\u0520"+
-    "\0\u01e0\0\u0540\0\u01e0\0\u01e0\0\u01e0\0\u0560\0\u01e0\0\u0580"+
-    "\0\u05a0\0\u01e0\0\u05c0\0\u05e0\0\u01e0\0\u0600\0\u0620\0\u01e0"+
-    "\0\u01e0";
+    "\0\u01e0\0\u0360\0\u0380\0\u01e0\0\u01e0\0\u03a0\0\u01e0\0\u01e0"+
+    "\0\u01e0\0\u01e0\0\u03c0\0\u03e0\0\u0400\0\u01e0\0\u01e0\0\u0420"+
+    "\0\u0440\0\u0460\0\u0480\0\u04a0\0\u01e0\0\u04c0\0\u04e0\0\u0500"+
+    "\0\u0520\0\u01e0\0\u0540\0\u01e0\0\u01e0\0\u01e0\0\u0560\0\u01e0"+
+    "\0\u0580\0\u05a0\0\u01e0\0\u05c0\0\u05e0\0\u01e0\0\u0600\0\u0620"+
+    "\0\u01e0\0\u01e0";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[89];
+    int [] result = new int[90];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -443,65 +443,65 @@ public class ProtagLexer implements TokenSource<ProtagSymbol> {
     "\2\51\33\55\1\50\1\56\3\55\1\57\2\60\1\57"+
     "\1\60\1\20\1\61\1\62\3\57\1\25\1\26\1\57"+
     "\1\30\1\63\1\57\1\64\1\57\1\35\1\23\1\36"+
-    "\1\37\1\23\1\40\1\57\1\41\1\57\1\42\1\56"+
-    "\1\44\1\45\1\65\2\17\1\65\1\17\1\23\1\61"+
-    "\1\22\3\65\1\25\1\26\1\65\1\23\2\65\1\33"+
-    "\1\65\6\23\1\65\1\41\1\65\1\42\1\56\1\44"+
-    "\1\45\1\16\2\17\1\16\1\17\1\20\1\66\1\22"+
-    "\2\23\1\24\1\67\1\26\1\27\1\30\1\31\1\23"+
+    "\1\37\1\23\1\40\1\57\1\41\1\57\1\42\1\65"+
+    "\1\44\1\45\1\66\2\17\1\66\1\17\1\23\1\61"+
+    "\1\22\3\66\1\25\1\26\1\66\1\23\2\66\1\33"+
+    "\1\66\6\23\1\66\1\41\1\66\1\42\1\65\1\44"+
+    "\1\45\1\16\2\17\1\16\1\17\1\20\1\67\1\22"+
+    "\2\23\1\24\1\70\1\26\1\27\1\30\1\31\1\23"+
     "\1\64\1\34\1\35\1\23\1\36\1\37\1\23\1\40"+
-    "\1\16\1\70\1\23\1\42\1\43\1\71\1\45\1\72"+
-    "\2\73\1\23\1\73\1\20\1\61\1\74\1\72\1\23"+
-    "\1\24\1\25\1\26\1\27\1\30\1\31\1\75\1\76"+
-    "\1\72\1\35\1\23\1\36\1\37\1\23\1\40\1\72"+
-    "\1\41\1\23\1\42\1\56\1\44\1\45\1\23\2\17"+
-    "\1\23\1\17\1\23\1\61\1\22\1\77\2\23\1\25"+
-    "\1\26\14\23\1\77\1\41\1\23\1\42\1\56\1\44"+
-    "\1\45\1\16\2\17\1\16\1\17\1\20\1\66\1\22"+
-    "\2\23\1\24\1\67\1\26\1\27\1\30\1\31\1\75"+
-    "\1\76\1\34\1\35\1\23\1\36\1\37\1\23\1\40"+
-    "\1\16\1\70\1\23\1\42\1\43\1\71\1\45\1\100"+
-    "\2\101\1\100\1\101\1\20\1\61\1\102\2\23\1\24"+
-    "\1\25\1\26\1\27\1\30\1\103\1\104\1\76\1\105"+
-    "\1\35\1\23\1\36\1\37\1\23\1\40\1\100\1\41"+
-    "\1\23\1\42\1\56\1\44\1\45\1\106\2\17\1\106"+
+    "\1\16\1\71\1\23\1\42\1\43\1\72\1\45\1\73"+
+    "\2\74\1\23\1\74\1\20\1\61\1\75\1\73\1\23"+
+    "\1\24\1\25\1\26\1\27\1\30\1\31\1\76\1\77"+
+    "\1\73\1\35\1\23\1\36\1\37\1\23\1\40\1\73"+
+    "\1\41\1\23\1\42\1\65\1\44\1\45\1\23\2\17"+
+    "\1\23\1\17\1\23\1\61\1\22\1\100\2\23\1\25"+
+    "\1\26\14\23\1\100\1\41\1\23\1\42\1\65\1\44"+
+    "\1\45\1\16\2\17\1\16\1\17\1\20\1\67\1\22"+
+    "\2\23\1\24\1\70\1\26\1\27\1\30\1\31\1\76"+
+    "\1\77\1\34\1\35\1\23\1\36\1\37\1\23\1\40"+
+    "\1\16\1\71\1\23\1\42\1\43\1\72\1\45\1\101"+
+    "\2\102\1\101\1\102\1\20\1\61\1\103\2\23\1\24"+
+    "\1\25\1\26\1\27\1\30\1\104\1\105\1\77\1\106"+
+    "\1\35\1\23\1\36\1\37\1\23\1\40\1\101\1\41"+
+    "\1\23\1\42\1\65\1\44\1\45\1\107\2\17\1\107"+
     "\1\17\1\23\1\61\1\22\3\23\1\25\1\26\5\23"+
-    "\1\107\6\23\1\106\1\41\1\23\1\42\1\56\1\44"+
-    "\1\45\1\16\2\17\1\16\1\17\1\20\1\66\1\22"+
-    "\2\23\1\24\1\67\1\26\1\27\1\30\1\31\1\104"+
-    "\1\76\1\34\1\35\1\23\1\36\1\37\1\23\1\40"+
-    "\1\16\1\70\1\23\1\42\1\43\1\71\1\45\1\16"+
-    "\2\0\1\16\13\0\1\110\2\0\1\16\6\0\1\16"+
-    "\7\0\2\17\1\0\1\17\73\0\2\22\1\111\1\22"+
-    "\1\112\33\22\27\0\1\113\32\0\1\34\34\0\1\114"+
-    "\20\0\6\46\1\0\24\46\1\0\4\46\40\115\32\51"+
-    "\2\0\1\51\1\0\2\51\32\115\1\56\2\115\1\56"+
-    "\2\115\33\55\2\0\3\55\1\57\2\0\1\57\4\0"+
-    "\3\57\2\0\1\57\1\0\1\116\1\57\1\0\1\57"+
+    "\1\110\6\23\1\107\1\41\1\23\1\42\1\65\1\44"+
+    "\1\45\1\16\2\17\1\16\1\17\1\20\1\67\1\22"+
+    "\2\23\1\24\1\70\1\26\1\27\1\30\1\31\1\105"+
+    "\1\77\1\34\1\35\1\23\1\36\1\37\1\23\1\40"+
+    "\1\16\1\71\1\23\1\42\1\43\1\72\1\45\1\16"+
+    "\2\0\1\16\13\0\1\111\2\0\1\16\6\0\1\16"+
+    "\7\0\2\17\1\0\1\17\73\0\2\22\1\112\1\22"+
+    "\1\113\33\22\27\0\1\114\32\0\1\34\34\0\1\115"+
+    "\20\0\6\46\1\0\24\46\1\0\4\46\40\116\32\51"+
+    "\2\0\1\51\1\0\2\51\32\116\1\56\2\116\1\56"+
+    "\2\116\33\55\2\0\3\55\1\57\2\0\1\57\4\0"+
+    "\3\57\2\0\1\57\1\0\1\117\1\57\1\0\1\57"+
     "\6\0\1\57\1\0\1\57\5\0\2\60\1\0\1\60"+
-    "\33\0\2\62\1\117\1\62\1\120\33\62\1\57\2\0"+
-    "\1\57\4\0\3\57\2\0\1\57\1\0\1\116\1\57"+
-    "\1\0\1\57\4\0\1\113\1\0\1\57\1\0\1\57"+
-    "\4\0\1\65\2\0\1\65\4\0\3\65\2\0\1\65"+
-    "\1\0\1\121\1\65\1\0\1\65\6\0\1\65\1\0"+
-    "\1\65\4\0\1\72\7\0\1\72\11\0\1\72\6\0"+
-    "\1\72\7\0\2\73\1\0\1\73\33\0\2\74\1\122"+
-    "\1\74\1\123\33\74\1\77\7\0\1\77\11\0\1\77"+
-    "\6\0\1\77\6\0\1\100\2\0\1\100\13\0\1\124"+
-    "\2\0\1\100\6\0\1\100\7\0\2\101\1\0\1\101"+
-    "\33\0\2\102\1\125\1\102\1\126\33\102\1\100\2\0"+
-    "\1\100\23\0\1\113\1\0\1\100\6\0\1\100\2\0"+
-    "\1\100\13\0\1\124\2\0\1\105\6\0\1\100\6\0"+
-    "\1\106\2\0\1\106\13\0\1\127\2\0\1\106\6\0"+
-    "\1\106\30\0\1\107\15\0\1\16\2\0\1\16\25\0"+
-    "\1\16\10\0\1\111\35\0\1\57\2\0\1\57\4\0"+
-    "\3\57\2\0\1\57\1\0\1\116\1\57\1\0\1\57"+
-    "\4\0\1\130\1\0\1\57\1\0\1\57\6\0\1\117"+
-    "\35\0\1\65\2\0\1\65\4\0\3\65\2\0\1\65"+
-    "\1\0\1\121\1\65\1\0\1\65\4\0\1\131\1\0"+
-    "\1\65\1\0\1\65\6\0\1\122\35\0\1\100\2\0"+
-    "\1\100\25\0\1\100\10\0\1\125\35\0\1\106\2\0"+
-    "\1\106\25\0\1\106\6\0";
+    "\33\0\2\62\1\120\1\62\1\121\33\62\1\57\2\0"+
+    "\1\57\4\0\3\57\2\0\1\57\1\0\1\117\1\57"+
+    "\1\0\1\57\4\0\1\114\1\0\1\57\1\0\1\57"+
+    "\4\0\1\66\2\0\1\66\4\0\3\66\2\0\1\66"+
+    "\1\0\1\122\1\66\1\0\1\66\6\0\1\66\1\0"+
+    "\1\66\4\0\1\73\7\0\1\73\11\0\1\73\6\0"+
+    "\1\73\7\0\2\74\1\0\1\74\33\0\2\75\1\123"+
+    "\1\75\1\124\33\75\1\100\7\0\1\100\11\0\1\100"+
+    "\6\0\1\100\6\0\1\101\2\0\1\101\13\0\1\125"+
+    "\2\0\1\101\6\0\1\101\7\0\2\102\1\0\1\102"+
+    "\33\0\2\103\1\126\1\103\1\127\33\103\1\101\2\0"+
+    "\1\101\23\0\1\114\1\0\1\101\6\0\1\101\2\0"+
+    "\1\101\13\0\1\125\2\0\1\106\6\0\1\101\6\0"+
+    "\1\107\2\0\1\107\13\0\1\130\2\0\1\107\6\0"+
+    "\1\107\30\0\1\110\15\0\1\16\2\0\1\16\25\0"+
+    "\1\16\10\0\1\112\35\0\1\57\2\0\1\57\4\0"+
+    "\3\57\2\0\1\57\1\0\1\117\1\57\1\0\1\57"+
+    "\4\0\1\131\1\0\1\57\1\0\1\57\6\0\1\120"+
+    "\35\0\1\66\2\0\1\66\4\0\3\66\2\0\1\66"+
+    "\1\0\1\122\1\66\1\0\1\66\4\0\1\132\1\0"+
+    "\1\66\1\0\1\66\6\0\1\123\35\0\1\101\2\0"+
+    "\1\101\25\0\1\101\10\0\1\126\35\0\1\107\2\0"+
+    "\1\107\25\0\1\107\6\0";
 
   private static int [] zzUnpacktrans() {
     int [] result = new int[1600];
@@ -549,13 +549,13 @@ public class ProtagLexer implements TokenSource<ProtagSymbol> {
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
     "\15\0\2\1\2\11\1\1\6\11\1\1\2\11\1\1"+
     "\1\11\1\1\7\11\1\1\1\11\2\1\1\11\1\1"+
-    "\1\11\1\1\1\11\2\1\1\11\2\1\1\11\1\1"+
+    "\1\11\1\1\1\11\2\1\1\11\2\1\2\11\1\1"+
     "\4\11\3\1\2\11\5\1\1\11\3\1\1\0\1\11"+
     "\1\1\3\11\1\1\1\11\2\1\1\11\1\1\1\0"+
     "\1\11\1\1\1\0\2\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[89];
+    int [] result = new int[90];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -632,6 +632,23 @@ public class ProtagLexer implements TokenSource<ProtagSymbol> {
   private boolean zzEOFDone;
 
   /* user code: */
+private int markedPos = -1;
+private Location markedLocation = null;
+
+private void mark() {
+    if(isMarked())
+        throw new IllegalStateException("Already marked! call unmark() before calling this.");
+    markedPos = zzStartRead;
+    markedLocation = currentLocation();
+}
+private void unmark() {
+    markedPos = -1;
+    markedLocation = null;
+}
+private boolean isMarked() {
+    return markedPos >= 0 && markedLocation != null;
+}
+
 @Override
 public ProtagSymbol getNextToken() {
       try {
@@ -641,7 +658,20 @@ public ProtagSymbol getNextToken() {
       }
 }
 
-
+private String getText() {
+    if(isMarked()) {
+        return new String(zzBuffer, markedPos, zzMarkedPos-markedPos);
+    } else {
+        return yytext();
+    }
+}
+private Location getLocation() {
+    if(isMarked()) {
+        return markedLocation;
+    } else {
+        return currentLocation();
+    }
+}
 private Location currentLocation() {
     return new Location(yyline, yycolumn, (int)yychar);
 }
@@ -655,6 +685,11 @@ private ProtagSymbol symbol( ProtagTokenType type ) {
         return new ProtagNaturalToken(currentLocation(), yytext());
     } else if(type.isFixed()) {
         return new ProtagSpecialToken(type, currentLocation());
+    } else if(type == LITERAL || type == REGEX){
+        String val = getText();
+        Location loc = getLocation();
+        unmark();
+        return new ProtagStringToken(type, loc, val);
     } else {
         return new ProtagStringToken(type, currentLocation(), yytext());
     }
@@ -686,6 +721,7 @@ private Deque<PathContext> context = new ArrayDeque<>();
 public void reset() {
     context.clear();
     context.push(PathContext.BASE);
+    unmark();
     yybegin(YYINITIAL);
 }
 
@@ -738,6 +774,7 @@ private void encounterJavaPath() {
 // new path that starts with a regex
 private void encounterRegexSegment() {
     debugCurrentState("START encounterRegexSegment");
+    mark();
     endTransition();
     context.push(PathContext.PROTAG);
     yybegin(REGEX_STATE);
@@ -748,6 +785,7 @@ private void encounterRegexSegment() {
 //       ^
 private void encounterLiteralSegment() {
     debugCurrentState("START encounterLiteralSegment");
+    mark();
     endTransition();
     context.push(PathContext.PROTAG);
     yybegin(LITERAL_STATE);
@@ -1273,15 +1311,15 @@ private static String zzToPrintable(CharSequence cs) {
             case LITERAL_STATE: {
               reset(); return symbol(ERROR_ELEMENT);
             }  // fall though
-            case 90: break;
+            case 91: break;
             case REGEX_STATE: {
               reset(); return symbol(ERROR_ELEMENT);
             }  // fall though
-            case 91: break;
+            case 92: break;
             case REGEX_CLASS: {
               reset(); return symbol(ERROR_ELEMENT);
             }  // fall though
-            case 92: break;
+            case 93: break;
             default:
           {     return symbol(EOF);
  }
@@ -1294,304 +1332,311 @@ private static String zzToPrintable(CharSequence cs) {
                                                         return symbol(PNAME);
             }
           // fall through
-          case 56: break;
+          case 57: break;
           case 2:
             { return symbol(WHITESPACE);
             }
           // fall through
-          case 57: break;
+          case 58: break;
           case 3:
             { /* fall back to BEFORE_SLASH when we're done parsing regex or literal */
                                                         encounterFilePath();
                                                         return symbol(FPATH_START);
             }
           // fall through
-          case 58: break;
+          case 59: break;
           case 4:
             { encounterLiteralSegment();
             }
           // fall through
-          case 59: break;
+          case 60: break;
           case 5:
             { return symbol(COMMENT);
             }
           // fall through
-          case 60: break;
+          case 61: break;
           case 6:
             { return symbol(BAD_CHARACTER);
             }
           // fall through
-          case 61: break;
+          case 62: break;
           case 7:
             { endCurrentPath();
                                                         return symbol(AND);
             }
           // fall through
-          case 62: break;
+          case 63: break;
           case 8:
             { openCurrentSegment();
                                                         return symbol(PRECEDENCE_START);
             }
           // fall through
-          case 63: break;
+          case 64: break;
           case 9:
             { closeCurrentSegment();
                                                         return symbol(PRECEDENCE_END);
             }
           // fall through
-          case 64: break;
+          case 65: break;
           case 10:
             { endCurrentPath();
                                                         return symbol(PLUS);
             }
           // fall through
-          case 65: break;
+          case 66: break;
           case 11:
             { endCurrentPath();
                                                         return symbol(LIST_SEP);
             }
           // fall through
-          case 66: break;
+          case 67: break;
           case 12:
             { endCurrentPath();
                                                         return symbol(MINUS);
             }
           // fall through
-          case 67: break;
+          case 68: break;
           case 13:
             { return symbol(DOT);
             }
           // fall through
-          case 68: break;
+          case 69: break;
           case 14:
             { return symbol(SLASH);
             }
           // fall through
-          case 69: break;
+          case 70: break;
           case 15:
             { encounterProTagPath();
                                                         return symbol(NATURAL);
             }
           // fall through
-          case 70: break;
+          case 71: break;
           case 16:
             { endCurrentPath();
                                                         return symbol(PROPERTY_SEP);
             }
           // fall through
-          case 71: break;
+          case 72: break;
           case 17:
             { endCurrentPath();
                                                         return symbol(PAIR_SEP);
             }
           // fall through
-          case 72: break;
+          case 73: break;
           case 18:
             { encounterJavaPath();
                                                         return symbol(JPATH_START);
             }
           // fall through
-          case 73: break;
+          case 74: break;
           case 19:
             { openCurrentSegment();
                                                         return symbol(LIST_START);
             }
           // fall through
-          case 74: break;
+          case 75: break;
           case 20:
             { closeCurrentSegment();
                                                         return symbol(LIST_END);
             }
           // fall through
-          case 75: break;
+          case 76: break;
           case 21:
             { encounterRegexSegment();
             }
           // fall through
-          case 76: break;
+          case 77: break;
           case 22:
             { openCurrentSegment();
                                                         return symbol(MAP_START);
             }
           // fall through
-          case 77: break;
+          case 78: break;
           case 23:
             { closeCurrentSegment();
                                                         return symbol(MAP_END);
             }
           // fall through
-          case 78: break;
+          case 79: break;
           case 24:
             { 
             }
           // fall through
-          case 79: break;
+          case 80: break;
           case 25:
             { yybegin(getCurrentFallback());
                                                             return symbol(LITERAL);
             }
           // fall through
-          case 80: break;
+          case 81: break;
           case 26:
             { yybegin(REGEX_CLASS);
             }
           // fall through
-          case 81: break;
+          case 82: break;
           case 27:
             { yybegin(getCurrentFallback()); return symbol(REGEX);
             }
           // fall through
-          case 82: break;
+          case 83: break;
           case 28:
             { yybegin(REGEX_STATE);
             }
           // fall through
-          case 83: break;
+          case 84: break;
           case 29:
             { return symbol(FNAME);
             }
           // fall through
-          case 84: break;
+          case 85: break;
           case 30:
             { yybegin(PENDING_SLASH); return symbol(WHITESPACE);
             }
           // fall through
-          case 85: break;
+          case 86: break;
           case 31:
-            { yybegin(LITERAL_STATE);
+            { mark();
+                                                        yybegin(LITERAL_STATE);
             }
           // fall through
-          case 86: break;
+          case 87: break;
           case 32:
             { yybegin(PENDING_SLASH); return symbol(COMMENT);
             }
           // fall through
-          case 87: break;
+          case 88: break;
           case 33:
             { yybegin(AFTER_SLASH); return symbol(SLASH);
             }
           // fall through
-          case 88: break;
+          case 89: break;
           case 34:
+            { mark();
+                                                        yybegin(REGEX_STATE);
+            }
+          // fall through
+          case 90: break;
+          case 35:
             { yybegin(BEFORE_SLASH); return symbol(FNAME);
             }
           // fall through
-          case 89: break;
-          case 35:
+          case 91: break;
+          case 36:
             { // we are encountering a new literal
                                                         encounterLiteralSegment();
             }
           // fall through
-          case 90: break;
-          case 36:
+          case 92: break;
+          case 37:
             { encounterOpenSegment();
                                                         return symbol(PRECEDENCE_START);
             }
           // fall through
-          case 91: break;
-          case 37:
+          case 93: break;
+          case 38:
             { encounterOpenSegment();
                                                         return symbol(LIST_START);
             }
           // fall through
-          case 92: break;
-          case 38:
+          case 94: break;
+          case 39:
             { encounterOpenSegment();
                                                         return symbol(MAP_START);
             }
           // fall through
-          case 93: break;
-          case 39:
+          case 95: break;
+          case 40:
             { return symbol(JBODY);
             }
           // fall through
-          case 94: break;
-          case 40:
+          case 96: break;
+          case 41:
             { yybegin(PENDING_JSCOPE); return symbol(WHITESPACE);
             }
           // fall through
-          case 95: break;
-          case 41:
+          case 97: break;
+          case 42:
             { yybegin(PENDING_JSCOPE); return symbol(COMMENT);
             }
           // fall through
-          case 96: break;
-          case 42:
+          case 98: break;
+          case 43:
             { yybegin(AFTER_JSCOPE); return symbol(DOT);
             }
           // fall through
-          case 97: break;
-          case 43:
+          case 99: break;
+          case 44:
             { endCurrentPath();
                                                         return symbol(SLASH);
             }
           // fall through
-          case 98: break;
-          case 44:
+          case 100: break;
+          case 45:
             { yybegin(BEFORE_JSCOPE); return symbol(JNAME);
             }
           // fall through
-          case 99: break;
-          case 45:
+          case 101: break;
+          case 46:
             { return symbol(PBODY);
             }
           // fall through
-          case 100: break;
-          case 46:
+          case 102: break;
+          case 47:
             { yybegin(PENDING_PSCOPE); return symbol(WHITESPACE);
             }
           // fall through
-          case 101: break;
-          case 47:
+          case 103: break;
+          case 48:
             { yybegin(PENDING_PSCOPE); return symbol(COMMENT);
             }
           // fall through
-          case 102: break;
-          case 48:
+          case 104: break;
+          case 49:
             { yybegin(AFTER_PSCOPE); return symbol(DOT);
             }
           // fall through
-          case 103: break;
-          case 49:
+          case 105: break;
+          case 50:
             { return symbol(NATURAL);
             }
           // fall through
-          case 104: break;
-          case 50:
+          case 106: break;
+          case 51:
             { yybegin(BEFORE_PSCOPE); return symbol(PNAME);
             }
           // fall through
-          case 105: break;
-          case 51:
+          case 107: break;
+          case 52:
             { yybegin(BEFORE_PSCOPE); return symbol(NATURAL);
             }
           // fall through
-          case 106: break;
-          case 52:
+          case 108: break;
+          case 53:
             { endCurrentPath();
                                                         return symbol(TRANSITION_SEP_R);
             }
           // fall through
-          case 107: break;
-          case 53:
+          case 109: break;
+          case 54:
             { endCurrentPath();
                                                         return symbol(TRANSITION_SEP_L);
             }
           // fall through
-          case 108: break;
-          case 54:
+          case 110: break;
+          case 55:
             { yypushback(2);
           return symbol(FNAME);
             }
           // fall through
-          case 109: break;
-          case 55:
+          case 111: break;
+          case 56:
             { yypushback(2);
           yybegin(BEFORE_SLASH);
           return symbol(FNAME);
             }
           // fall through
-          case 110: break;
+          case 112: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

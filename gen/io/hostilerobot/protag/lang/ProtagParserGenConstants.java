@@ -11,15 +11,66 @@ interface ProtagParserGenConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int PLUS = 1;
+  int WHITESPACE = 1;
   /** RegularExpression Id. */
-  int MINUS = 2;
+  int NATURAL = 2;
+  /** RegularExpression Id. */
+  int DOT = 3;
+  /** RegularExpression Id. */
+  int AND = 4;
+  /** RegularExpression Id. */
+  int SLASH = 5;
+  /** RegularExpression Id. */
+  int JPATH_START = 6;
+  /** RegularExpression Id. */
+  int JNAME = 7;
+  /** RegularExpression Id. */
+  int JBODY = 8;
+  /** RegularExpression Id. */
+  int PLUS = 9;
+  /** RegularExpression Id. */
+  int MINUS = 10;
+  /** RegularExpression Id. */
+  int LIST_START = 11;
+  /** RegularExpression Id. */
+  int LIST_END = 12;
+  /** RegularExpression Id. */
+  int LIST_SEP = 13;
+  /** RegularExpression Id. */
+  int PRECEDENCE_START = 14;
+  /** RegularExpression Id. */
+  int PRECEDENCE_END = 15;
+  /** RegularExpression Id. */
+  int REGEX = 16;
+  /** RegularExpression Id. */
+  int LITERAL = 17;
+  /** RegularExpression Id. */
+  int PNAME = 18;
+  /** RegularExpression Id. */
+  int COMMENT = 19;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
+    "<WHITESPACE>",
+    "<NATURAL>",
+    "<DOT>",
+    "<AND>",
+    "<SLASH>",
+    "<JPATH_START>",
+    "<JNAME>",
+    "<JBODY>",
     "<PLUS>",
     "<MINUS>",
+    "<LIST_START>",
+    "<LIST_END>",
+    "<LIST_SEP>",
+    "<PRECEDENCE_START>",
+    "<PRECEDENCE_END>",
+    "<REGEX>",
+    "<LITERAL>",
+    "<PNAME>",
+    "<COMMENT>",
   };
 
 }

@@ -56,11 +56,11 @@ public enum ProtagTokenType {
     private static int getTerminalId(String name) {
         for(int id = 0; id < ProtagParserGenConstants.tokenImage.length; id++) {
             if(name.equals(ProtagParserGenConstants.tokenImage[id])) {
-//                System.out.printf("name:%s = id:%d\n", name, id);
+                System.out.printf("name:%s = id:%d\n", name, id);
                 return id;
             }
         }
-//        System.out.printf("name:%s id unknown\n", name);
+        System.out.printf("name:%s id unknown\n", name);
         return -1;
     }
 

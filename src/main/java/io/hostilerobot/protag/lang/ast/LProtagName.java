@@ -10,4 +10,9 @@ public final class LProtagName extends AbstractProtagNode implements CStringNode
     public String getRawValue() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        return "%s[%s]".formatted(getClass().getSimpleName(), name);
+    }
 }

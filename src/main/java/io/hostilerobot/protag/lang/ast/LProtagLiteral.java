@@ -9,4 +9,9 @@ public final class LProtagLiteral extends AbstractProtagNode implements CStringN
     public String getRawValue() {
         return literal;
     }
+
+    @Override
+    public String toString() {
+        return "%s[%s]".formatted(getClass().getSimpleName(), literal);
+    }
 }

@@ -25,7 +25,6 @@ class ProtagParserGen {
         this.ReInit((TokenManager) lexer);
         token = new StartToken();
     }
-}}
 }
 
 
@@ -37,30 +36,32 @@ PARSER_END(ProtagParserGen)
 //yapping ::= yapping_?
 public IProtagSequence program() :
 {
-    IProtagSequence result = null;
+    IProtagSequence result = new ProtagSequence();
 }
 {
 //  Plus() {return ESignType.PLUS; } | Minus() {return ESignType.MINUS; }
-    [result=ProtagSequence(null, null)] <EOF>
+    [result=ProtagSequence(result, null)] <EOF>
     {
-
-        if(result == null)
-            result = new ProtagSequence();
         return result;
     }
 }
 //private yapping_ ::= Properties|(item yapping_?)
-IProtagSequence ProtagSequence(ProtagNode parent, ProtagProperties context) :
+IProtagSequence ProtagSequence(IProtagSequence result, ProtagProperties context) :
 {
-    IProtagSequence result = new ProtagSequence();
+    IProtagProperties properties;
+    ProtagNode item;
 }
 {
-    properties=ProtagProperties(result, context)
+    /*properties=ProtagProperties(result, context)
     {
-        
+
     }
-    | item() [ProtagSequence(result, context)]
+    | */item=item() [ProtagSequence(result, context)]
     {
+        if(item != null) {
+            result.getItems().addFirst(item);
+        }
+        return result;
     }
 }
 //private item ::=
@@ -68,15 +69,22 @@ IProtagSequence ProtagSequence(ProtagNode parent, ProtagProperties context) :
 //    |COMMENT|WHITESPACE // whitespace
 private ProtagNode item() :
 {
-    ProtagNode item;
+    ProtagNode item = null;
+    LProtagLineComment lineComment;
 }
 {
     item=unboundedData()
     {
         return item;
     }
-    |<COMMENT>
+    |lineComment=ProtagLineComment()
+    {
+        // todo - add lineComment to meta table
+        return null;
+    }
+
     |<WHITESPACE>
+    { return null; }
 }
 //private BaseData ::=
 //    yPath1|jPath|fPath // paths. final path is a two part or more yapping segment
@@ -91,15 +99,15 @@ private ProtagNode baseData() :
 }
 {
     (
-        result=ProtagPath()
-        | result=JavaPath()
-        | result=FilePath()
-        | result=ProtagPathSegment()
+        /*result=ProtagPath()
+        | */result=JavaPath()
+       // | result=FilePath()
+        /*| result=ProtagPathSegment()*/
         | result=ProtagPrecedence()
-        | result=ProtagMap()
+        //| result=ProtagMap()
         | result=ProtagList()
-        | result=ProtagReal()
-        | result=ProtagQuotient()
+        | LOOKAHEAD([Sign() spacing()] <NATURAL> <DOT>) result=ProtagReal()
+        | LOOKAHEAD(IntegerVal() spacing() (<AND>|<SLASH>)) result=ProtagQuotient()
         | result=ProtagInteger()
         | result=ProtagRegex()
         | result=ProtagLiteral()
@@ -109,44 +117,107 @@ private ProtagNode baseData() :
         return result;
     }
 }
+
 // *** Java Paths and Scopes ***
     IJavaPath JavaPath() :
-    {}
     {
-        <JPATH_START> spacing() jScope()
+        LinkedList<IJavaPathSegment> segments = new LinkedList<>();
+        List<IJavaPathSegment> result;
     }
-    private List<IJavaPathSegment> jScope() :
-    {}
     {
-        JavaPathSegment() [spacing() <DOT> spacing() jScope()]
+        <JPATH_START> spacing() result=jScope(segments)
+        { return new JavaPath(segments); }
+    }
+    private List<IJavaPathSegment> jScope(LinkedList<IJavaPathSegment> segments) :
+    {
+        IJavaPathSegment item;
+    }
+    {
+        item=JavaPathSegment() [LOOKAHEAD(spacing() <DOT>) spacing() <DOT> spacing() jScope(segments)]
+        {
+            segments.addFirst(item);
+            return segments;
+        }
     }
     public IJavaPathSegment JavaPathSegment() :
-    {}
     {
-        jSegmentMulti() | jSegmentSingle()
+        LinkedList<ProtagNode> pathSegments = new LinkedList<>();
+        ProtagNode singleSegment;
+    }
+    {
+        LOOKAHEAD(2)
+        jSegmentMulti(pathSegments)
+        {
+            return new JavaPathSegment(pathSegments);
+        }
+        | singleSegment=jSegmentSingle()
+        {
+            pathSegments.addFirst(singleSegment);
+            return new JavaPathSegment(pathSegments);
+        }
     }
     private ProtagNode jSegmentSingle() :
-    {}
     {
-        <JNAME> | containedSegment()
+        Token jName;
+        ProtagNode segment;
     }
-    private List<ProtagNode> jSegmentMulti() :
-    {}
     {
-        (<JNAME> jSegmentExclJBody())
-        | (containedSegment() jSegmentInclJBody())
+        jName=<JNAME>
+        {
+            ProtagStringToken pst = (ProtagStringToken) jName;
+            return new LJavaName(String.valueOf(pst.getValue()));
+        }
+        | segment=containedSegment()
+        {
+            return segment;
+        }
     }
-    private List<ProtagNode> jSegmentInclJBody() :
-    {}
+    private List<ProtagNode> jSegmentMulti(LinkedList<ProtagNode> pathSegments) :
     {
-        <JBODY> [jSegmentExclJBody()]
-        | jSegmentExclJBody()
+        Token jName;
+        ProtagNode segmentItem;
     }
-    private List<ProtagNode> jSegmentExclJBody() :
-    {}
     {
-        containedSegment() [jSegmentInclJBody()]
+        LOOKAHEAD(2) jName=<JNAME> jSegmentExclJBody(pathSegments)
+        {
+            ProtagStringToken pst = (ProtagStringToken) jName;
+            pathSegments.addFirst(new LJavaName(String.valueOf(pst.getValue())));
+            return pathSegments;
+        }
+        | LOOKAHEAD(2) segmentItem=containedSegment() jSegmentInclJBody(pathSegments)
+        {
+            pathSegments.addFirst(segmentItem);
+            return pathSegments;
+        }
     }
+    private List<ProtagNode> jSegmentInclJBody(LinkedList<ProtagNode> pathSegments) :
+    {
+        Token jBody;
+    }
+    {
+        jBody=<JBODY> [LOOKAHEAD(containedSegment()) jSegmentExclJBody(pathSegments)]
+        {
+            ProtagStringToken pst = (ProtagStringToken) jBody;
+            pathSegments.addFirst(new LJavaBody(String.valueOf(pst.getValue())));
+            return pathSegments;
+        }
+        | LOOKAHEAD(containedSegment()) jSegmentExclJBody(pathSegments)
+        {
+            return pathSegments;
+        }
+    }
+    private List<ProtagNode> jSegmentExclJBody(LinkedList<ProtagNode> pathSegments) :
+    {
+        ProtagNode segmentItem;
+    }
+    {
+        segmentItem=containedSegment() [LOOKAHEAD(<JBODY>|containedSegment()) jSegmentInclJBody(pathSegments)]
+        {
+            pathSegments.addFirst(segmentItem);
+            return pathSegments;
+        }
+    }
+    /*
 // *** File Paths and Scopes ***
     //    fPath ::= (FPATH_START spacing fScope)
     IFilePath FilePath() :
@@ -195,6 +266,7 @@ private ProtagNode baseData() :
     {
         containedSegment() [fSegmentInclFName()]
     }
+
 // *** Protag Paths and Scopes ***
 //    //yPath0 ::= yPath1|NATURAL|ySegmentExclNat // single a or a(.b)+
 //    yPath1 ::= ((NATURAL spacing DOT spacing ySegmentExclNat) (spacing DOT spacing yPathRest)?)
@@ -244,44 +316,52 @@ private ProtagNode baseData() :
         (<NATURAL>|<PBODY>) [protagSegmentExclVals()]
         | protagSegmentExclVals()
     }
+*/
 
 //QUOTIENT ::= (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4, 1/2
 LProtagQuotient ProtagQuotient() :
 {
     XInteger intPart;
     XInteger numerator;
-    ProtagNaturalToken denominator;
+    Token denominator;
 }
 {
-    [intPart=IntegerVal() spacing() <AND> spacing()] numerator=IntegerVal() spacing() <SLASH> spacing() denominator=<NATURAL>
+    LOOKAHEAD(IntegerVal() spacing() <AND>)
+    intPart=IntegerVal() spacing() <AND> spacing() numerator=IntegerVal() spacing() <SLASH> spacing() denominator=<NATURAL>
     {
         int integerPart = intPart.toInteger();
         // todo if denominator is zero, we should probably throw somewhere and make it more explicit to user
-        Fraction fractionalPart = new Fraction(numerator.toInteger(), denominator.getValue());
+        Fraction fractionalPart = new Fraction(numerator.toInteger(), ((ProtagNaturalToken)denominator).getValue());
         return new LProtagQuotient(fractionalPart.add(integerPart));
+    }
+    |
+    numerator=IntegerVal() spacing() <SLASH> spacing() denominator=<NATURAL>
+    {
+        Fraction fractionalPart = new Fraction(numerator.toInteger(), ((ProtagNaturalToken)denominator).getValue());
+        return new LProtagQuotient(fractionalPart);
     }
 }
 XInteger IntegerVal() :
 {
     ESignType sign = ESignType.NONE;
-    ProtagNaturalToken nat;
+    Token nat;
 }
 {
     [sign=Sign() spacing()] nat=<NATURAL>
     {
-        return new XInteger(sign, nat.getValue());
+        return new XInteger(sign, ((ProtagNaturalToken)nat).getValue());
     }
 }
 //INTEGER ::= (SIGN spacing)? NATURAL
 LProtagInteger ProtagInteger() :
 {
     ESignType sign = ESignType.NONE;
-    ProtagNaturalToken nat;
+    Token nat;
 }
 {
     [sign=Sign() spacing()] nat=<NATURAL>
     {
-        return new LProtagInteger(sign,negate(nat.getValue()));
+        return new LProtagInteger(sign.negate(((ProtagNaturalToken)nat).getValue()));
     }
 }
 //REAL ::= (SIGN spacing)? DECIMAL
@@ -299,12 +379,12 @@ LProtagReal ProtagReal() :
 //private DECIMAL ::= NATURAL DOT NATURAL // define DECIMAL in parser rather than lexer, as this might be part of a ysegment rather than a decimal
 XDecimal Decimal() :
 {
-    ProtagNaturalToken integerPart;
-    ProtagNaturalToken fractionalPart;
+    Token integerPart;
+    Token fractionalPart;
 }
 {
     integerPart=<NATURAL> <DOT> fractionalPart=<NATURAL>
-    { return new XDecimal(integerPart.getValue(), fractionalPart.getValue());}
+    { return new XDecimal(((ProtagNaturalToken)integerPart).getValue(), ((ProtagNaturalToken)fractionalPart).getValue());}
 }
 //private SIGN ::= (PLUS|MINUS)
 ESignType Sign() :
@@ -315,9 +395,9 @@ ESignType Sign() :
     | <MINUS>
     { return ESignType.MINUS; }
 }
-
+/*
 //Properties ::= BaseData spacing PROPERTY_SEP (yapping_)? {
-IProtagProperties ProtagProperties(ProtagNode parent, IProtagProperties context) :
+IProtagProperties ProtagProperties(IProtagProperties context) :
 {
     IProtagProperties result = context == null ? new ProtagProperties() : context;
     ProtagNode name;
@@ -340,7 +420,7 @@ IProtagMap ProtagMap() :
 {
     <MAP_START> spacing() <MAP_END>
     | <MAP_START> spacing() pairBounded() (spacing() <LIST_SEP> spacing() pairBounded())* spacing() <MAP_END>
-}
+}*/
 
 //List ::= (LIST_START LIST_END) // []
 //    // [a[, b]*]
@@ -348,29 +428,62 @@ IProtagMap ProtagMap() :
 //        methods=[isElement]
 //    }
 IProtagList ProtagList() :
-{}
 {
-    <LIST_START> <LIST_END>
-    | <LIST_START> spacing() boundedData() (spacing() <LIST_SEP> spacing() boundedData())* spacing() <LIST_END>
+    LinkedList<ProtagNode> list = new LinkedList<>();
+    IProtagList result = new ProtagList(list);
+    ProtagNode item;
+}
+{
+    LOOKAHEAD(<LIST_START> spacing() <LIST_END>)
+    <LIST_START> spacing() <LIST_END>
+    {
+        return result;
+    }
+    | LOOKAHEAD(<LIST_START> spacing() boundedData(null))
+      <LIST_START>
+        spacing() item=boundedData()
+        {
+            list.add(item);
+        }
+        (
+            LOOKAHEAD(spacing() <LIST_SEP>)
+            spacing() <LIST_SEP> spacing() item=boundedData()
+            {
+                list.add(item);
+            }
+        )*
+        spacing()
+      <LIST_END>
+    {
+        return result;
+    }
 }
 
 //Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
 IProtagPrecedence ProtagPrecedence() :
-{}
 {
-    <PRECEDENCE_START> spacing() boundedData() spacing() <PRECEDENCE_END>
+    ProtagNode data;
+}
+{
+    <PRECEDENCE_START> spacing() data=boundedData() spacing() <PRECEDENCE_END>
+    {
+        return new ProtagPrecedence(data);
+    }
 }
 
 //private UnboundedData ::= PairExpr|TransitionLExpr|TransitionRExpr|BaseData
 private ProtagNode unboundedData() :
-{}
 {
-    ProtagPair()
+    ProtagNode result;
+}
+{
+    /*ProtagPair()
     | ProtagTransitionLeft()
     | ProtagTransitionRight()
-    | baseData()
+    | */result = baseData()
+    { return result; }
 }
-
+/*
 //PairExpr ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing UnboundedData
 IProtagPair ProtagPair() :
 {}
@@ -393,18 +506,24 @@ IProtagTransitionRight ProtagTransitionRight() :
 {
     baseData() spacing() <TRANSITION_SEP_R> spacing() ( ProtagTransitionRight() | baseData() )
 }
+*/
 //
 //private BoundedData ::= PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData
 private ProtagNode boundedData() :
-{}
 {
-    pairBounded()
+    ProtagNode result;
+}
+{
+    /*pairBounded()
     | ProtagTransitionLeftBounded()
     | ProtagTransitionRightBounded()
     | ProtagProperties()
-    | baseData()
+    | */result=baseData()
+    {
+        return result;
+    }
 }
-
+/*
 //PairBounded ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing BoundedData
 private ProtagNode pairBounded() :
 {}
@@ -429,42 +548,84 @@ private IProtagTransitionRight ProtagTransitionRightBounded() :
 {
     baseData() spacing() <TRANSITION_SEP_R> spacing() ( ProtagTransitionRightBounded() | ProtagProperties() | baseData() )
 }
+ */
 //
 //// all these items that can be contained in a path and have incipient and terminator chars.
 //private containedSegment ::= REGEX|LITERAL|List|Map|Precedence
 private ProtagNode containedSegment() :
-{}
 {
-    ProtagRegex()
-    | ProtagLiteral()
-    | ProtagList()
-    | ProtagMap()
-    | ProtagPrecedence()
+    ProtagNode result;
+}
+{
+    ( result=ProtagRegex()
+    | result=ProtagLiteral()
+    | result=ProtagList()
+//    | ProtagMap()
+    | result=ProtagPrecedence() )
+
+    {
+        return result;
+    }
 }
 //| ProtagRegex()
 //    | ProtagLiteral()
 //    | ProtagIdentifier()
 IProtagRegex ProtagRegex() :
-{}
 {
-    <REGEX>
+    Token tok;
 }
-LProtagLiteral ProtagLiteral()
-{}
 {
-    <LITERAL>
+    tok=<REGEX>
+    {
+        ProtagStringToken pst = (ProtagStringToken) tok;
+        return new LProtagRegexRaw(String.valueOf(pst.getValue()));
+    }
+}
+LProtagLiteral ProtagLiteral() :
+{
+    Token tok;
+}
+{
+    tok=<LITERAL>
+    {
+        ProtagStringToken lit = (ProtagStringToken) tok;
+        return new LProtagLiteral(String.valueOf(lit.getValue()));
+    }
 }
 LProtagName ProtagName() :
-{}
 {
-    <PNAME>
+    Token tok;
 }
-
+{
+    tok=<PNAME>
+    {
+        ProtagStringToken lit = (ProtagStringToken) tok;
+        return new LProtagName(String.valueOf(lit.getValue()));
+    }
+}
 //// asdf10&3/4 vs "asdf"10 & 3/4"asdf"
 //// spacing items
 //private spacing ::= (WHITESPACE|COMMENT)*
-private void spacing() :
-{}
+private List<LProtagLineComment> spacing() :
 {
-    ( <WHITESPACE> | <COMMENT> )*
+    List<LProtagLineComment> result = new ArrayList<>();
+    LProtagLineComment comment;
+}
+{
+    ( <WHITESPACE>
+      | comment=ProtagLineComment()
+      {
+          result.add(comment);
+      }
+    )*
+    {return result;}
+}
+
+private LProtagLineComment ProtagLineComment() :
+{
+    Token comment;
+}
+{
+    comment=<COMMENT>
+    {return new LProtagLineComment(((ProtagStringToken)comment).getValue());}
 }
