@@ -442,23 +442,23 @@ private ProtagNode baseData() :
     }
     {
         (
-        firstNodeSegmentItem=containedSegment() protagSegmentInclVals(segmentItems)
-        {
-            segmentItems.addFirst(firstNodeSegmentItem);
-
-        }
-        | (
-            firstTokenSegmentItem=<PNAME>
+            firstNodeSegmentItem=containedSegment() protagSegmentInclVals(segmentItems)
             {
-                ProtagStringToken pst = (ProtagStringToken) firstTokenSegmentItem;
-                segmentItems.add(new LProtagName(String.valueOf(pst.getValue())));
+                segmentItems.addFirst(firstNodeSegmentItem);
             }
-          | firstTokenSegmentItem=<NATURAL>
-            {
-                ProtagNaturalToken pnt = (ProtagNaturalToken) firstTokenSegmentItem;
-                segmentItems.add(new LProtagNatural(pnt.getValue()));
-            }
-          ) protagSegmentExclVals(segmentItems)
+        |
+            (
+                firstTokenSegmentItem=<PNAME>
+                {
+                    ProtagStringToken pst = (ProtagStringToken) firstTokenSegmentItem;
+                    segmentItems.add(new LProtagName(String.valueOf(pst.getValue())));
+                }
+            |   firstTokenSegmentItem=<NATURAL>
+                {
+                    ProtagNaturalToken pnt = (ProtagNaturalToken) firstTokenSegmentItem;
+                    segmentItems.add(new LProtagNatural(pnt.getValue()));
+                }
+            ) protagSegmentExclVals(segmentItems)
         )
         { return new ProtagPathSegment(segmentItems); }
     }
@@ -485,19 +485,19 @@ private ProtagNode baseData() :
     }
     {
         (
-          (
-            firstTokenSegmentItem=<NATURAL>
-            {
-                ProtagNaturalToken pnt = (ProtagNaturalToken) firstTokenSegmentItem;
-                segmentItems.add(new LProtagNatural(pnt.getValue()));
-            }
-          | firstTokenSegmentItem=<PBODY>
-            {
-                ProtagStringToken pst = (ProtagStringToken) firstTokenSegmentItem;
-                segmentItems.add(new LProtagBody(String.valueOf(pst.getValue())));
-            }
-          ) [LOOKAHEAD(containedSegment()) protagSegmentExclVals(segmentItems)]
-        | protagSegmentExclVals(segmentItems)
+            (
+                firstTokenSegmentItem=<NATURAL>
+                {
+                    ProtagNaturalToken pnt = (ProtagNaturalToken) firstTokenSegmentItem;
+                    segmentItems.add(new LProtagNatural(pnt.getValue()));
+                }
+            |   firstTokenSegmentItem=<PBODY>
+                {
+                    ProtagStringToken pst = (ProtagStringToken) firstTokenSegmentItem;
+                    segmentItems.add(new LProtagBody(String.valueOf(pst.getValue())));
+                }
+            ) [LOOKAHEAD(containedSegment()) protagSegmentExclVals(segmentItems)]
+        |   protagSegmentExclVals(segmentItems)
         )
         { return segmentItems; }
     }
@@ -526,6 +526,7 @@ LProtagQuotient ProtagQuotient() :
         return new LProtagQuotient(fractionalPart);
     }
 }
+
 XInteger IntegerVal() :
 {
     ESignType sign = ESignType.NONE;
@@ -577,7 +578,7 @@ ESignType Sign() :
 {
     <PLUS>
     { return ESignType.PLUS; }
-    | <MINUS>
+|   <MINUS>
     { return ESignType.MINUS; }
 }
 /*
@@ -624,8 +625,8 @@ IProtagList ProtagList() :
     {
         return result;
     }
-    | LOOKAHEAD(<LIST_START> spacing() boundedData(null))
-      <LIST_START>
+|   LOOKAHEAD(<LIST_START> spacing() boundedData())
+    <LIST_START>
         spacing() item=boundedData()
         {
             list.add(item);
@@ -638,7 +639,7 @@ IProtagList ProtagList() :
             }
         )*
         spacing()
-      <LIST_END>
+    <LIST_END>
     {
         return result;
     }
@@ -656,84 +657,187 @@ IProtagPrecedence ProtagPrecedence() :
     }
 }
 
-//private UnboundedData ::= PairExpr|TransitionLExpr|TransitionRExpr|BaseData
+//private UnboundedData ::= PairExpr|TransitionRightExpr|TransitionLeftExpr|BaseData
 private ProtagNode unboundedData() :
 {
     ProtagNode result;
 }
 {
-    /*ProtagPair()
-    | ProtagTransitionLeft()
-    | ProtagTransitionRight()
-    | */result = baseData()
+    (
+        LOOKAHEAD((ProtagTransitionRight() | ProtagTransitionLeft() | baseData()) spacing() <PAIR_SEP>)
+        result = ProtagPair()
+    |   LOOKAHEAD((ProtagTransitionLeft() | baseData()) spacing() <TRANSITION_SEP_R>)
+        result = ProtagTransitionRight()
+    |   LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        result = ProtagTransitionLeft()
+    |   result = baseData()
+    )
     { return result; }
 }
-/*
-//PairExpr ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing UnboundedData
+
+//PairExpr ::= (TransitionRightExpr|TransitionLeftExpr|BaseData) spacing PAIR_SEP spacing UnboundedData
 IProtagPair ProtagPair() :
-{}
 {
-   ( ProtagTransitionLeft()
-    | ProtagTransitionRight()
-    | baseData() ) spacing() <PAIR_SEP> spacing() unboundedData()
+    ProtagNode lhs;
+    ProtagNode rhs;
 }
-//TransitionLExpr ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing (TransitionLExpr|TransitionRExpr|BaseData)
-IProtagTransitionLeft ProtagTransitionLeft() :
-{}
 {
-    ( ProtagTransitionRight() | baseData() ) spacing()
-        <TRANSITION_SEP_L> spacing()
-        (ProtagTransitionLeft() | ProtagTransitionRight() | baseData() )
+    (
+        LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        lhs=ProtagTransitionLeft()
+    |   LOOKAHEAD((ProtagTransitionLeft() | baseData()) spacing() <TRANSITION_SEP_R>)
+        lhs=ProtagTransitionRight()
+    |   //LOOKAHEAD(baseData())
+        lhs=baseData()
+    )
+    spacing() <PAIR_SEP> spacing()
+    rhs=unboundedData()
+    {
+        return new ProtagPair(lhs, rhs);
+    }
 }
-//TransitionRExpr ::= BaseData spacing TRANSITION_SEP_R spacing (TransitionRExpr|BaseData)
+//TransitionRightExpr ::= (TransitionLeftExpr|BaseData) spacing TRANSITION_SEP_R spacing (TransitionRightExpr|TransitionLeftExpr|BaseData)
 IProtagTransitionRight ProtagTransitionRight() :
-{}
 {
-    baseData() spacing() <TRANSITION_SEP_R> spacing() ( ProtagTransitionRight() | baseData() )
+    ProtagNode lhs;
+    ProtagNode rhs;
 }
-*/
+{
+//    LOOKAHEAD((ProtagTransitionLeft() | baseData()) spacing() <TRANSITION_SEP_R>)
+    (
+        LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        lhs=ProtagTransitionLeft()
+    |   LOOKAHEAD(baseData())
+        lhs=baseData()
+    )
+    spacing() <TRANSITION_SEP_R> spacing()
+    (
+        LOOKAHEAD((ProtagTransitionLeft() | baseData()) spacing() <TRANSITION_SEP_R>)
+        rhs=ProtagTransitionRight()
+
+    |   LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        rhs=ProtagTransitionLeft()
+
+    |   //LOOKAHEAD(baseData())
+        rhs=baseData()
+    )
+    {
+        return new ProtagTransitionRight(lhs, rhs);
+    }
+}
+//TransitionLeftExpr ::= BaseData spacing TRANSITION_SEP_L spacing (TransitionLeftExpr|BaseData)
+IProtagTransitionLeft ProtagTransitionLeft() :
+{
+    ProtagNode lhs;
+    ProtagNode rhs;
+}
+{
+//    LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+    lhs=baseData()
+    spacing() <TRANSITION_SEP_L> spacing()
+    (
+        LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        rhs=ProtagTransitionLeft()
+    |   //LOOKAHEAD(baseData())
+        rhs=baseData()
+    )
+    {
+        return new ProtagTransitionLeft(lhs, rhs);
+    }
+}
+
 //
-//private BoundedData ::= PairBounded|TransitionLBounded|TransitionRBounded|Properties|BaseData
+//private BoundedData ::= PairBounded|TransitionRightBounded|TransitionLeftBounded|Properties|BaseData
 private ProtagNode boundedData() :
 {
     ProtagNode result;
 }
 {
-    /*pairBounded()
-    | ProtagTransitionLeftBounded()
-    | ProtagTransitionRightBounded()
-    | ProtagProperties()
-    | */result=baseData()
+      LOOKAHEAD((ProtagTransitionRight() | ProtagTransitionLeft() | baseData()) spacing() <PAIR_SEP>)
+      result=pairBounded()
+    | LOOKAHEAD((ProtagTransitionLeft() | baseData()) spacing() <TRANSITION_SEP_R>)
+      result=ProtagTransitionRightBounded()
+    | LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+      result=ProtagTransitionLeftBounded()
+//    | ProtagProperties()
+    | result=baseData()
     {
         return result;
     }
 }
-/*
-//PairBounded ::= (TransitionLExpr|TransitionRExpr|BaseData) spacing PAIR_SEP spacing BoundedData
-private ProtagNode pairBounded() :
-{}
-{
-    ( ProtagTransitionLeft()
-    | ProtagTransitionRight()
-    | baseData() ) spacing() <PAIR_SEP> spacing() boundedData()
 
-}
-//TransitionLBounded ::= (TransitionRExpr|BaseData) spacing TRANSITION_SEP_L spacing (TransitionLBounded|TransitionRBounded|Properties|BaseData)
-private IProtagTransitionLeft ProtagTransitionLeftBounded() :
-{}
+//PairBounded ::= (TransitionRightExpr|TransitionLeftExpr|BaseData) spacing PAIR_SEP spacing BoundedData
+private IProtagPair pairBounded() :
 {
-    ( ProtagTransitionRight() | baseData() ) spacing()
-        <TRANSITION_SEP_L> spacing()
-        ( ProtagTransitionLeftBounded() | ProtagTransitionRightBounded() | ProtagProperties() | baseData() )
-
+    ProtagNode lhs;
+    ProtagNode rhs;
 }
-//TransitionRBounded ::= BaseData spacing TRANSITION_SEP_R spacing (TransitionRBounded|Properties|BaseData)
+{
+//    LOOKAHEAD((ProtagTransitionLeft()|ProtagTransitionRight()|baseData()) spacing() <PAIR_SEP>)
+    (
+        LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        lhs=ProtagTransitionRight()
+    |   LOOKAHEAD((ProtagTransitionLeft() | baseData()) spacing() <TRANSITION_SEP_R>)
+        lhs=ProtagTransitionLeft()
+    |   //LOOKAHEAD(baseData())
+        lhs=baseData()
+    )
+    spacing() <PAIR_SEP> spacing()
+    rhs=boundedData()
+    {
+        return new ProtagPair(lhs, rhs);
+    }
+}
+//TransitionRightBounded ::= (TransitionLeftExpr|BaseData) spacing TRANSITION_SEP_R spacing (TransitionRightBounded|TransitionLeftBounded|Properties|BaseData)
 private IProtagTransitionRight ProtagTransitionRightBounded() :
-{}
 {
-    baseData() spacing() <TRANSITION_SEP_R> spacing() ( ProtagTransitionRightBounded() | ProtagProperties() | baseData() )
+    ProtagNode lhs;
+    ProtagNode rhs;
 }
- */
+{
+//    LOOKAHEAD((baseData() spacing() <TRANSITION_SEP_L> | baseData()) spacing() <TRANSITION_SEP_R>)
+    (
+        LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        lhs=ProtagTransitionLeft()
+    |   LOOKAHEAD(baseData())
+        lhs=baseData()
+    )
+    spacing() <TRANSITION_SEP_R> spacing()
+    (
+        LOOKAHEAD((ProtagTransitionLeft() | baseData()) spacing() <TRANSITION_SEP_R>)
+        rhs=ProtagTransitionRightBounded()
+    |   LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        rhs=ProtagTransitionLeftBounded()
+//    |   ProtagProperties()
+    |   LOOKAHEAD(baseData())
+        rhs=baseData()
+    )
+    {
+        return new ProtagTransitionRight(lhs, rhs);
+    }
+}
+//TransitionLeftBounded ::= BaseData spacing TRANSITION_SEP_L spacing (TransitionLeftBounded|Properties|BaseData)
+private IProtagTransitionLeft ProtagTransitionLeftBounded() :
+{
+    ProtagNode lhs;
+    ProtagNode rhs;
+}
+{
+//    LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+    lhs=baseData()
+    spacing() <TRANSITION_SEP_L> spacing()
+    (
+        LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
+        rhs=ProtagTransitionLeftBounded()
+//    |   ProtagProperties()
+    |   LOOKAHEAD(baseData())
+        rhs=baseData()
+    )
+    {
+        return new ProtagTransitionLeft(lhs, rhs);
+    }
+}
+
 //
 //// all these items that can be contained in a path and have incipient and terminator chars.
 //private containedSegment ::= REGEX|LITERAL|List|Map|Precedence

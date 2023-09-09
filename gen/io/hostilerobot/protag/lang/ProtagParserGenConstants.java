@@ -49,11 +49,17 @@ interface ProtagParserGenConstants {
   /** RegularExpression Id. */
   int PRECEDENCE_END = 19;
   /** RegularExpression Id. */
-  int REGEX = 20;
+  int PAIR_SEP = 20;
   /** RegularExpression Id. */
-  int LITERAL = 21;
+  int TRANSITION_SEP_R = 21;
   /** RegularExpression Id. */
-  int COMMENT = 22;
+  int TRANSITION_SEP_L = 22;
+  /** RegularExpression Id. */
+  int REGEX = 23;
+  /** RegularExpression Id. */
+  int LITERAL = 24;
+  /** RegularExpression Id. */
+  int COMMENT = 25;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -77,6 +83,9 @@ interface ProtagParserGenConstants {
     "<LIST_SEP>",
     "<PRECEDENCE_START>",
     "<PRECEDENCE_END>",
+    "<PAIR_SEP>",
+    "<TRANSITION_SEP_R>",
+    "<TRANSITION_SEP_L>",
     "<REGEX>",
     "<LITERAL>",
     "<COMMENT>",
