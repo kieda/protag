@@ -4,8 +4,10 @@ import io.hostilerobot.protag.lang.ast.AbstractListLikeNode;
 import io.hostilerobot.protag.lang.ast.IProtagPathSegment;
 import io.hostilerobot.protag.lang.ast.ProtagNode;
 
-public final class ProtagPathSegment extends AbstractListLikeNode<ProtagNode> implements IProtagPathSegment {
-    public ProtagPathSegment() {
+import java.util.LinkedList;
 
+public final class ProtagPathSegment extends AbstractListLikeNode<ProtagNode> implements IProtagPathSegment {
+    public ProtagPathSegment(LinkedList<ProtagNode> segmentItems) {
+        super(segmentItems);
     }
 }

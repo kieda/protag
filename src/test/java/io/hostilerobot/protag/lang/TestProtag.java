@@ -7,6 +7,13 @@ import java.io.StringReader;
 
 public class TestProtag {
     static String test = """
+            "x"(sadf)y13`v`12.123"x".213
+            """;
+    static String test4 = """
+            !file/ s/ 
+                to/path( @sd[asd]"asd".s )asd
+            """;
+    static String test3 = """
             @hello
             @world.frant"cools"asdf
             @rodl(hello)asdf # comment    

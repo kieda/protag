@@ -13,53 +13,63 @@ interface ProtagParserGenConstants {
   /** RegularExpression Id. */
   int WHITESPACE = 1;
   /** RegularExpression Id. */
-  int NATURAL = 2;
+  int DOT = 2;
   /** RegularExpression Id. */
-  int DOT = 3;
+  int NATURAL = 3;
   /** RegularExpression Id. */
-  int AND = 4;
+  int PNAME = 4;
   /** RegularExpression Id. */
-  int SLASH = 5;
+  int AND = 5;
   /** RegularExpression Id. */
-  int JPATH_START = 6;
+  int SLASH = 6;
   /** RegularExpression Id. */
-  int JNAME = 7;
+  int JPATH_START = 7;
   /** RegularExpression Id. */
-  int JBODY = 8;
+  int JNAME = 8;
   /** RegularExpression Id. */
-  int PLUS = 9;
+  int JBODY = 9;
   /** RegularExpression Id. */
-  int MINUS = 10;
+  int FPATH_START = 10;
   /** RegularExpression Id. */
-  int LIST_START = 11;
+  int FNAME = 11;
   /** RegularExpression Id. */
-  int LIST_END = 12;
+  int PBODY = 12;
   /** RegularExpression Id. */
-  int LIST_SEP = 13;
+  int PLUS = 13;
   /** RegularExpression Id. */
-  int PRECEDENCE_START = 14;
+  int MINUS = 14;
   /** RegularExpression Id. */
-  int PRECEDENCE_END = 15;
+  int LIST_START = 15;
   /** RegularExpression Id. */
-  int REGEX = 16;
+  int LIST_END = 16;
   /** RegularExpression Id. */
-  int LITERAL = 17;
+  int LIST_SEP = 17;
   /** RegularExpression Id. */
-  int PNAME = 18;
+  int PRECEDENCE_START = 18;
   /** RegularExpression Id. */
-  int COMMENT = 19;
+  int PRECEDENCE_END = 19;
+  /** RegularExpression Id. */
+  int REGEX = 20;
+  /** RegularExpression Id. */
+  int LITERAL = 21;
+  /** RegularExpression Id. */
+  int COMMENT = 22;
 
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
     "<WHITESPACE>",
-    "<NATURAL>",
     "<DOT>",
+    "<NATURAL>",
+    "<PNAME>",
     "<AND>",
     "<SLASH>",
     "<JPATH_START>",
     "<JNAME>",
     "<JBODY>",
+    "<FPATH_START>",
+    "<FNAME>",
+    "<PBODY>",
     "<PLUS>",
     "<MINUS>",
     "<LIST_START>",
@@ -69,7 +79,6 @@ interface ProtagParserGenConstants {
     "<PRECEDENCE_END>",
     "<REGEX>",
     "<LITERAL>",
-    "<PNAME>",
     "<COMMENT>",
   };
 

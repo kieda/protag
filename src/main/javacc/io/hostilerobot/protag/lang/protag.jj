@@ -86,6 +86,7 @@ private ProtagNode item() :
     |<WHITESPACE>
     { return null; }
 }
+
 //private BaseData ::=
 //    yPath1|jPath|fPath // paths. final path is a two part or more yapping segment
 //    |ySegmentMulti  // single yapping segment (not a path)
@@ -99,15 +100,19 @@ private ProtagNode baseData() :
 }
 {
     (
-        /*result=ProtagPath()
-        | */result=JavaPath()
-       // | result=FilePath()
-        /*| result=ProtagPathSegment()*/
+          LOOKAHEAD((protagSegmentExclNat() spacing() <DOT>)|(<NATURAL> spacing() <DOT> spacing() protagSegmentExclNat()))
+          result=ProtagPath()
+        | result=JavaPath()
+        | result=FilePath()
+        | LOOKAHEAD((containedSegment() (<PNAME>|<NATURAL>|containedSegment()))|((<PNAME>|<NATURAL>) containedSegment()))
+          result=ProtagPathSegment()
         | result=ProtagPrecedence()
         //| result=ProtagMap()
         | result=ProtagList()
-        | LOOKAHEAD([Sign() spacing()] <NATURAL> <DOT>) result=ProtagReal()
-        | LOOKAHEAD(IntegerVal() spacing() (<AND>|<SLASH>)) result=ProtagQuotient()
+        | LOOKAHEAD([Sign() spacing()] <NATURAL> <DOT>)
+          result=ProtagReal()
+        | LOOKAHEAD(IntegerVal() spacing() (<AND>|<SLASH>))
+          result=ProtagQuotient()
         | result=ProtagInteger()
         | result=ProtagRegex()
         | result=ProtagLiteral()
@@ -217,54 +222,112 @@ private ProtagNode baseData() :
             return pathSegments;
         }
     }
-    /*
+
 // *** File Paths and Scopes ***
     //    fPath ::= (FPATH_START spacing fScope)
     IFilePath FilePath() :
-    {}
     {
-        <FPATH_START> spacing() fScope()
+        LinkedList<IFilePathSegment> segments = new LinkedList<>();
+        List<IFilePathSegment> result;
+    }
+    {
+        <FPATH_START> spacing() result=fScope(segments)
+        { return new FilePath(segments); }
     }
     //    private fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
-    private List<IFilePathSegment> fScope() :
-    {}
+    private List<IFilePathSegment> fScope(LinkedList<IFilePathSegment> segments) :
     {
-        FilePathSegment() [spacing() <SLASH> spacing() fScope()]
+        IFilePathSegment item;
+    }
+    {
+        item=FilePathSegment() [LOOKAHEAD(spacing() <SLASH>) spacing() <SLASH> spacing() fScope(segments)]
+        {
+            segments.addFirst(item);
+            return segments;
+        }
     }
     //    private fScopeSegment ::= fSegmentMulti | fSegmentSingle
     IFilePathSegment FilePathSegment() :
-    {}
     {
-        fSegmentMulti() | fSegmentSingle()
+        LinkedList<ProtagNode> pathSegments = new LinkedList<>();
+        ProtagNode singleSegment;
+    }
+    {
+        LOOKAHEAD(2)
+        fSegmentMulti(pathSegments)
+        {
+            return new FilePathSegment(pathSegments);
+        }
+        | singleSegment=fSegmentSingle()
+        {
+            pathSegments.addFirst(singleSegment);
+            return new FilePathSegment(pathSegments);
+        }
     }
     //    private fSegmentSingle ::= FNAME | containedSegment
     private ProtagNode fSegmentSingle() :
-    {}
     {
-        <FNAME> | containedSegment()
+        Token fName;
+        ProtagNode segment;
+    }
+    {
+        fName=<FNAME>
+        {
+            ProtagStringToken pst = (ProtagStringToken) fName;
+            return new LFileName(String.valueOf(pst.getValue()));
+        }
+        | segment=containedSegment()
+        { return segment; }
     }
     //    fSegmentMulti ::= (containedSegment fSegmentInclFName)
     //        | (FNAME fSegmentExclFName) {methods=[isElementType]}
-    private List<ProtagNode> fSegmentMulti() :
-    {}
+    private List<ProtagNode> fSegmentMulti(LinkedList<ProtagNode> pathSegments) :
     {
-        containedSegment() fSegmentInclFName()
-        | <FNAME> fSegmentExclFName()
+        Token fName;
+        ProtagNode segmentItem;
+    }
+    {
+        LOOKAHEAD(2) fName=<FNAME> fSegmentExclFName(pathSegments)
+        {
+            ProtagStringToken pst = (ProtagStringToken) fName;
+            pathSegments.addFirst(new LFileName(String.valueOf(pst.getValue())));
+            return pathSegments;
+        }
+        | LOOKAHEAD(2) segmentItem=containedSegment() fSegmentInclFName(pathSegments)
+        {
+            pathSegments.addFirst(segmentItem);
+            return pathSegments;
+        }
     }
     //    private fSegmentInclFName ::= (FNAME (fSegmentExclFName?))
     //        | fSegmentExclFName
-    private List<ProtagNode> fSegmentInclFName() :
+    private List<ProtagNode> fSegmentInclFName(LinkedList<ProtagNode> pathSegments) :
     {
+        Token fBody;
     }
     {
-        <FNAME> [fSegmentExclFName()]
-        | fSegmentExclFName()
+        fBody=<FNAME> [LOOKAHEAD(containedSegment()) fSegmentExclFName(pathSegments)]
+        {
+            ProtagStringToken pst = (ProtagStringToken) fBody;
+            pathSegments.addFirst(new LFileName(String.valueOf(pst.getValue())));
+            return pathSegments;
+        }
+        | LOOKAHEAD(containedSegment()) fSegmentExclFName(pathSegments)
+        {
+            return pathSegments;
+        }
     }
     //    private fSegmentExclFName ::= containedSegment fSegmentInclFName?
-    private List<ProtagNode> fSegmentExclFName() :
-    {}
+    private List<ProtagNode> fSegmentExclFName(LinkedList<ProtagNode> pathSegments) :
     {
-        containedSegment() [fSegmentInclFName()]
+        ProtagNode segmentItem;
+    }
+    {
+        segmentItem=containedSegment() [LOOKAHEAD(<FNAME>|containedSegment()) fSegmentInclFName(pathSegments)]
+        {
+            pathSegments.addFirst(segmentItem);
+            return pathSegments;
+        }
     }
 
 // *** Protag Paths and Scopes ***
@@ -272,51 +335,173 @@ private ProtagNode baseData() :
 //    yPath1 ::= ((NATURAL spacing DOT spacing ySegmentExclNat) (spacing DOT spacing yPathRest)?)
 //        | (ySegmentExclNat spacing DOT spacing yPathRest) {methods=[isElementType]}
     public IProtagPath ProtagPath() :
-    {}
     {
-        <NATURAL> spacing() <DOT> spacing() protagSegmentExclNat()
-        | protagSegmentExclNat() spacing() <DOT> spacing() protagPathRest()
+
+        LinkedList<IProtagPathSegment> segments = new LinkedList<>();
+        IProtagPathSegment firstPart;
+        IProtagPathSegment secondPart;
+        Token firstPartNat;
+    }
+    {
+        LOOKAHEAD(<NATURAL> spacing() <DOT> spacing() protagSegmentExclNat())
+        firstPartNat=<NATURAL> spacing() <DOT> spacing()
+            secondPart=protagSegmentExclNat()
+            [LOOKAHEAD(spacing() <DOT>) spacing() <DOT> spacing() protagPathRest(segments)]
+        {
+            // first add the second part
+            segments.addFirst(secondPart);
+
+            // then add the first part, which is a segment that just consists of the natural
+            ProtagNaturalToken pnt = (ProtagNaturalToken) firstPartNat;
+            LProtagNatural firstNode = new LProtagNatural(pnt.getValue());
+            LinkedList<ProtagNode> nodeList = new LinkedList<>();
+            nodeList.addFirst(firstNode);
+            segments.addFirst(new ProtagPathSegment(nodeList));
+            return new ProtagPath(segments);
+        }
+        | LOOKAHEAD(protagSegmentExclNat() spacing() <DOT>)
+        firstPart=protagSegmentExclNat() spacing() <DOT> spacing() protagPathRest(segments)
+        {
+            segments.addFirst(firstPart);
+            return new ProtagPath(segments);
+        }
     }
     //    private ySegmentExclNat ::= ySegmentMulti | containedSegment | YNAME  // multi segments are not considered nats
     private IProtagPathSegment protagSegmentExclNat() :
-    {}
     {
-        ProtagPathSegment() | containedSegment() | <PNAME>
+        IProtagPathSegment segment;
+        ProtagNode contained;
+        Token ident;
+    }
+    {
+        LOOKAHEAD((containedSegment() (<PNAME>|<NATURAL>|containedSegment()))|((<PNAME>|<NATURAL>) containedSegment()))
+        segment=ProtagPathSegment()
+        {
+            return segment;
+        }
+        | contained=containedSegment()
+        {
+            LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+            segmentItems.add(contained);
+            return new ProtagPathSegment(segmentItems);
+        }
+        | ident=<PNAME>
+        {
+            ProtagStringToken pst = (ProtagStringToken) ident;
+
+            LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+            segmentItems.add(new LProtagName(String.valueOf(ident.getValue())));
+            return new ProtagPathSegment(segmentItems);
+        }
     }
     //    private yPathRest ::= (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
-    private List<ProtagNode> protagPathRest() :
-    {}
+    private List<IProtagPathSegment> protagPathRest(LinkedList<IProtagPathSegment> segments) :
     {
-        (ProtagPath()
-        |containedSegment()
-        | <PNAME>
-        | <NATURAL>) [spacing() <DOT> spacing() protagPathRest()]
+        IProtagPathSegment segment;
+        ProtagNode singleNodeSegment;
+        Token singleTokenSegment;
+    }
+    {
+        (
+            LOOKAHEAD((containedSegment() (<PNAME>|<NATURAL>|containedSegment()))|((<PNAME>|<NATURAL>) containedSegment()))
+            segment=ProtagPathSegment()
+            {
+                segments.add(segment);
+            }
+            | singleNodeSegment=containedSegment()
+            {
+                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+                segmentItems.add(singleNodeSegment);
+                segments.add(new ProtagPathSegment(segmentItems));
+            }
+            | singleTokenSegment=<PNAME>
+            {
+                ProtagStringToken pst = (ProtagStringToken) singleTokenSegment;
+                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+                segmentItems.add(new LProtagName(String.valueOf(pst.getValue())));
+                segments.add(new ProtagPathSegment(segmentItems));
+            }
+            | singleTokenSegment=<NATURAL>
+            {
+                ProtagNaturalToken pnt = (ProtagNaturalToken) singleTokenSegment;
+                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+                segmentItems.add(new LProtagNatural(pnt.getValue()));
+
+                segments.add(new ProtagPathSegment(segmentItems));
+            }
+        ) [LOOKAHEAD(spacing() <DOT>) spacing() <DOT> spacing() protagPathRest(segments)]
+        {return segments;}
     }
     //    ySegmentMulti ::= (containedSegment ySegmentInclVals)
     //        | ((YNAME|NATURAL) ySegmentExclVals) {methods=[isElementType]}
     IProtagPathSegment ProtagPathSegment() :
-    {}
     {
-        containedSegment() protagSegmentInclVals()
-        | (<PNAME>|<NATURAL>) protagSegmentExclVals()
+        LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+        ProtagNode firstNodeSegmentItem;
+        Token firstTokenSegmentItem;
+    }
+    {
+        (
+        firstNodeSegmentItem=containedSegment() protagSegmentInclVals(segmentItems)
+        {
+            segmentItems.addFirst(firstNodeSegmentItem);
+
+        }
+        | (
+            firstTokenSegmentItem=<PNAME>
+            {
+                ProtagStringToken pst = (ProtagStringToken) firstTokenSegmentItem;
+                segmentItems.add(new LProtagName(String.valueOf(pst.getValue())));
+            }
+          | firstTokenSegmentItem=<NATURAL>
+            {
+                ProtagNaturalToken pnt = (ProtagNaturalToken) firstTokenSegmentItem;
+                segmentItems.add(new LProtagNatural(pnt.getValue()));
+            }
+          ) protagSegmentExclVals(segmentItems)
+        )
+        { return new ProtagPathSegment(segmentItems); }
     }
     //    private ySegmentExclVals ::= containedSegment ySegmentInclVals?
-    private List<ProtagNode> protagSegmentExclVals() :
-    {}
+    private List<ProtagNode> protagSegmentExclVals(LinkedList<ProtagNode> segmentItems) :
     {
-        containedSegment() [protagSegmentInclVals()]
+        ProtagNode segmentItem;
+    }
+    {
+
+        segmentItem=containedSegment()
+        {
+            segmentItems.add(segmentItem);
+        }
+        [LOOKAHEAD(<NATURAL>|<PBODY>|containedSegment()) protagSegmentInclVals(segmentItems)]
+
+        {return segmentItems;}
     }
     //    private ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
     //        | ySegmentExclVals
-    private List<ProtagNode> protagSegmentInclVals() :
+    private List<ProtagNode> protagSegmentInclVals(LinkedList<ProtagNode> segmentItems) :
     {
+        Token firstTokenSegmentItem;
+    }
+    {
+        (
+          (
+            firstTokenSegmentItem=<NATURAL>
+            {
+                ProtagNaturalToken pnt = (ProtagNaturalToken) firstTokenSegmentItem;
+                segmentItems.add(new LProtagNatural(pnt.getValue()));
+            }
+          | firstTokenSegmentItem=<PBODY>
+            {
+                ProtagStringToken pst = (ProtagStringToken) firstTokenSegmentItem;
+                segmentItems.add(new LProtagBody(String.valueOf(pst.getValue())));
+            }
+          ) [LOOKAHEAD(containedSegment()) protagSegmentExclVals(segmentItems)]
+        | protagSegmentExclVals(segmentItems)
+        )
+        { return segmentItems; }
+    }
 
-    }
-    {
-        (<NATURAL>|<PBODY>) [protagSegmentExclVals()]
-        | protagSegmentExclVals()
-    }
-*/
 
 //QUOTIENT ::= (INTEGER spacing AND spacing)? INTEGER spacing SLASH spacing NATURAL // 1 & 3/4, -1 &3/4, +1 & -3/4, 1/2
 LProtagQuotient ProtagQuotient() :
