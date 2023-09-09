@@ -39,27 +39,31 @@ interface ProtagParserGenConstants {
   /** RegularExpression Id. */
   int MINUS = 14;
   /** RegularExpression Id. */
-  int LIST_START = 15;
+  int MAP_START = 15;
   /** RegularExpression Id. */
-  int LIST_END = 16;
+  int MAP_END = 16;
   /** RegularExpression Id. */
   int LIST_SEP = 17;
   /** RegularExpression Id. */
-  int PRECEDENCE_START = 18;
+  int LIST_START = 18;
   /** RegularExpression Id. */
-  int PRECEDENCE_END = 19;
+  int LIST_END = 19;
   /** RegularExpression Id. */
-  int PAIR_SEP = 20;
+  int PRECEDENCE_START = 20;
   /** RegularExpression Id. */
-  int TRANSITION_SEP_R = 21;
+  int PRECEDENCE_END = 21;
   /** RegularExpression Id. */
-  int TRANSITION_SEP_L = 22;
+  int PAIR_SEP = 22;
   /** RegularExpression Id. */
-  int REGEX = 23;
+  int TRANSITION_SEP_R = 23;
   /** RegularExpression Id. */
-  int LITERAL = 24;
+  int TRANSITION_SEP_L = 24;
   /** RegularExpression Id. */
-  int COMMENT = 25;
+  int REGEX = 25;
+  /** RegularExpression Id. */
+  int LITERAL = 26;
+  /** RegularExpression Id. */
+  int COMMENT = 27;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -78,9 +82,11 @@ interface ProtagParserGenConstants {
     "<PBODY>",
     "<PLUS>",
     "<MINUS>",
+    "<MAP_START>",
+    "<MAP_END>",
+    "<LIST_SEP>",
     "<LIST_START>",
     "<LIST_END>",
-    "<LIST_SEP>",
     "<PRECEDENCE_START>",
     "<PRECEDENCE_END>",
     "<PAIR_SEP>",

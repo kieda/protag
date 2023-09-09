@@ -107,7 +107,7 @@ private ProtagNode baseData() :
         | LOOKAHEAD((containedSegment() (<PNAME>|<NATURAL>|containedSegment()))|((<PNAME>|<NATURAL>) containedSegment()))
           result=ProtagPathSegment()
         | result=ProtagPrecedence()
-        //| result=ProtagMap()
+        | result=ProtagMap()
         | result=ProtagList()
         | LOOKAHEAD([Sign() spacing()] <NATURAL> <DOT>)
           result=ProtagReal()
@@ -594,7 +594,7 @@ IProtagProperties ProtagProperties(IProtagProperties context) :
     {
 
     }
-}
+}*/
 
 //Map ::= (MAP_START spacing MAP_END) // {}
 //    // { a = b[, c = d]* }
@@ -602,11 +602,34 @@ IProtagProperties ProtagProperties(IProtagProperties context) :
 //        methods=[isElementType]
 //    }
 IProtagMap ProtagMap() :
-{}
 {
+    LinkedList<IProtagPair> entries = new LinkedList<>();
+    IProtagPair entry;
+}
+{
+    LOOKAHEAD(<MAP_START> spacing() <MAP_END>)
     <MAP_START> spacing() <MAP_END>
-    | <MAP_START> spacing() pairBounded() (spacing() <LIST_SEP> spacing() pairBounded())* spacing() <MAP_END>
-}*/
+    {
+        return new ProtagMap(entries);
+    }
+    |
+    <MAP_START>
+        spacing() entry=pairBounded()
+        {
+            entries.add(entry);
+        }
+        (
+            LOOKAHEAD(spacing() <LIST_SEP>)
+            spacing() <LIST_SEP> spacing() entry=pairBounded()
+            {
+                entries.add(entry);
+            }
+        )* spacing()
+    <MAP_END>
+    {
+        return new ProtagMap(entries);
+    }
+}
 
 //List ::= (LIST_START LIST_END) // []
 //    // [a[, b]*]
@@ -849,7 +872,7 @@ private ProtagNode containedSegment() :
     ( result=ProtagRegex()
     | result=ProtagLiteral()
     | result=ProtagList()
-//    | ProtagMap()
+    | result=ProtagMap()
     | result=ProtagPrecedence() )
 
     {
