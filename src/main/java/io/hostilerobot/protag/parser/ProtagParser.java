@@ -1,9 +1,8 @@
 package io.hostilerobot.protag.parser;
 
-import io.hostilerobot.protag.lang.ProtagParserGen;
-import io.hostilerobot.protag.ast.ProtagNode;
+import io.hostilerobot.protag.ast.CProtagNode;
 
-public class ProtagParser implements Parser<ProtagSymbol, ProtagNode, ProtagLexer>{
+public class ProtagParser implements Parser<ProtagSymbol, CProtagNode, ProtagLexer>{
     private ProtagParserGen internal;
     private ProtagLexer lexer;
     public ProtagParser(ProtagLexer lexer) {
@@ -27,7 +26,7 @@ public class ProtagParser implements Parser<ProtagSymbol, ProtagNode, ProtagLexe
     }
 
     @Override
-    public ProtagNode parse() throws ParseException {
+    public CProtagNode parse() throws ParseException {
         return internal.program();
     }
 }

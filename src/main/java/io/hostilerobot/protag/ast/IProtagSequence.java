@@ -4,5 +4,5 @@ import java.util.Deque;
 
 public interface IProtagSequence extends CListLikeNode {
     @Override
-    Deque<ProtagNode> getItems();
+    Deque<CProtagNode> getItems();
 }

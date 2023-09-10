@@ -1,6 +1,6 @@
 package io.hostilerobot.protag.parser;
 
-import io.hostilerobot.protag.lang.Token;
+import io.hostilerobot.protag.parser.Token;
 
 public abstract sealed class ProtagSymbol extends Token permits
         ProtagStringToken, ProtagNaturalToken, /* variable types of tokens, strings and nat numbers */

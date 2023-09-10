@@ -6,7 +6,7 @@ import java.util.List;
 
 
 // todo - should we remove getChildren() or getItems(), or just keep it as is to access the fields in multiple ways??
-public abstract class AbstractListLikeNode<T extends ProtagNode> extends AbstractProtagNode implements CListLikeNode{
+public abstract class AbstractListLikeNode<T extends CProtagNode> extends AbstractProtagNode implements CListLikeNode{
     private final LinkedList<T> items;
     public AbstractListLikeNode() {
         this.items = new LinkedList<>();
@@ -21,7 +21,7 @@ public abstract class AbstractListLikeNode<T extends ProtagNode> extends Abstrac
     }
 
     @Override
-    public List<ProtagNode> getChildren() {
-        return (List<ProtagNode>)items;
+    public List<CProtagNode> getChildren() {
+        return (List<CProtagNode>)items;
     }
 }

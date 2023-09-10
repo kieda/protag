@@ -7,10 +7,6 @@ PARSER_BEGIN(ProtagParserGen)
 package io.hostilerobot.protag.parser;
 
 import java.util.*;
-import java.io.*;
-import io.hostilerobot.protag.parser.ProtagLexer;
-import io.hostilerobot.protag.parser.ProtagSymbol;
-import io.hostilerobot.protag.parser.ProtagTokenType;
 import io.hostilerobot.protag.ast.*;
 import io.hostilerobot.protag.ast.impl.*;import org.apache.commons.math.fraction.Fraction;
 
@@ -24,6 +20,7 @@ class ProtagParserGen {
         this.ReInit((TokenManager) lexer);
         token = new StartToken();
     }
+}}
 }
 
 
@@ -35,7 +32,7 @@ PARSER_END(ProtagParserGen)
 //yapping ::= yapping_?
 public IProtagSequence program() :
 {
-    IProtagSequence result = new ProtagSequence();
+    IProtagSequence result = new ProtagSequenceImpl();
 }
 {
 //  Plus() {return ESignType.PLUS; } | Minus() {return ESignType.MINUS; }
@@ -48,11 +45,11 @@ public IProtagSequence program() :
 IProtagSequence ProtagSequence(IProtagSequence result, IProtagProperties context) :
 {
     IProtagProperties properties;
-    ProtagNode item;
+    CProtagNode item;
 }
 {
     LOOKAHEAD(baseData() spacing() <PROPERTY_SEP>)
-    properties=ProtagProperties(context == null ? new ProtagProperties() : context)
+    properties=ProtagProperties(context == null ? new ProtagPropertiesImpl() : context)
     {
         if(context == null) {
             result.getItems().addFirst(properties);
@@ -70,9 +67,9 @@ IProtagSequence ProtagSequence(IProtagSequence result, IProtagProperties context
 //private item ::=
 //    UnboundedData
 //    |COMMENT|WHITESPACE // whitespace
-private ProtagNode item() :
+private CProtagNode item() :
 {
-    ProtagNode item = null;
+    CProtagNode item = null;
     LProtagLineComment lineComment;
 }
 {
@@ -97,9 +94,9 @@ private ProtagNode item() :
 //    |Map|List   // composite data
 //    |REAL|QUOTIENT|INTEGER  // primitive - numbers
 //    |REGEX|LITERAL|YNAME // primitive - string types
-private ProtagNode baseData() :
+private CProtagNode baseData() :
 {
-    ProtagNode result;
+    CProtagNode result;
 }
 {
     (
@@ -134,7 +131,7 @@ private ProtagNode baseData() :
     }
     {
         <JPATH_START> spacing() result=jScope(segments)
-        { return new JavaPath(segments); }
+        { return new JavaPathImpl(segments); }
     }
     private List<IJavaPathSegment> jScope(LinkedList<IJavaPathSegment> segments) :
     {
@@ -149,25 +146,25 @@ private ProtagNode baseData() :
     }
     public IJavaPathSegment JavaPathSegment() :
     {
-        LinkedList<ProtagNode> pathSegments = new LinkedList<>();
-        ProtagNode singleSegment;
+        LinkedList<CProtagNode> pathSegments = new LinkedList<>();
+        CProtagNode singleSegment;
     }
     {
         LOOKAHEAD(2)
         jSegmentMulti(pathSegments)
         {
-            return new JavaPathSegment(pathSegments);
-        }
+    return new JavaPathSegmentImpl(pathSegments);
+}
         | singleSegment=jSegmentSingle()
         {
             pathSegments.addFirst(singleSegment);
-            return new JavaPathSegment(pathSegments);
+            return new JavaPathSegmentImpl(pathSegments);
         }
     }
-    private ProtagNode jSegmentSingle() :
+    private CProtagNode jSegmentSingle() :
     {
         Token jName;
-        ProtagNode segment;
+        CProtagNode segment;
     }
     {
         jName=<JNAME>
@@ -180,10 +177,10 @@ private ProtagNode baseData() :
             return segment;
         }
     }
-    private List<ProtagNode> jSegmentMulti(LinkedList<ProtagNode> pathSegments) :
+    private List<CProtagNode> jSegmentMulti(LinkedList<CProtagNode> pathSegments) :
     {
         Token jName;
-        ProtagNode segmentItem;
+        CProtagNode segmentItem;
     }
     {
         LOOKAHEAD(2) jName=<JNAME> jSegmentExclJBody(pathSegments)
@@ -198,7 +195,7 @@ private ProtagNode baseData() :
             return pathSegments;
         }
     }
-    private List<ProtagNode> jSegmentInclJBody(LinkedList<ProtagNode> pathSegments) :
+    private List<CProtagNode> jSegmentInclJBody(LinkedList<CProtagNode> pathSegments) :
     {
         Token jBody;
     }
@@ -214,9 +211,9 @@ private ProtagNode baseData() :
             return pathSegments;
         }
     }
-    private List<ProtagNode> jSegmentExclJBody(LinkedList<ProtagNode> pathSegments) :
+    private List<CProtagNode> jSegmentExclJBody(LinkedList<CProtagNode> pathSegments) :
     {
-        ProtagNode segmentItem;
+        CProtagNode segmentItem;
     }
     {
         segmentItem=containedSegment() [LOOKAHEAD(<JBODY>|containedSegment()) jSegmentInclJBody(pathSegments)]
@@ -235,7 +232,7 @@ private ProtagNode baseData() :
     }
     {
         <FPATH_START> spacing() result=fScope(segments)
-        { return new FilePath(segments); }
+        { return new FilePathImpl(segments); }
     }
     //    private fScope ::= fScopeSegment (spacing SLASH spacing fScope)?
     private List<IFilePathSegment> fScope(LinkedList<IFilePathSegment> segments) :
@@ -252,26 +249,26 @@ private ProtagNode baseData() :
     //    private fScopeSegment ::= fSegmentMulti | fSegmentSingle
     IFilePathSegment FilePathSegment() :
     {
-        LinkedList<ProtagNode> pathSegments = new LinkedList<>();
-        ProtagNode singleSegment;
+        LinkedList<CProtagNode> pathSegments = new LinkedList<>();
+        CProtagNode singleSegment;
     }
     {
         LOOKAHEAD(2)
         fSegmentMulti(pathSegments)
         {
-            return new FilePathSegment(pathSegments);
-        }
+    return new FilePathSegmentImpl(pathSegments);
+}
         | singleSegment=fSegmentSingle()
         {
             pathSegments.addFirst(singleSegment);
-            return new FilePathSegment(pathSegments);
+            return new FilePathSegmentImpl(pathSegments);
         }
     }
     //    private fSegmentSingle ::= FNAME | containedSegment
-    private ProtagNode fSegmentSingle() :
+    private CProtagNode fSegmentSingle() :
     {
         Token fName;
-        ProtagNode segment;
+        CProtagNode segment;
     }
     {
         fName=<FNAME>
@@ -284,10 +281,10 @@ private ProtagNode baseData() :
     }
     //    fSegmentMulti ::= (containedSegment fSegmentInclFName)
     //        | (FNAME fSegmentExclFName) {methods=[isElementType]}
-    private List<ProtagNode> fSegmentMulti(LinkedList<ProtagNode> pathSegments) :
+    private List<CProtagNode> fSegmentMulti(LinkedList<CProtagNode> pathSegments) :
     {
         Token fName;
-        ProtagNode segmentItem;
+        CProtagNode segmentItem;
     }
     {
         LOOKAHEAD(2) fName=<FNAME> fSegmentExclFName(pathSegments)
@@ -304,7 +301,7 @@ private ProtagNode baseData() :
     }
     //    private fSegmentInclFName ::= (FNAME (fSegmentExclFName?))
     //        | fSegmentExclFName
-    private List<ProtagNode> fSegmentInclFName(LinkedList<ProtagNode> pathSegments) :
+    private List<CProtagNode> fSegmentInclFName(LinkedList<CProtagNode> pathSegments) :
     {
         Token fBody;
     }
@@ -321,10 +318,10 @@ private ProtagNode baseData() :
         }
     }
     //    private fSegmentExclFName ::= containedSegment fSegmentInclFName?
-    private List<ProtagNode> fSegmentExclFName(LinkedList<ProtagNode> pathSegments) :
+    private List<CProtagNode> fSegmentExclFName(LinkedList<CProtagNode> pathSegments) :
     {
-        ProtagNode segmentItem;
-    }
+    CCProtagNode segmentItem;
+}
     {
         segmentItem=containedSegment() [LOOKAHEAD(<FNAME>|containedSegment()) fSegmentInclFName(pathSegments)]
         {
@@ -351,29 +348,29 @@ private ProtagNode baseData() :
             secondPart=protagSegmentExclNat()
             [LOOKAHEAD(spacing() <DOT>) spacing() <DOT> spacing() protagPathRest(segments)]
         {
-            // first add the second part
-            segments.addFirst(secondPart);
+    // first add the second part
+    segments.addFirst(secondPart);
 
-            // then add the first part, which is a segment that just consists of the natural
-            ProtagNaturalToken pnt = (ProtagNaturalToken) firstPartNat;
-            LProtagNatural firstNode = new LProtagNatural(pnt.getValue());
-            LinkedList<ProtagNode> nodeList = new LinkedList<>();
-            nodeList.addFirst(firstNode);
-            segments.addFirst(new ProtagPathSegment(nodeList));
-            return new ProtagPath(segments);
-        }
+    // then add the first part, which is a segment that just consists of the natural
+    ProtagNaturalToken pnt = (ProtagNaturalToken) firstPartNat;
+    LProtagNatural firstNode = new LProtagNatural(pnt.getValue());
+    LinkedList<CProtagNode> nodeList = new LinkedList<>();
+    nodeList.addFirst(firstNode);
+    segments.addFirst(new ProtagPathSegmentImpl(nodeList));
+    return new ProtagPathImpl(segments);
+}
         | LOOKAHEAD(protagSegmentExclNat() spacing() <DOT>)
         firstPart=protagSegmentExclNat() spacing() <DOT> spacing() protagPathRest(segments)
         {
             segments.addFirst(firstPart);
-            return new ProtagPath(segments);
+            return new ProtagPathImpl(segments);
         }
     }
     //    private ySegmentExclNat ::= ySegmentMulti | containedSegment | YNAME  // multi segments are not considered nats
     private IProtagPathSegment protagSegmentExclNat() :
     {
         IProtagPathSegment segment;
-        ProtagNode contained;
+        CProtagNode contained;
         Token ident;
     }
     {
@@ -384,24 +381,24 @@ private ProtagNode baseData() :
         }
         | contained=containedSegment()
         {
-            LinkedList<ProtagNode> segmentItems = new LinkedList<>();
-            segmentItems.add(contained);
-            return new ProtagPathSegment(segmentItems);
-        }
+    LinkedList<CProtagNode> segmentItems = new LinkedList<>();
+    segmentItems.add(contained);
+    return new ProtagPathSegmentImpl(segmentItems);
+}
         | ident=<PNAME>
         {
-            ProtagStringToken pst = (ProtagStringToken) ident;
+    ProtagStringToken pst = (ProtagStringToken) ident;
 
-            LinkedList<ProtagNode> segmentItems = new LinkedList<>();
-            segmentItems.add(new LProtagName(String.valueOf(ident.getValue())));
-            return new ProtagPathSegment(segmentItems);
-        }
+    LinkedList<CProtagNode> segmentItems = new LinkedList<>();
+    segmentItems.add(new LProtagName(String.valueOf(ident.getValue())));
+    return new ProtagPathSegmentImpl(segmentItems);
+}
     }
     //    private yPathRest ::= (ySegmentMulti|containedSegment|YNAME|NATURAL) (spacing DOT spacing yPathRest)?
     private List<IProtagPathSegment> protagPathRest(LinkedList<IProtagPathSegment> segments) :
     {
         IProtagPathSegment segment;
-        ProtagNode singleNodeSegment;
+        CProtagNode singleNodeSegment;
         Token singleTokenSegment;
     }
     {
@@ -413,25 +410,25 @@ private ProtagNode baseData() :
             }
             | singleNodeSegment=containedSegment()
             {
-                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+                LinkedList<CProtagNode> segmentItems = new LinkedList<>();
                 segmentItems.add(singleNodeSegment);
-                segments.add(new ProtagPathSegment(segmentItems));
+                segments.add(new ProtagPathSegmentImpl(segmentItems));
             }
             | singleTokenSegment=<PNAME>
             {
                 ProtagStringToken pst = (ProtagStringToken) singleTokenSegment;
-                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+                LinkedList<CProtagNode> segmentItems = new LinkedList<>();
                 segmentItems.add(new LProtagName(String.valueOf(pst.getValue())));
-                segments.add(new ProtagPathSegment(segmentItems));
+                segments.add(new ProtagPathSegmentImpl(segmentItems));
             }
             | singleTokenSegment=<NATURAL>
             {
-                ProtagNaturalToken pnt = (ProtagNaturalToken) singleTokenSegment;
-                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
-                segmentItems.add(new LProtagNatural(pnt.getValue()));
+    ProtagNaturalToken pnt = (ProtagNaturalToken) singleTokenSegment;
+    LinkedList<CProtagNode> segmentItems = new LinkedList<>();
+    segmentItems.add(new LProtagNatural(pnt.getValue()));
 
-                segments.add(new ProtagPathSegment(segmentItems));
-            }
+    segments.add(new ProtagPathSegmentImpl(segmentItems));
+}
         ) [LOOKAHEAD(spacing() <DOT>) spacing() <DOT> spacing() protagPathRest(segments)]
         {return segments;}
     }
@@ -439,8 +436,8 @@ private ProtagNode baseData() :
     //        | ((YNAME|NATURAL) ySegmentExclVals) {methods=[isElementType]}
     IProtagPathSegment ProtagPathSegment() :
     {
-        LinkedList<ProtagNode> segmentItems = new LinkedList<>();
-        ProtagNode firstNodeSegmentItem;
+        LinkedList<CProtagNode> segmentItems = new LinkedList<>();
+        CProtagNode firstNodeSegmentItem;
         Token firstTokenSegmentItem;
     }
     {
@@ -463,12 +460,12 @@ private ProtagNode baseData() :
                 }
             ) protagSegmentExclVals(segmentItems)
         )
-        { return new ProtagPathSegment(segmentItems); }
+        { return new ProtagPathSegmentImpl(segmentItems); }
     }
     //    private ySegmentExclVals ::= containedSegment ySegmentInclVals?
-    private List<ProtagNode> protagSegmentExclVals(LinkedList<ProtagNode> segmentItems) :
+    private List<CProtagNode> protagSegmentExclVals(LinkedList<CProtagNode> segmentItems) :
     {
-        ProtagNode segmentItem;
+        CProtagNode segmentItem;
     }
     {
 
@@ -482,7 +479,7 @@ private ProtagNode baseData() :
     }
     //    private ySegmentInclVals ::= ((NATURAL|YBODY) ySegmentExclVals?)
     //        | ySegmentExclVals
-    private List<ProtagNode> protagSegmentInclVals(LinkedList<ProtagNode> segmentItems) :
+    private List<CProtagNode> protagSegmentInclVals(LinkedList<CProtagNode> segmentItems) :
     {
         Token firstTokenSegmentItem;
     }
@@ -589,16 +586,16 @@ ESignType Sign() :
 IProtagProperties ProtagProperties(IProtagProperties context) :
 {
 //    IProtagProperties result = context == null ? new ProtagProperties() : context;
-    ProtagNode name;
-    IProtagSequence body = new ProtagSequence();
+    CProtagNode name;
+    IProtagSequence body = new ProtagSequenceImpl();
 }
 {
     name=baseData() spacing() <PROPERTY_SEP> [LOOKAHEAD(item() | baseData() spacing() <PROPERTY_SEP>) body=ProtagSequence(body, context)]
     {
-        ProtagSection section = new ProtagSection(name, body);
-        context.getItems().addFirst(section);
-        return context;
-    }
+    ProtagSectionImpl section = new ProtagSectionImpl(name, body);
+    context.getItems().addFirst(section);
+    return context;
+}
 }
 
 //Map ::= (MAP_START spacing MAP_END) // {}
@@ -615,8 +612,8 @@ IProtagMap ProtagMap() :
     LOOKAHEAD(<MAP_START> spacing() <MAP_END>)
     <MAP_START> spacing() <MAP_END>
     {
-        return new ProtagMap(entries);
-    }
+    return new ProtagMapImpl(entries);
+}
     |
     <MAP_START>
         spacing() entry=pairBounded()
@@ -632,7 +629,7 @@ IProtagMap ProtagMap() :
         )* spacing()
     <MAP_END>
     {
-        return new ProtagMap(entries);
+        return new ProtagMapImpl(entries);
     }
 }
 
@@ -643,9 +640,9 @@ IProtagMap ProtagMap() :
 //    }
 IProtagList ProtagList() :
 {
-    LinkedList<ProtagNode> list = new LinkedList<>();
-    IProtagList result = new ProtagList(list);
-    ProtagNode item;
+    LinkedList<CProtagNode> list = new LinkedList<>();
+    IProtagList result = new ProtagListImpl(list);
+    CProtagNode item;
 }
 {
     LOOKAHEAD(<LIST_START> spacing() <LIST_END>)
@@ -676,19 +673,19 @@ IProtagList ProtagList() :
 //Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
 IProtagPrecedence ProtagPrecedence() :
 {
-    ProtagNode data;
+    CProtagNode data;
 }
 {
     <PRECEDENCE_START> spacing() data=boundedData() spacing() <PRECEDENCE_END>
     {
-        return new ProtagPrecedence(data);
-    }
+    return new ProtagPrecedenceImpl(data);
+}
 }
 
 //private UnboundedData ::= PairExpr|TransitionRightExpr|TransitionLeftExpr|BaseData
-private ProtagNode unboundedData() :
+private CProtagNode unboundedData() :
 {
-    ProtagNode result;
+    CProtagNode result;
 }
 {
     (
@@ -707,8 +704,8 @@ private ProtagNode unboundedData() :
 //PairExpr ::= (TransitionRightExpr|TransitionLeftExpr|BaseData) spacing PAIR_SEP spacing UnboundedData
 IProtagPair ProtagPair() :
 {
-    ProtagNode lhs;
-    ProtagNode rhs;
+    CProtagNode lhs;
+    CProtagNode rhs;
 }
 {
     (
@@ -722,14 +719,14 @@ IProtagPair ProtagPair() :
     spacing() <PAIR_SEP> spacing()
     rhs=unboundedData()
     {
-        return new ProtagPair(lhs, rhs);
-    }
+    return new ProtagPairImpl(lhs, rhs);
+}
 }
 //TransitionRightExpr ::= (TransitionLeftExpr|BaseData) spacing TRANSITION_SEP_R spacing (TransitionRightExpr|TransitionLeftExpr|BaseData)
 IProtagTransitionRight ProtagTransitionRight() :
 {
-    ProtagNode lhs;
-    ProtagNode rhs;
+    CProtagNode lhs;
+    CProtagNode rhs;
 }
 {
     (
@@ -750,14 +747,14 @@ IProtagTransitionRight ProtagTransitionRight() :
         rhs=baseData()
     )
     {
-        return new ProtagTransitionRight(lhs, rhs);
-    }
+    return new ProtagTransitionRightImpl(lhs, rhs);
+}
 }
 //TransitionLeftExpr ::= BaseData spacing TRANSITION_SEP_L spacing (TransitionLeftExpr|BaseData)
 IProtagTransitionLeft ProtagTransitionLeft() :
 {
-    ProtagNode lhs;
-    ProtagNode rhs;
+    CProtagNode lhs;
+    CProtagNode rhs;
 }
 {
 //    LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
@@ -770,15 +767,15 @@ IProtagTransitionLeft ProtagTransitionLeft() :
         rhs=baseData()
     )
     {
-        return new ProtagTransitionLeft(lhs, rhs);
-    }
+    return new ProtagTransitionLeftImpl(lhs, rhs);
+}
 }
 
 //
 //private BoundedData ::= PairBounded|TransitionRightBounded|TransitionLeftBounded|Properties|BaseData
-private ProtagNode boundedData() :
+private CProtagNode boundedData() :
 {
-    ProtagNode result;
+    CProtagNode result;
 }
 {
     ( LOOKAHEAD((ProtagTransitionRight() | ProtagTransitionLeft() | baseData()) spacing() <PAIR_SEP>)
@@ -788,7 +785,7 @@ private ProtagNode boundedData() :
     | LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
       result=ProtagTransitionLeftBounded()
     | LOOKAHEAD(baseData() spacing() <PROPERTY_SEP>)
-      result=ProtagProperties(new ProtagProperties())
+      result=ProtagProperties(new ProtagPropertiesImpl())
     | LOOKAHEAD(baseData())
       result=baseData()
     )
@@ -800,8 +797,8 @@ private ProtagNode boundedData() :
 //PairBounded ::= (TransitionRightExpr|TransitionLeftExpr|BaseData) spacing PAIR_SEP spacing BoundedData
 private IProtagPair pairBounded() :
 {
-    ProtagNode lhs;
-    ProtagNode rhs;
+    CProtagNode lhs;
+    CProtagNode rhs;
 }
 {
     (
@@ -815,14 +812,14 @@ private IProtagPair pairBounded() :
     spacing() <PAIR_SEP> spacing()
     rhs=boundedData()
     {
-        return new ProtagPair(lhs, rhs);
-    }
+    return new ProtagPairImpl(lhs, rhs);
+}
 }
 //TransitionRightBounded ::= (TransitionLeftExpr|BaseData) spacing TRANSITION_SEP_R spacing (TransitionRightBounded|TransitionLeftBounded|Properties|BaseData)
 private IProtagTransitionRight ProtagTransitionRightBounded() :
 {
-    ProtagNode lhs;
-    ProtagNode rhs;
+    CProtagNode lhs;
+    CProtagNode rhs;
 }
 {
     (
@@ -838,19 +835,19 @@ private IProtagTransitionRight ProtagTransitionRightBounded() :
     |   LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
         rhs=ProtagTransitionLeftBounded()
     |   LOOKAHEAD(baseData() spacing() <PROPERTY_SEP>)
-        rhs=ProtagProperties(new ProtagProperties())
+        rhs=ProtagProperties(new ProtagPropertiesImpl())
     |   LOOKAHEAD(baseData())
         rhs=baseData()
     )
     {
-        return new ProtagTransitionRight(lhs, rhs);
-    }
+    return new ProtagTransitionRightImpl(lhs, rhs);
+}
 }
 //TransitionLeftBounded ::= BaseData spacing TRANSITION_SEP_L spacing (TransitionLeftBounded|Properties|BaseData)
 private IProtagTransitionLeft ProtagTransitionLeftBounded() :
 {
-    ProtagNode lhs;
-    ProtagNode rhs;
+    CProtagNode lhs;
+    CProtagNode rhs;
 }
 {
     lhs=baseData()
@@ -859,21 +856,21 @@ private IProtagTransitionLeft ProtagTransitionLeftBounded() :
         LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
         rhs=ProtagTransitionLeftBounded()
     |   LOOKAHEAD(baseData() spacing() <PROPERTY_SEP>)
-        rhs=ProtagProperties(new ProtagProperties())
+        rhs=ProtagProperties(new ProtagPropertiesImpl())
     |   LOOKAHEAD(baseData())
         rhs=baseData()
     )
     {
-        return new ProtagTransitionLeft(lhs, rhs);
+        return new ProtagTransitionLeftImpl(lhs, rhs);
     }
 }
 
 //
 //// all these items that can be contained in a path and have incipient and terminator chars.
 //private containedSegment ::= REGEX|LITERAL|List|Map|Precedence
-private ProtagNode containedSegment() :
+private CProtagNode containedSegment() :
 {
-    ProtagNode result;
+    CProtagNode result;
 }
 {
     ( result=ProtagRegex()

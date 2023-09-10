@@ -18,7 +18,7 @@ class ProtagParserGen implements ProtagParserGenConstants {
         token = new StartToken();
     }
 
-  final public IProtagSequence program() throws ParseException {IProtagSequence result = new ProtagSequence();
+  final public IProtagSequence program() throws ParseException {IProtagSequence result = new ProtagSequenceImpl();
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case WHITESPACE:
     case NATURAL:
@@ -47,9 +47,9 @@ class ProtagParserGen implements ProtagParserGenConstants {
 
 //private yapping_ ::= Properties|(item yapping_?)
   final public IProtagSequence ProtagSequence(IProtagSequence result, IProtagProperties context) throws ParseException {IProtagProperties properties;
-    ProtagNode item;
+    CProtagNode item;
     if (jj_2_2(2147483647)) {
-      properties = ProtagProperties(context == null ? new ProtagProperties() : context);
+      properties = ProtagProperties(context == null ? new ProtagPropertiesImpl() : context);
 if(context == null) {
             result.getItems().addFirst(properties);
         }
@@ -90,7 +90,8 @@ if(item != null) {
     throw new Error("Missing return statement in function");
 }
 
-  final private ProtagNode item() throws ParseException {ProtagNode item = null;
+  final private CProtagNode item() throws ParseException {
+      CProtagNode item = null;
     LProtagLineComment lineComment;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case NATURAL:
@@ -127,7 +128,8 @@ if(item != null) {
     throw new Error("Missing return statement in function");
 }
 
-  final private ProtagNode baseData() throws ParseException {ProtagNode result;
+  final private CProtagNode baseData() throws ParseException {
+      CProtagNode result;
     if (jj_2_3(2147483647)) {
       result = ProtagPath();
     } else {
@@ -204,7 +206,7 @@ if(item != null) {
     jj_consume_token(JPATH_START);
     spacing();
     result = jScope(segments);
-{if ("" != null) return new JavaPath(segments);}
+{if ("" != null) return new JavaPathImpl(segments);}
     throw new Error("Missing return statement in function");
 }
 
@@ -223,11 +225,11 @@ segments.addFirst(item);
     throw new Error("Missing return statement in function");
 }
 
-  final public IJavaPathSegment JavaPathSegment() throws ParseException {LinkedList<ProtagNode> pathSegments = new LinkedList<>();
-        ProtagNode singleSegment;
+  final public IJavaPathSegment JavaPathSegment() throws ParseException {LinkedList<CProtagNode> pathSegments = new LinkedList<>();
+        CProtagNode singleSegment;
     if (jj_2_8(2)) {
       jSegmentMulti(pathSegments);
-{if ("" != null) return new JavaPathSegment(pathSegments);}
+{if ("" != null) return new JavaPathSegmentImpl(pathSegments);}
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case JNAME:
@@ -238,7 +240,7 @@ segments.addFirst(item);
       case LITERAL:{
         singleSegment = jSegmentSingle();
 pathSegments.addFirst(singleSegment);
-            {if ("" != null) return new JavaPathSegment(pathSegments);}
+            {if ("" != null) return new JavaPathSegmentImpl(pathSegments);}
         break;
         }
       default:
@@ -250,8 +252,8 @@ pathSegments.addFirst(singleSegment);
     throw new Error("Missing return statement in function");
 }
 
-  final private ProtagNode jSegmentSingle() throws ParseException {Token jName;
-        ProtagNode segment;
+  final private CProtagNode jSegmentSingle() throws ParseException {Token jName;
+        CProtagNode segment;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case JNAME:{
       jName = jj_consume_token(JNAME);
@@ -276,8 +278,8 @@ ProtagStringToken pst = (ProtagStringToken) jName;
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> jSegmentMulti(LinkedList<ProtagNode> pathSegments) throws ParseException {Token jName;
-        ProtagNode segmentItem;
+  final private List<CProtagNode> jSegmentMulti(LinkedList<CProtagNode> pathSegments) throws ParseException {Token jName;
+        CProtagNode segmentItem;
     if (jj_2_9(2)) {
       jName = jj_consume_token(JNAME);
       jSegmentExclJBody(pathSegments);
@@ -296,7 +298,7 @@ pathSegments.addFirst(segmentItem);
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> jSegmentInclJBody(LinkedList<ProtagNode> pathSegments) throws ParseException {Token jBody;
+  final private List<CProtagNode> jSegmentInclJBody(LinkedList<CProtagNode> pathSegments) throws ParseException {Token jBody;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case JBODY:{
       jBody = jj_consume_token(JBODY);
@@ -323,7 +325,8 @@ ProtagStringToken pst = (ProtagStringToken) jBody;
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> jSegmentExclJBody(LinkedList<ProtagNode> pathSegments) throws ParseException {ProtagNode segmentItem;
+  final private List<CProtagNode> jSegmentExclJBody(LinkedList<CProtagNode> pathSegments) throws ParseException {
+      CProtagNode segmentItem;
     segmentItem = containedSegment();
     if (jj_2_13(2147483647)) {
       jSegmentInclJBody(pathSegments);
@@ -342,7 +345,7 @@ pathSegments.addFirst(segmentItem);
     jj_consume_token(FPATH_START);
     spacing();
     result = fScope(segments);
-{if ("" != null) return new FilePath(segments);}
+{if ("" != null) return new FilePathImpl(segments);}
     throw new Error("Missing return statement in function");
 }
 
@@ -362,11 +365,11 @@ segments.addFirst(item);
 }
 
 //    private fScopeSegment ::= fSegmentMulti | fSegmentSingle
-  final public     IFilePathSegment FilePathSegment() throws ParseException {LinkedList<ProtagNode> pathSegments = new LinkedList<>();
-        ProtagNode singleSegment;
+  final public     IFilePathSegment FilePathSegment() throws ParseException {LinkedList<CProtagNode> pathSegments = new LinkedList<>();
+        CProtagNode singleSegment;
     if (jj_2_15(2)) {
       fSegmentMulti(pathSegments);
-{if ("" != null) return new FilePathSegment(pathSegments);}
+{if ("" != null) return new FilePathSegmentImpl(pathSegments);}
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case FNAME:
@@ -377,7 +380,7 @@ segments.addFirst(item);
       case LITERAL:{
         singleSegment = fSegmentSingle();
 pathSegments.addFirst(singleSegment);
-            {if ("" != null) return new FilePathSegment(pathSegments);}
+            {if ("" != null) return new FilePathSegmentImpl(pathSegments);}
         break;
         }
       default:
@@ -389,8 +392,8 @@ pathSegments.addFirst(singleSegment);
     throw new Error("Missing return statement in function");
 }
 
-  final private ProtagNode fSegmentSingle() throws ParseException {Token fName;
-        ProtagNode segment;
+  final private CProtagNode fSegmentSingle() throws ParseException {Token fName;
+        CProtagNode segment;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case FNAME:{
       fName = jj_consume_token(FNAME);
@@ -415,8 +418,8 @@ ProtagStringToken pst = (ProtagStringToken) fName;
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> fSegmentMulti(LinkedList<ProtagNode> pathSegments) throws ParseException {Token fName;
-        ProtagNode segmentItem;
+  final private List<CProtagNode> fSegmentMulti(LinkedList<CProtagNode> pathSegments) throws ParseException {Token fName;
+        CProtagNode segmentItem;
     if (jj_2_16(2)) {
       fName = jj_consume_token(FNAME);
       fSegmentExclFName(pathSegments);
@@ -435,7 +438,7 @@ pathSegments.addFirst(segmentItem);
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> fSegmentInclFName(LinkedList<ProtagNode> pathSegments) throws ParseException {Token fBody;
+  final private List<CProtagNode> fSegmentInclFName(LinkedList<CProtagNode> pathSegments) throws ParseException {Token fBody;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case FNAME:{
       fBody = jj_consume_token(FNAME);
@@ -462,7 +465,8 @@ ProtagStringToken pst = (ProtagStringToken) fBody;
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> fSegmentExclFName(LinkedList<ProtagNode> pathSegments) throws ParseException {ProtagNode segmentItem;
+  final private List<CProtagNode> fSegmentExclFName(LinkedList<CProtagNode> pathSegments) throws ParseException {
+      CProtagNode segmentItem;
     segmentItem = containedSegment();
     if (jj_2_20(2147483647)) {
       fSegmentInclFName(pathSegments);
@@ -498,10 +502,10 @@ pathSegments.addFirst(segmentItem);
             // then add the first part, which is a segment that just consists of the natural
             ProtagNaturalToken pnt = (ProtagNaturalToken) firstPartNat;
             LProtagNatural firstNode = new LProtagNatural(pnt.getValue());
-            LinkedList<ProtagNode> nodeList = new LinkedList<>();
+            LinkedList<CProtagNode> nodeList = new LinkedList<>();
             nodeList.addFirst(firstNode);
-            segments.addFirst(new ProtagPathSegment(nodeList));
-            {if ("" != null) return new ProtagPath(segments);}
+            segments.addFirst(new ProtagPathSegmentImpl(nodeList));
+            {if ("" != null) return new ProtagPathImpl(segments);}
     } else if (jj_2_23(2147483647)) {
       firstPart = protagSegmentExclNat();
       spacing();
@@ -509,7 +513,7 @@ pathSegments.addFirst(segmentItem);
       spacing();
       protagPathRest(segments);
 segments.addFirst(firstPart);
-            {if ("" != null) return new ProtagPath(segments);}
+            {if ("" != null) return new ProtagPathImpl(segments);}
     } else {
       jj_consume_token(-1);
       throw new ParseException();
@@ -518,7 +522,7 @@ segments.addFirst(firstPart);
 }
 
   final private IProtagPathSegment protagSegmentExclNat() throws ParseException {IProtagPathSegment segment;
-        ProtagNode contained;
+        CProtagNode contained;
         Token ident;
     if (jj_2_24(2147483647)) {
       segment = ProtagPathSegment();
@@ -531,18 +535,18 @@ segments.addFirst(firstPart);
       case REGEX:
       case LITERAL:{
         contained = containedSegment();
-LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+LinkedList<CProtagNode> segmentItems = new LinkedList<>();
             segmentItems.add(contained);
-            {if ("" != null) return new ProtagPathSegment(segmentItems);}
+            {if ("" != null) return new ProtagPathSegmentImpl(segmentItems);}
         break;
         }
       case PNAME:{
         ident = jj_consume_token(PNAME);
 ProtagStringToken pst = (ProtagStringToken) ident;
 
-            LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+            LinkedList<CProtagNode> segmentItems = new LinkedList<>();
             segmentItems.add(new LProtagName(String.valueOf(ident.getValue())));
-            {if ("" != null) return new ProtagPathSegment(segmentItems);}
+            {if ("" != null) return new ProtagPathSegmentImpl(segmentItems);}
         break;
         }
       default:
@@ -555,7 +559,7 @@ ProtagStringToken pst = (ProtagStringToken) ident;
 }
 
   final private List<IProtagPathSegment> protagPathRest(LinkedList<IProtagPathSegment> segments) throws ParseException {IProtagPathSegment segment;
-        ProtagNode singleNodeSegment;
+        CProtagNode singleNodeSegment;
         Token singleTokenSegment;
     if (jj_2_25(2147483647)) {
       segment = ProtagPathSegment();
@@ -568,26 +572,26 @@ segments.add(segment);
       case REGEX:
       case LITERAL:{
         singleNodeSegment = containedSegment();
-LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+LinkedList<CProtagNode> segmentItems = new LinkedList<>();
                 segmentItems.add(singleNodeSegment);
-                segments.add(new ProtagPathSegment(segmentItems));
+                segments.add(new ProtagPathSegmentImpl(segmentItems));
         break;
         }
       case PNAME:{
         singleTokenSegment = jj_consume_token(PNAME);
 ProtagStringToken pst = (ProtagStringToken) singleTokenSegment;
-                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+                LinkedList<CProtagNode> segmentItems = new LinkedList<>();
                 segmentItems.add(new LProtagName(String.valueOf(pst.getValue())));
-                segments.add(new ProtagPathSegment(segmentItems));
+                segments.add(new ProtagPathSegmentImpl(segmentItems));
         break;
         }
       case NATURAL:{
         singleTokenSegment = jj_consume_token(NATURAL);
 ProtagNaturalToken pnt = (ProtagNaturalToken) singleTokenSegment;
-                LinkedList<ProtagNode> segmentItems = new LinkedList<>();
+                LinkedList<CProtagNode> segmentItems = new LinkedList<>();
                 segmentItems.add(new LProtagNatural(pnt.getValue()));
 
-                segments.add(new ProtagPathSegment(segmentItems));
+                segments.add(new ProtagPathSegmentImpl(segmentItems));
         break;
         }
       default:
@@ -610,8 +614,8 @@ ProtagNaturalToken pnt = (ProtagNaturalToken) singleTokenSegment;
 
 //    ySegmentMulti ::= (containedSegment ySegmentInclVals)
     //        | ((YNAME|NATURAL) ySegmentExclVals) {methods=[isElementType]}
-  final public     IProtagPathSegment ProtagPathSegment() throws ParseException {LinkedList<ProtagNode> segmentItems = new LinkedList<>();
-        ProtagNode firstNodeSegmentItem;
+  final public     IProtagPathSegment ProtagPathSegment() throws ParseException {LinkedList<CProtagNode> segmentItems = new LinkedList<>();
+        CProtagNode firstNodeSegmentItem;
         Token firstTokenSegmentItem;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case MAP_START:
@@ -652,11 +656,12 @@ ProtagNaturalToken pnt = (ProtagNaturalToken) firstTokenSegmentItem;
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return new ProtagPathSegment(segmentItems);}
+{if ("" != null) return new ProtagPathSegmentImpl(segmentItems);}
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> protagSegmentExclVals(LinkedList<ProtagNode> segmentItems) throws ParseException {ProtagNode segmentItem;
+  final private List<CProtagNode> protagSegmentExclVals(LinkedList<CProtagNode> segmentItems) throws ParseException {
+      CProtagNode segmentItem;
     segmentItem = containedSegment();
 segmentItems.add(segmentItem);
     if (jj_2_27(2147483647)) {
@@ -668,7 +673,7 @@ segmentItems.add(segmentItem);
     throw new Error("Missing return statement in function");
 }
 
-  final private List<ProtagNode> protagSegmentInclVals(LinkedList<ProtagNode> segmentItems) throws ParseException {Token firstTokenSegmentItem;
+  final private List<CProtagNode> protagSegmentInclVals(LinkedList<CProtagNode> segmentItems) throws ParseException {Token firstTokenSegmentItem;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case NATURAL:
     case PBODY:{
@@ -844,8 +849,8 @@ Fraction fractionalPart = new Fraction(numerator.toInteger(), ((ProtagNaturalTok
 
 //Properties ::= BaseData spacing PROPERTY_SEP (yapping_)? {
   final public IProtagProperties ProtagProperties(IProtagProperties context) throws ParseException {//    IProtagProperties result = context == null ? new ProtagProperties() : context;
-    ProtagNode name;
-    IProtagSequence body = new ProtagSequence();
+    CProtagNode name;
+    IProtagSequence body = new ProtagSequenceImpl();
     name = baseData();
     spacing();
     jj_consume_token(PROPERTY_SEP);
@@ -854,7 +859,7 @@ Fraction fractionalPart = new Fraction(numerator.toInteger(), ((ProtagNaturalTok
     } else {
       ;
     }
-ProtagSection section = new ProtagSection(name, body);
+ProtagSectionImpl section = new ProtagSectionImpl(name, body);
         context.getItems().addFirst(section);
         {if ("" != null) return context;}
     throw new Error("Missing return statement in function");
@@ -871,7 +876,7 @@ ProtagSection section = new ProtagSection(name, body);
       jj_consume_token(MAP_START);
       spacing();
       jj_consume_token(MAP_END);
-{if ("" != null) return new ProtagMap(entries);}
+{if ("" != null) return new ProtagMapImpl(entries);}
     } else {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case MAP_START:{
@@ -894,7 +899,7 @@ entries.add(entry);
         }
         spacing();
         jj_consume_token(MAP_END);
-{if ("" != null) return new ProtagMap(entries);}
+{if ("" != null) return new ProtagMapImpl(entries);}
         break;
         }
       default:
@@ -911,9 +916,9 @@ entries.add(entry);
 //    | LIST_START spacing BoundedData (spacing LIST_SEP spacing BoundedData)* spacing LIST_END {
 //        methods=[isElement]
 //    }
-  final public IProtagList ProtagList() throws ParseException {LinkedList<ProtagNode> list = new LinkedList<>();
-    IProtagList result = new ProtagList(list);
-    ProtagNode item;
+  final public IProtagList ProtagList() throws ParseException {LinkedList<CProtagNode> list = new LinkedList<>();
+    IProtagList result = new ProtagListImpl(list);
+    CProtagNode item;
     if (jj_2_34(2147483647)) {
       jj_consume_token(LIST_START);
       spacing();
@@ -948,17 +953,19 @@ list.add(item);
 }
 
 //Precedence ::= PRECEDENCE_START spacing BoundedData spacing PRECEDENCE_END
-  final public IProtagPrecedence ProtagPrecedence() throws ParseException {ProtagNode data;
+  final public IProtagPrecedence ProtagPrecedence() throws ParseException {
+      CProtagNode data;
     jj_consume_token(PRECEDENCE_START);
     spacing();
     data = boundedData();
     spacing();
     jj_consume_token(PRECEDENCE_END);
-{if ("" != null) return new ProtagPrecedence(data);}
+{if ("" != null) return new ProtagPrecedenceImpl(data);}
     throw new Error("Missing return statement in function");
 }
 
-  final private ProtagNode unboundedData() throws ParseException {ProtagNode result;
+  final private CProtagNode unboundedData() throws ParseException {
+      CProtagNode result;
     if (jj_2_36(2147483647)) {
       result = ProtagPair();
     } else if (jj_2_37(2147483647)) {
@@ -976,8 +983,9 @@ list.add(item);
 }
 
 //PairExpr ::= (TransitionRightExpr|TransitionLeftExpr|BaseData) spacing PAIR_SEP spacing UnboundedData
-  final public IProtagPair ProtagPair() throws ParseException {ProtagNode lhs;
-    ProtagNode rhs;
+  final public IProtagPair ProtagPair() throws ParseException {
+      CProtagNode lhs;
+    CProtagNode rhs;
     if (jj_2_40(2147483647)) {
       lhs = ProtagTransitionLeft();
     } else if (jj_2_41(2147483647)) {
@@ -992,13 +1000,14 @@ list.add(item);
     jj_consume_token(PAIR_SEP);
     spacing();
     rhs = unboundedData();
-{if ("" != null) return new ProtagPair(lhs, rhs);}
+{if ("" != null) return new ProtagPairImpl(lhs, rhs);}
     throw new Error("Missing return statement in function");
 }
 
 //TransitionRightExpr ::= (TransitionLeftExpr|BaseData) spacing TRANSITION_SEP_R spacing (TransitionRightExpr|TransitionLeftExpr|BaseData)
-  final public IProtagTransitionRight ProtagTransitionRight() throws ParseException {ProtagNode lhs;
-    ProtagNode rhs;
+  final public IProtagTransitionRight ProtagTransitionRight() throws ParseException {
+      CProtagNode lhs;
+    CProtagNode rhs;
     if (jj_2_43(2147483647)) {
       lhs = ProtagTransitionLeft();
     } else if (jj_2_44(2147483647)) {
@@ -1020,13 +1029,14 @@ list.add(item);
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return new ProtagTransitionRight(lhs, rhs);}
+{if ("" != null) return new ProtagTransitionRightImpl(lhs, rhs);}
     throw new Error("Missing return statement in function");
 }
 
 //TransitionLeftExpr ::= BaseData spacing TRANSITION_SEP_L spacing (TransitionLeftExpr|BaseData)
-  final public IProtagTransitionLeft ProtagTransitionLeft() throws ParseException {ProtagNode lhs;
-    ProtagNode rhs;
+  final public IProtagTransitionLeft ProtagTransitionLeft() throws ParseException {
+      CProtagNode lhs;
+    CProtagNode rhs;
     //    LOOKAHEAD(baseData() spacing() <TRANSITION_SEP_L>)
         lhs = baseData();
     spacing();
@@ -1057,11 +1067,12 @@ list.add(item);
         throw new ParseException();
       }
     }
-{if ("" != null) return new ProtagTransitionLeft(lhs, rhs);}
+{if ("" != null) return new ProtagTransitionLeftImpl(lhs, rhs);}
     throw new Error("Missing return statement in function");
 }
 
-  final private ProtagNode boundedData() throws ParseException {ProtagNode result;
+  final private CProtagNode boundedData() throws ParseException {
+      CProtagNode result;
     if (jj_2_49(2147483647)) {
       result = pairBounded();
     } else if (jj_2_50(2147483647)) {
@@ -1069,7 +1080,7 @@ list.add(item);
     } else if (jj_2_51(2147483647)) {
       result = ProtagTransitionLeftBounded();
     } else if (jj_2_52(2147483647)) {
-      result = ProtagProperties(new ProtagProperties());
+      result = ProtagProperties(new ProtagPropertiesImpl());
     } else if (jj_2_53(2147483647)) {
       result = baseData();
     } else {
@@ -1081,8 +1092,8 @@ list.add(item);
 }
 
   final private IProtagPair pairBounded() throws ParseException {
-      ProtagNode lhs;
-    ProtagNode rhs;
+      CProtagNode lhs;
+    CProtagNode rhs;
     if (jj_2_54(2147483647)) {
       lhs = ProtagTransitionRight();
     } else if (jj_2_55(2147483647)) {
@@ -1097,12 +1108,13 @@ list.add(item);
     jj_consume_token(PAIR_SEP);
     spacing();
     rhs = boundedData();
-{if ("" != null) return new ProtagPair(lhs, rhs);}
+{if ("" != null) return new ProtagPairImpl(lhs, rhs);}
     throw new Error("Missing return statement in function");
 }
 
-  final private IProtagTransitionRight ProtagTransitionRightBounded() throws ParseException {ProtagNode lhs;
-    ProtagNode rhs;
+  final private IProtagTransitionRight ProtagTransitionRightBounded() throws ParseException {
+      CProtagNode lhs;
+    CProtagNode rhs;
     if (jj_2_57(2147483647)) {
       lhs = ProtagTransitionLeft();
     } else if (jj_2_58(2147483647)) {
@@ -1119,19 +1131,20 @@ list.add(item);
     } else if (jj_2_60(2147483647)) {
       rhs = ProtagTransitionLeftBounded();
     } else if (jj_2_61(2147483647)) {
-      rhs = ProtagProperties(new ProtagProperties());
+      rhs = ProtagProperties(new ProtagPropertiesImpl());
     } else if (jj_2_62(2147483647)) {
       rhs = baseData();
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return new ProtagTransitionRight(lhs, rhs);}
+{if ("" != null) return new ProtagTransitionRightImpl(lhs, rhs);}
     throw new Error("Missing return statement in function");
 }
 
-  final private IProtagTransitionLeft ProtagTransitionLeftBounded() throws ParseException {ProtagNode lhs;
-    ProtagNode rhs;
+  final private IProtagTransitionLeft ProtagTransitionLeftBounded() throws ParseException {
+      CProtagNode lhs;
+    CProtagNode rhs;
     lhs = baseData();
     spacing();
     jj_consume_token(TRANSITION_SEP_L);
@@ -1139,18 +1152,19 @@ list.add(item);
     if (jj_2_63(2147483647)) {
       rhs = ProtagTransitionLeftBounded();
     } else if (jj_2_64(2147483647)) {
-      rhs = ProtagProperties(new ProtagProperties());
+      rhs = ProtagProperties(new ProtagPropertiesImpl());
     } else if (jj_2_65(2147483647)) {
       rhs = baseData();
     } else {
       jj_consume_token(-1);
       throw new ParseException();
     }
-{if ("" != null) return new ProtagTransitionLeft(lhs, rhs);}
+{if ("" != null) return new ProtagTransitionLeftImpl(lhs, rhs);}
     throw new Error("Missing return statement in function");
 }
 
-  final private ProtagNode containedSegment() throws ParseException {ProtagNode result;
+  final private CProtagNode containedSegment() throws ParseException {
+      CProtagNode result;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
     case REGEX:{
       result = ProtagRegex();

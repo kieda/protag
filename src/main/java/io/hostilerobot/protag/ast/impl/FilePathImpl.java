@@ -6,8 +6,8 @@ import io.hostilerobot.protag.ast.IFilePathSegment;
 
 import java.util.LinkedList;
 
-public final class FilePath extends AbstractListLikeNode<IFilePathSegment> implements IFilePath {
-    public FilePath(LinkedList<IFilePathSegment> segments) {
+public final class FilePathImpl extends AbstractListLikeNode<IFilePathSegment> implements IFilePath {
+    public FilePathImpl(LinkedList<IFilePathSegment> segments) {
         super(segments);
     }
 }

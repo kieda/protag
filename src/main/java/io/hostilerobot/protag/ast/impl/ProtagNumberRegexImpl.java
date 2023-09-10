@@ -1,8 +1,8 @@
 package io.hostilerobot.protag.ast.impl;
 
 import io.hostilerobot.protag.ast.AbstractProtagNode;
+import io.hostilerobot.protag.ast.CProtagNode;
 import io.hostilerobot.protag.ast.IProtagRegex;
-import io.hostilerobot.protag.ast.ProtagNode;
 
 import java.util.List;
 
@@ -11,9 +11,9 @@ import java.util.List;
 // =, |, &, +, -, /, *, ^, !
 // basically we produce a DFA to produce
 // depending on the context, may resolve to a number, or to 0 (false), non-zero (true)
-public final class ProtagNumberRegex extends AbstractProtagNode implements IProtagRegex {
+public final class ProtagNumberRegexImpl extends AbstractProtagNode implements IProtagRegex {
     private final String value;
-    public ProtagNumberRegex(String value) {
+    public ProtagNumberRegexImpl(String value) {
         this.value = value;
     }
     @Override
@@ -22,7 +22,7 @@ public final class ProtagNumberRegex extends AbstractProtagNode implements IProt
     }
 
     @Override
-    public List<ProtagNode> getChildren() {
+    public List<CProtagNode> getChildren() {
         return List.of();
     }
 }

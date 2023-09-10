@@ -1,6 +1,6 @@
 package io.hostilerobot.protag.parser;
 
-import io.hostilerobot.protag.ast.ProtagNode;
+import io.hostilerobot.protag.ast.CProtagNode;
 
 import java.io.StringReader;
 
@@ -47,7 +47,7 @@ public class TestProtag {
         ProtagParser pp = new ProtagParser(pl);
 
 //        pp.
-         ProtagNode node = pp.parse();
+         CProtagNode node = pp.parse();
         System.out.println(node);
 //        System.out.println(node.value);
 

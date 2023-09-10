@@ -1,6 +1,6 @@
 package io.hostilerobot.protag.parser;
 
-import io.hostilerobot.protag.lang.ProtagParserGenConstants;
+import io.hostilerobot.protag.parser.ProtagParserGenConstants;
 
 public enum ProtagTokenType {
     // terminal string tokens

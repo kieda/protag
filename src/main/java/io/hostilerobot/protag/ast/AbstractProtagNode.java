@@ -2,12 +2,12 @@ package io.hostilerobot.protag.ast;
 
 import java.util.List;
 
-public abstract class AbstractProtagNode implements ProtagNode {
+public abstract class AbstractProtagNode implements CProtagNode {
     public AbstractProtagNode() {
     }
 
     @Override
-    public List<ProtagNode> getChildren() {
+    public List<CProtagNode> getChildren() {
         return List.of();
     }
 

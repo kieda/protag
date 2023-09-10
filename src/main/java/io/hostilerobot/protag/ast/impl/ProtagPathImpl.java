@@ -6,8 +6,8 @@ import io.hostilerobot.protag.ast.IProtagPathSegment;
 
 import java.util.LinkedList;
 
-public final class ProtagPath extends AbstractListLikeNode<IProtagPathSegment> implements IProtagPath {
-    public ProtagPath(LinkedList<IProtagPathSegment> pathSegments) {
+public final class ProtagPathImpl extends AbstractListLikeNode<IProtagPathSegment> implements IProtagPath {
+    public ProtagPathImpl(LinkedList<IProtagPathSegment> pathSegments) {
         super(pathSegments);
     }
 }

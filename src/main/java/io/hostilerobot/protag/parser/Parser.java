@@ -1,6 +1,6 @@
 package io.hostilerobot.protag.parser;
 
-import io.hostilerobot.protag.lang.Token;
+import io.hostilerobot.protag.parser.Token;
 
 public interface Parser<T extends Token, N, S extends TokenSource<T>> {
     public void reInit(S tokenManager);

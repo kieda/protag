@@ -7,7 +7,7 @@ package io.hostilerobot.protag.ast;
  * TODO: add path resolution methods. Basically want to have
  *      (Context, existingPath, CStringNode) -> newPath
  */
-public sealed interface CStringNode extends ProtagNode permits
+public sealed interface CStringNode extends CProtagNode permits
         IProtagRegex, LProtagLiteral, // regex, literal - common among all paths
         LFileName,                    // file paths
         LJavaBody, LJavaName,         // java paths

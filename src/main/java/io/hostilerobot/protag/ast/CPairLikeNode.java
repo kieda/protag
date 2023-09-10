@@ -4,8 +4,8 @@ package io.hostilerobot.protag.ast;
  * used to represent nodes that have a pair-like semantics
  *
  */
-public sealed interface CPairLikeNode extends ProtagNode
+public sealed interface CPairLikeNode extends CProtagNode
     permits IProtagSection, IProtagPair, IProtagTransitionLeft, IProtagTransitionRight{
-    ProtagNode getKey();
-    ProtagNode getValue();
+    CProtagNode getKey();
+    CProtagNode getValue();
 }
