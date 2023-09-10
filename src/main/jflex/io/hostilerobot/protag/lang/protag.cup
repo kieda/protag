@@ -4,12 +4,12 @@ import java.util.*;
 import java.io.*;
 import java_cup.runtime.Symbol;
 import java_cup.runtime.SymbolFactory;
-import io.hostilerobot.protag.lang.ProtagLexer;
-import io.hostilerobot.protag.lang.ProtagSymbol;
+import io.hostilerobot.protag.parser.ProtagLexer;
+import io.hostilerobot.protag.parser.ProtagSymbol;
 import io.hostilerobot.protag.lang.ProtagSymbolFactory;
-import io.hostilerobot.protag.lang.ProtagTokenType;
+import io.hostilerobot.protag.parser.ProtagTokenType;
 import io.hostilerobot.protag.lang.ast.*;
-import io.hostilerobot.protag.lang.ast.impl.*;
+import io.hostilerobot.protag.ast.impl.*;
 
 parser code {:
     ProtagLexer lexer;

@@ -1,0 +1,32 @@
+package io.hostilerobot.protag.ast.impl;
+
+import io.hostilerobot.protag.ast.AbstractProtagNode;
+import io.hostilerobot.protag.ast.IProtagSection;
+import io.hostilerobot.protag.ast.IProtagSequence;
+import io.hostilerobot.protag.ast.ProtagNode;
+
+import java.util.List;
+
+public final class ProtagSection extends AbstractProtagNode implements IProtagSection {
+    private final ProtagNode name;
+    private final IProtagSequence items;
+    public ProtagSection(ProtagNode name, IProtagSequence items) {
+        this.name = name;
+        this.items = items;
+    }
+
+    @Override
+    public ProtagNode getKey() {
+        return name;
+    }
+
+    @Override
+    public IProtagSequence getValue() {
+        return items;
+    }
+
+    @Override
+    public List<ProtagNode> getChildren() {
+        return List.of(name, items);
+    }
+}
