@@ -35,7 +35,43 @@ Now instead of using an actual tree, imagine that you could do this on JSON. ***
   - Example object: `@javax.vecmath.Vector3d` defines a path to the java object, and we may replace nodes with java objects as well like below
   - Example replacement: `[x, y, z] -> @javax.vecmath.Vector3d.new[x, y, z]` defines a rule to replace a tree pattern matching `[x, y, z]` with an instance of a java object
   - Objects are not a first-class defined datatype in ProTag, but we may utilize them from Java. Plus, I needed something for the 'o' in the acronym
-    
+
+## Cool, show me an example!
+```
+# define a replacement rule, and apply it!
+import:
+  !protag/base.pt
+  boxMesh = !meshes/box.pt
+  vertices = [x, y, z] <-                  # match [x, y, z]
+      [_ <- &number]                       # each element is a number
+      -> @javax.vecmath.Vector3d[x, y, z]  # replace with Vector3d instance
+vertices: # use vertices rule
+    [0, 3 / 4, 0.33334]   # base number types: integer, quotient, real 
+    boxMesh.vertices      # use boxMesh.vertices import
+```
+
+At its base, everything in ProTag can be read as data. All other functionality is provided via import, and the 
+java import module must be specified in Java during initialization. 
+
+Using imports can be useful for providing arbitrary functionality, for example we can define functions using
+```
+import: 
+  @functional.pt @math.pt
+  intList = !myValues.pt # defines a series of integers
+in:
+      # via functional, defines a function
+      # importing functional.pt will mark this file as turing complete!
+      negateAll = # match a sequence where first item is a pair vName = vItem
+                  # rest of items in the sequence are placed into 'rest' identifier 
+                  fun: vName = vItem rest+  
+                         # bind "neg"vName to negated vItem, then recurse
+                         is: ("neg"vName = neg: vItem) (negateAll: rest)
+                  fun: vName = vItem
+                         is: ("neg"vName = neg: vItem);
+      
+      vertices: (negateAll: intList) 
+```
+
 ## Implications: this is a brand new branch of metaprogramming and an entirely ***new programming paradigm***.
 - Currently, tree adjunction grammars are primarily theoretical and have yet to be implemented as first-class features of a programming language
 - Tree adjunction grammars are also mainly used for NLP to generate a tree from a sentence. Mine uses the principles to take an initial tree to some terminal tree based on the rules

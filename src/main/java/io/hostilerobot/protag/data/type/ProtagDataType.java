@@ -10,10 +10,11 @@ package io.hostilerobot.protag.data.type;
  *    JavaValueType         - a java value
  *    None                  - void/null type - used in place of null when returned from java
  */
-public sealed interface ProtagDataType permits
+public sealed interface ProtagDataType<T> permits
     ProtagNodeType,
     ProtagPluginType,
     ProtagEnvironmentType,
     JavaValueType,
-    NoneType
-    {}
+    NoneType {
+    T getValue();
+}

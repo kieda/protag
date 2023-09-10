@@ -1,4 +1,15 @@
 package io.hostilerobot.protag.data.type;
 
-public final class ProtagEnvironmentType implements ProtagDataType{
+import io.hostilerobot.protag.data.plugin.ProtagEnvironment;
+
+public final class ProtagEnvironmentType implements ProtagDataType<ProtagEnvironment> {
+    private ProtagEnvironment environmentValue;
+    public ProtagEnvironmentType(ProtagEnvironment environmentValue) {
+        this.environmentValue = environmentValue;
+    }
+
+    @Override
+    public ProtagEnvironment getValue() {
+        return environmentValue;
+    }
 }
