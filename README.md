@@ -33,37 +33,93 @@ Now instead of using an actual tree, imagine that you could do this on JSON. ***
   - Example properties: `foo: a b c baz: d e f`. Properties are used to utilize automata grammar for a given section, like `if: clause then: something else: other`
   - Example record: `{a = b, c = d, a = f}`. Simple key-value storage. Permits the same key to be defined multiple times; tree grammar may define how to deal with the situation
   - Example object: `@javax.vecmath.Vector3d` defines a path to the java object, and we may replace nodes with java objects as well like below
-  - Example replacement: `[x, y, z] -> @javax.vecmath.Vector3d.new[x, y, z]` defines a rule to replace a tree pattern matching `[x, y, z]` with an instance of a java object
+  - Example replacement: `[x, y, z] -> @javax.vecmath.Vector3d(args: x y z)` defines a rule to replace a tree pattern matching `[x, y, z]` with an instance of a java object
   - Objects are not a first-class defined datatype in ProTag, but we may utilize them from Java. Plus, I needed something for the 'o' in the acronym
 
 ## Cool, show me an example!
+
+### Hello world 
+```
+import: 
+  !protag/debug.pt
+in: 
+  print( "Hello World" )
+```
+
+The structure of this file is as follows: 
+```
+  Properties[
+    Section("import", 
+      FilePath[ "protag", debug.pt" ]
+    ), 
+    Section("in", 
+      ProtagPath[print, "Hello World"]
+    )
+  ]
+```
+When evaluated, we import the `debug` plugin which defines a rule that matches `print` 
+followed by other items in a path. The subsequent items in the path are printed, and the `ProtagPath` node is removed from the tree
+
+Based on these replacement rules, there are multiple ways to say hello world
+```
+import: 
+  !protag/debug.pt
+section: 
+  print"Hello ""World"       # ProtagPath[ print, "Hello ", "World" ]
+  print["Hello ", "World"]   # ProtagPath[ print, ["Hello ", "World"]]
+  (print: "Hello World")     # Properties[Section(print, "Hello World")] 
+```
+The first two follow the same replacement rules, and are essentially equivalent. 
+
+The third opens the `print` environment which was imported. Whenever the name of a section resolves to 
+an environment, a list of environments, or a map of environments, we use the replacement rules the 
+environment defines. 
+
+Note that this may just be parsed as a structured file, or we can evaluate it. Evaluation only requires one
+plugin, the `ProtagImport` plugin, which allows all other functionality to be imported and defined.
+
+### Defining a replacement rule
+
 ```
 # define a replacement rule, and apply it!
 import:
-  !protag/base.pt
+  # imports a plugins that define 
+  # * assigning/reading variables
+  # * writing replacement rules
+  (!protag/base.pt).[vars, rules]   
   boxMesh = !meshes/box.pt
-  vertices = [x, y, z] <-                  # match [x, y, z]
-      [_ <- &number]                       # each element is a number
-      -> @javax.vecmath.Vector3d[x, y, z]  # replace with Vector3d instance
+  # define a replacement rule
+  vertices = [x, y, z] <-                      # match [x, y, z]
+      [_ <- &number]                           # each element is a number
+      -> @javax.vecmath.Vector3d(args: x y z)  # replace with Vector3d instance
 vertices: # use vertices rule
     [0, 3 / 4, 0.33334]   # base number types: integer, quotient, real 
     boxMesh.vertices      # use boxMesh.vertices import
 ```
+We allow replacement rules to be defined in protag itself, and it essentially consists 
+of three parts
+1. matching - will our current node match the one we're looking at?
+2. rewriting - what will our resulting matched node structure look like when rewritten?
+3. labeling - additional information for matching and rewriting. Are resulting nodes terminal,
+   non-terminal, adjunction sites, etc? Are we matching in an unordered or ordered manner in the tree?
 
-At its base, everything in ProTag can be read as data. All other functionality is provided via import, and the 
-java import module must be specified in Java during initialization. 
+Note that in our example, the nodes defining a replacement rule is itself processed by a replacement rule
+that needs to be imported. Since we can't write this replacement rule using replacement rules, it is written in Java.
+User-based Java based replacement rules are supported.
+
+### Functions
 
 Using imports can be useful for providing arbitrary functionality, for example we can define functions using
 ```
 import: 
-  @functional.pt @math.pt
+  !protag/functional.pt !protag/math.pt
   intList = !myValues.pt # defines a series of integers
 in:
       # via functional, defines a function
       # importing functional.pt will mark this file as turing complete!
       negateAll = # match a sequence where first item is a pair vName = vItem
                   # rest of items in the sequence are placed into 'rest' identifier 
-                  fun: vName = vItem rest+  
+                  fun: vName = vItem rest <- +  
                          # bind "neg"vName to negated vItem, then recurse
                          is: ("neg"vName = neg: vItem) (negateAll: rest)
                   fun: vName = vItem
@@ -71,17 +127,89 @@ in:
       
       vertices: (negateAll: intList) 
 ```
+This defines a `negateAll` closure, which runs through a sequence and negates the items, producing a new 
+sequence of the negated items.
 
-## Implications: this is a brand new branch of metaprogramming and an entirely ***new programming paradigm***.
-- Currently, tree adjunction grammars are primarily theoretical and have yet to be implemented as first-class features of a programming language
-- Tree adjunction grammars are also mainly used for NLP to generate a tree from a sentence. Mine uses the principles to take an initial tree to some terminal tree based on the rules
-- I have not found any examples of tree grammars or tree automata being used as the basis for a programming language. However if you know of any, I would love to learn more. Feel free to email me. My AndrewID is ***zkieda***, and I'm an ***alumni cmu edu***.
+### Basic Types
+Every node resolves to a type. Here are examples:
+```
+# properties: a list of sections
+yapPrimitives:   # begin properties
+   123           # int
+   123.456       # real
+   1 & 3/4       # quotient
+   myName        # identifier
+   `regex~flags` # regex
+   "name"        # literal
+protagConstructs:# (another section)
+   name1 = 1     # pair
+   2 = name2     # pair
+   a <- b        # left transition
+   a -> b        # right transition
+   [item1, 0]    # list
+   item1"abc"2`foo`bar    # segment - consists of multiple items concatenated
+   item1"abc".2.`foo`bar  # path - consists of multiple segments
+   {myName1 = name1, myName2 = name2} # map
+   # properties - to contain properties within properties use ( .. )
+   ( hello: val1 
+     world: val2 )
+   # properties may end with ';' for pair-like nodes
+   a = hello: val1 val2;
+   a -> hello: val1 val2;
+combineConstructs:
+   name1 = name2 = 1  # equivalent to (name1 = (name2 = 1))
+   (l, r) = (1, 2)
+   {a = b, c = d} = (section: 1 2 section: 3 4)
+       # pair( map( pair(a, b), pair(c, d) ), properties((section, 1 2), (section, 3 4)) )
+```
+
+For disambiguation, the following constructs are only permitted directly in segments
+* Natural  `"hello"123`
+* Identifier `"hello"world`
+* Regex ``123`[0-9]+`world ``
+* Literal `"hello""world"`
+* List `"hello"["world", "foo"]`
+* Map `"hello"{"foo" = plugin1, "baz" = plugin2}`
+* Precedence `"hello"(1 & 3/4)(section: val)(a -> b)`
+
+Note that non-primitive constructs allow us to place arbitrary data in a segment, but may need to be wrapped
+in parentheses `( ... )` for precedence.
+
+### An airbag with a gun
+> *The airbag is here for your safety. The gun is here to shoot yourself in the foot.*
+
+The replacement rules allow you to know that a given section of code is turing complete or not based on the rule
+classification, and allows you to know the complexity of the automata to perform this operation. 
+
+As a result, we can also know what different expressions will resolve to in evaluation, because we know it will terminate.
+Knowing this during evaluation time provides many great guarantees in safety. 
+
+However, evaluation is highly context-sensitive, as the same data can evaluate to different things
+based on the replacement rules in scope. This may make code difficult to grok
+
+```
+import: !protag/scope.pt
+in: print["Hello ", "World"] # resolves to ["printHello ", "printWorld"]
+```
+
+## Implications: a more useful abstract rewriting system and a new programming paradigm
+- There are some higher-order logic systems that use rewrite systems to prove properties on higher-order logic.  
+  Maude is a good example of this. 
+- However, these systems more towards formal verification and analyzing other systems. 
+- ProTag is just about replacing nodes of its own files in a deterministic manner that can be verfied
+  that its own turing completeness is curtailed
+- May be read as a properties file, or as a system that may rewrite itself with termination.  
 
 ## Practical Implications
 - This is a really useful tool to define advanced properties files for your java program and know it isn't turing complete
 - This is also very useful for playing around with data, functionality, and even some scripting without having to restart your java program
   - Use case example: sync a visualization to a piece of music. You may define sections, filters, and data to define how a visualization will occur through time. Updating individual nodes will restart the visualization and music to that particular time for rapid testing and modifications
+- Running replacement rules on nodes may be parallelized and distributed, allowing for replacements on distributed unstructured data. For example, operations on Hadoop that we know will terminate. 
  
 ## Future improvements: JTag
 Convert a JSON file to a valid subset of the ProTag abstract syntax tree, so JSON may be processed and self-generating in the same manner without turing completeness, and without using my bespoke DSL.
+
+## Future improvements: Security
+We'll probably want to have a security system in place so ProTag can only access designated Java files, 
+or access no java files at all
   
