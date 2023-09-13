@@ -175,6 +175,45 @@ For disambiguation, the following constructs are only permitted directly in segm
 Note that non-primitive constructs allow us to place arbitrary data in a segment, but may need to be wrapped
 in parentheses `( ... )` for precedence.
 
+### Another example: map rewriting
+```
+# protag/maps.pt
+import: 
+  !protag/rules.pt
+  !protag/export.pt
+in: 
+  to-unique = { 
+    before <- *,
+    key = value1,
+    mid <- *,
+    key = value2,
+    after <- * 
+  } -> { before, mid, key = value2, after } <- result: post-term type: &uniquemap;
+export: 
+  to-unique
+```
+* This rule matches an existing map that might have duplicate entries. 
+* Then, it finds instances where the keys are the same. 
+* Then, it rewrites the existing map node such that `value2` is used over `value1` while the rest of the structure is the same.
+* Finally, after no more rules can be applied, the node is replaced and cast to `&uniquemap`, which is essentially a java `HashMap`
+  which throws if a duplicate entry is added
+
+#### Usage
+```
+import: !protag/maps.pt
+to-unique: 
+  { a = 1, 
+    b = 2, 
+    a = 3, 
+    c = 4, 
+    c = 5 }
+  # resolves to {b = 2, a = 3, c = 5}
+```
+
+This opens the door to multiple ways of merging duplicate entries on map types. For example, we could
+define a rule that accepts a rule and a map, then uses the rule to rewrite `[key, val1, val2]` into 
+some new `val3`, then modifies the tree to merge the to the new value.
+
 ### An airbag with a gun
 > *The airbag is here for your safety. The gun is here to shoot yourself in the foot.*
 
