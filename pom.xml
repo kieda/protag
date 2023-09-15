@@ -103,6 +103,8 @@
     </dependency>
   </dependencies>
   <build>
+    <finalName>${project.artifactId}-${project.version}</finalName>
+    <sourceDirectory>src</sourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -183,4 +185,11 @@
 
     </plugins>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>github.repo</id>
+      <name>Github Repo</name>
+      <url>file://${project.basedir}/../maven-repo</url>
+    </repository>
+  </distributionManagement>
 </project>
