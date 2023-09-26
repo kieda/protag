@@ -1,24 +1,21 @@
 import:
     !protag/[export, rules, types].pt
+    !protag/lib.pt
 pass-java-args:
     # this allows us to pass args to a call to a single static java method
     # in the form @com.user.MyClass.method(args: ...)
     pass-java =
-        (@X :> ^java-path)((args: Y <- *) <- -actual)
-        -> import: @io.hostilerobot.protag.stdlib.PassJavaArgs
-           X: Y
-        ;
+        (X :> ^java-path)((args: Y <- *) <- -actual)
+        -> @io.hostilerobot.protag.stdlib.PassJavaArgs: X Y;
 pass-protag-args:
     pass-protag =
-        (!X :> ^protag-path) ((args: Y <- *) <- -actual)
-        -> import: @io.hostilerobot.protag.stdlib.PassProtagArgs
-           X: Y
-        ;
+        (X :> ^protag-path) ((args: Y <- *) <- -actual)
+        -> @io.hostilerobot.protag.stdlib.PassProtagArgs: X Y;
 accept-protag-args:
     /* # Format
      * {
-     *     match-rule = result <- (-default = ...)
-     * } <- (-default = ...)
+     *     match-rule = result <: (-default = ...)
+     * } <: (-default = ...)
      *
      * we may define a default value for a given rule, and we may also define a default value if there are no rules that match
      */

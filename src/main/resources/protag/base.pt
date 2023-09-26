@@ -4,7 +4,7 @@ args:
     /* # Format
      * CONTAINER-NAME = {
      *     match-rule = result
-     * } <- (-default = ...)
+     * } <: (-default = ...)
      */
     ^default = ["scope", "rules", "debug", "vars"]
     result = {
@@ -14,6 +14,6 @@ args:
         "-debug" = "debug",
         "-vars" = "vars",
         "-args" = "args"
-    } <- {-default = ^default}
+    } <: {-default = ^default}
 export:
     !"protag/"result".pt"
