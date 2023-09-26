@@ -1,0 +1,4 @@
+import:
+    !protag/export.pt
+export:
+    @io.hostilerobot.protag.stdlib.Scope

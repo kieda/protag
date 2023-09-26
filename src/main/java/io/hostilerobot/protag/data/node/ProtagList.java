@@ -1,5 +1,7 @@
 package io.hostilerobot.protag.data.node;
 
-public class ProtagList extends ProtagNode{
+import java.util.List;
 
+public class ProtagList extends ProtagNode{
+    private List<ProtagNode> children;
 }

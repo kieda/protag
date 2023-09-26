@@ -177,7 +177,7 @@ in parentheses `( ... )` for precedence.
 
 ### Another example: map rewriting
 ```
-# protag/maps.pt
+# user/mymap.pt
 import: 
   !protag/rules.pt
   !protag/export.pt
@@ -198,9 +198,36 @@ export:
 * Finally, after no more rules can be applied, the node is replaced and cast to `&uniquemap`, which is essentially a java `HashMap`
   which throws if a duplicate entry is added
 
+
+### Set-based type system
+Typing is based on _sets_. We check to see if an item belongs in a set, and we 
+have basic constructs for non-turing complete set generation.
+
+For example, a regex is really just a set of strings that we can test for inclusion with a regular automaton.
+Or, `^natural` is really just a set defined by all the integers `>=0`, and 
+`^integer` is just a superset of these numbers. `^number` defines a set that's the union of 
+`^integer`, `^quotient`, `^real`, etc.
+
+We write `x <: Y` to match when an item `x` is in the set `Y`. For example, 
+`6 <: ^natural`, ``aaabc <: `a+bc` ``. We may union and intersect sets 
+using `|` and `&` operations. 
+
+
+We write `a (= B` to represent 
+`a` is a subset of `B`. For example `a (= ^integer` can match when `a` is `^natural`. Similarly, 
+we write `a =) B` to represent `a` is a superset of `B`. 
+
+However, this can be more powerful than For many use cases, this is analogous
+to `a extends B` where `B` represents a class. 
+
+What is a class anyway? Let's start with objects. Objects are essentially a strict map 
+from a string identifier to a value or method. The values are typed, and all the possible 
+representation of its values can be represented as a set.
+
+
 #### Usage
 ```
-import: !protag/maps.pt
+import: !user/mymap.pt
 to-unique: 
   { a = 1, 
     b = 2, 

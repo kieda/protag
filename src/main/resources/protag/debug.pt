@@ -1,0 +1,21 @@
+import:
+    !protag/[export, vars, args, types].pt
+in:
+    /* # Usage:
+     * - print"ABC"
+     * - print[hello, world]
+     * - print(foo)
+     * ## Mechanics:
+     * find print, where print is the actual node before substitutions
+     * then match any number of nodes `X` following the print in the same segment
+     *
+     * the pattern is in the set of possible segments.
+     * the matched rule is evaluated using a java static function which we pass args to
+     * then the result is tagged for removal from the tree.
+     * the resulting type of the RHS is in the set ^void
+     */
+    print = (print <- -actual)(X <- *) :> ^segment
+        -> @io.hostilerobot.protag.stdlib.Debug.debug(args: X) <- -removal
+            :> ^void
+export:
+    print

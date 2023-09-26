@@ -1,0 +1,19 @@
+import:
+    !protag/[export, args, scope, vars].pt
+args:
+    /* # Format
+     * CONTAINER-NAME = {
+     *     match-rule = result
+     * } <- (-default = ...)
+     */
+    ^default = ["scope", "rules", "debug", "vars"]
+    result = {
+        "-export" = "export",
+        "-scope" = "scope",
+        "-rules" = "rules",
+        "-debug" = "debug",
+        "-vars" = "vars",
+        "-args" = "args"
+    } <- {-default = ^default}
+export:
+    !"protag/"result".pt"
